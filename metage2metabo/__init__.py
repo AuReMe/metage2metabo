@@ -1,0 +1,1 @@
+from metage2metabo.m2m_workflow import run_workflow
