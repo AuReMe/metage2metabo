@@ -28,7 +28,7 @@ setup(
     'Automatic reconstruction of draft metabolic networks with Pathway Tools and graph-based metabolic analysis',
     long_description=
     'metage2metabo is a Python3 workflow to perform graph-based metabolic analysis starting from annotated genomes. It uses Pathway Tools in a automatic and parallel way to reconstruct metabolic networks for a large number of genomes. The obtained metabolic networks are then analyzed individually and collectively in order to get the added value of cooperation in microbiota over individual metabolism, and to identify and screen interesting organisms among all. \
-More information on usage and troubleshooting on Github: https://github.com/aureme/metage2metabo'                                                                                                 ,
+More information on usage and troubleshooting on Github: https://github.com/aureme/metage2metabo',
     author='AuReMe',
     author_email='gem-aureme@inria.fr',
     packages=['metage2metabo'],
@@ -38,6 +38,6 @@ More information on usage and troubleshooting on Github: https://github.com/aure
         'console_scripts': [
             'm2m_workflow = metage2metabo.__main__:main_workflow',
         ]
-    }#,
-    #install_requires=['padmet','miscoto','menetools','mpwt']
-    )
+    },
+    install_requires=['miscoto', 'menetools', 'mpwt']  #'padmet',
+)
