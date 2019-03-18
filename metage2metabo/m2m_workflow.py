@@ -30,6 +30,7 @@ from menetools import run_menescope
 from miscoto import run_scopes, run_mincom, run_instance
 from padmet_utils.scripts.connection.pgdb_to_padmet import from_pgdb_to_padmet
 from padmet_utils.scripts.connection.sbmlGenerator import padmet_to_sbml
+from multiprocessing import Pool
 
 logger = logging.getLogger(__name__)
 logging.getLogger("menetools").setLevel(logging.CRITICAL)
@@ -98,7 +99,7 @@ def run_workflow():
         sys.exit(1)
 
     pgdb_dir = genomes_to_pgdb(inp_dir, out_dir, nb_cpu, clean)
-    sbml_dir = pgdb_to_sbml(pgdb_dir, out_dir)
+    sbml_dir = pgdb_to_sbml(pgdb_dir, out_dir, nb_cpu)
 
     scope_json = indiv_scope_run(sbml_dir, seeds, out_dir)
     uniontargets = analyze_indiv_scope(scope_json)
@@ -161,7 +162,26 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
 
     return (pgdb_dir)
 
-def pgdb_to_sbml(pgdb_dir, output_dir):
+def run_pgdb_to_sbml(species_multiprocess_data):
+    """Function used in multiprocess to turn PGDBs into SBML2.
+
+    Args:
+        species_multiprocess_data (list): [pathname to species pgdb dir, pathname to species sbml file]
+
+    Returns:
+        sbml_check (bool): Check if sbml file exists
+    """
+    species_pgdb_dir = species_multiprocess_data[0]
+    species_sbml_file = species_multiprocess_data[1]
+    padmet = from_pgdb_to_padmet(species_pgdb_dir, 'metacyc', '22.5', False, True, None, None, None)
+
+    padmet_to_sbml(padmet, species_sbml_file, sbml_lvl=2, verbose=False)
+
+    sbml_check = utils.is_valid_path(species_sbml_file)
+
+    return sbml_check
+
+def pgdb_to_sbml(pgdb_dir, output_dir, cpu):
     """Turn Pathway Tools PGDBs into SBML2 files using Padmet
     
     Args:
@@ -176,11 +196,24 @@ def pgdb_to_sbml(pgdb_dir, output_dir):
         logger.info(pusage)
         sys.exit(1)
 
-    for species in os.listdir(pgdb_dir):
-        padmet = from_pgdb_to_padmet(pgdb_dir + '/' + species, 'metacyc', '22.5', None, True, None, None, None)
+    pgdb_to_sbml_pool = Pool(processes=cpu)
 
-        padmet_to_sbml(padmet, sbml_dir + '/' + species + '.sbml', sbml_lvl=2, verbose=True)
-    return sbml_dir
+    multiprocess_data = []
+    for species in os.listdir(pgdb_dir):
+        multiprocess_data.append([pgdb_dir + '/' + species, sbml_dir + '/' + species + '.sbml'])
+
+    sbml_checks = pgdb_to_sbml_pool.map(run_pgdb_to_sbml, multiprocess_data)
+
+    if all(sbml_checks):
+        pgdb_to_sbml_pool.close()
+        pgdb_to_sbml_pool.join()
+
+        return sbml_dir
+
+    else:
+        logger.critical("Error during padmet/sbml creation.")
+        logger.info(pusage)
+        sys.exit(1)
 
 def indiv_scope_run(sbml_dir, seeds, output_dir):
     """Run Menetools and analyse individual metabolic capabilities
