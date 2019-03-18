@@ -148,7 +148,7 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu):
     #                     patho_log=False,
     #                     verbose=True)
     # except:
-    #     print("Oops, something went wrong running Pathway Tools")
+    #     logger.critical("Oops, something went wrong running Pathway Tools")
 
     return (pgdb_dir)
 
@@ -197,7 +197,7 @@ def indiv_scope_run(sbml_dir, seeds, output_dir):
         all_scopes[bname] = run_menescope(
             draft_sbml=os.path.join(sbml_dir, f), seeds_sbml=seeds)
         # except:
-        #     print("Oops, something went wrong running Menetools")
+        #     logger.critical("Oops, something went wrong running Menetools")
 
     with open(menetools_dir + "/indiv_scopes.json", 'w') as dumpfile:
         json.dump(all_scopes, dumpfile)
