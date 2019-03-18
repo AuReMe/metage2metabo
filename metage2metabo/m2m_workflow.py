@@ -21,10 +21,13 @@ import argparse
 import time
 from metage2metabo import utils, padmet2sbml
 import os, os.path
-import mpwt
-from menetools import run_menescope
+import tempfile
 import json
 import logging
+import mpwt
+from shutil import copyfile
+from menetools import run_menescope
+from miscoto import run_scopes, run_mincom, run_instance
 
 logger = logging.getLogger(__name__)
 logging.getLogger("menetools").setLevel(logging.CRITICAL)
@@ -68,11 +71,18 @@ def run_workflow():
                         "--seeds",
                         help="seeds (growth medium) for metabolic analysis",
                         required=True)
+    parser.add_argument("-m",
+                        "--modelhost",
+                        help="host metabolic model for community analysis",
+                        required=False,
+                        default=None)
 
     args = parser.parse_args()
     inp_dir = args.genomes
     out_dir = args.output
     seeds = args.seeds
+    host = args.modelhost
+
     try:
         nb_cpu = int(args.cpu)
     except:
@@ -80,11 +90,22 @@ def run_workflow():
         logger.info(pusage)
         sys.exit(1)
 
-    plop = indiv_scope_run(
-        "/Users/cfrioux/wd/scripts/metage2metabo/toy_res/sbml",
-        "/Users/cfrioux/wd/ecosystems/bft_and_co/Seafile/sync_stage_enora/data/alga/seeds_modified_for_ions.xml",
-        "/Users/cfrioux/wd/scripts/metage2metabo/toy_res/")
-    analyze_indiv_scope(plop)
+    temp_res_dir = "/Users/cfrioux/wd/scripts/metage2metabo/toy_res/"
+    temp_seeds = "/Users/cfrioux/wd/ecosystems/bft_and_co/Seafile/sync_stage_enora/data/alga/seeds_modified_for_ions.xml"
+    temp_sbml = "/Users/cfrioux/wd/scripts/metage2metabo/toy_res/sbml"
+
+    plop = indiv_scope_run(temp_sbml, temp_seeds, temp_res_dir)
+    uniontargets = analyze_indiv_scope(plop)
+    instance_com = instance_community(temp_sbml, temp_seeds, temp_res_dir)
+    microbiotascope = comm_scope_run(instance_com,
+                          temp_res_dir)
+    newtargets = set(microbiotascope) - uniontargets
+    print(newtargets, str(len(newtargets)))
+    instance_w_targets = add_targets_to_instance(
+        instance_com, temp_res_dir,
+        newtargets)
+    all_results = mincom(instance_w_targets,temp_res_dir)
+    print(all_results)
     # print('Hello world, I do nothing more so far ¯\_(ツ)_/¯')
     # genomes_to_pgdb(inp_dir, out_dir, nb_cpu)
 
@@ -204,8 +225,102 @@ def analyze_indiv_scope(jsonfile):
     len_scope = [len(d[elem]) for elem in d]
     logger.info("max metabolites in scope " + str(max(len_scope)))
     logger.info("min metabolites in scope " + str(min(len_scope)))
-    return
 
+    return union_scope
+
+def instance_community(sbml_dir, seeds, output_dir, host_mn=None):
+    """create ASP instance for community analysis
+    
+    Args:
+        sbml_dir (str): directory of symbionts SBML files
+        seeds (str): seeds SBML file
+        output_dir (str): directory for results
+
+    Returns:
+        str: instance filepath
+    """
+    miscoto_dir = output_dir + "/community_analysis"
+    if not utils.is_valid_dir(miscoto_dir):
+        logger.critical("Impossible to access/create output directory")
+        logger.info(pusage)
+        sys.exit(1)
+
+    # create tempfile
+    fd, outputfile = tempfile.mkstemp(suffix='.lp', prefix='miscoto_', dir=miscoto_dir)
+
+    instance_filepath = run_instance(
+        bacteria_dir=sbml_dir,
+        seeds_file=seeds,
+        host_file=host_mn,
+        targets_file=None,
+        output=outputfile)
+
+    logger.info("Created instance in " + instance_filepath)
+
+    return instance_filepath
+
+
+def comm_scope_run(instance, output_dir):
+    """Run Miscoto_scope and analyse individual metabolic capabilities
+    
+    Args:
+        sbml_dir (str): directory of SBML files
+        seeds (str): seeds SBML file
+        output_dir (str): directory for results
+    
+    Returns:
+        lst: microbiota scope
+    """
+    miscoto_dir = output_dir + "/community_analysis"
+    if not utils.is_valid_dir(miscoto_dir):
+        logger.critical("Impossible to access/create output directory")
+        logger.info(pusage)
+        sys.exit(1)
+
+    microbiota_scope = run_scopes(instance)
+    return microbiota_scope['com_scope']
+
+def add_targets_to_instance(instancefile, output_dir, target_set):
+    """Add targets to the ASP community instance file
+    
+    Args:
+        instancefile (str): instance filepath
+        target_set (set): targets to be added
+    
+    Returns:
+        str: new instance filepath
+    """
+    new_instance_file = output_dir + utils.get_basename(instancefile) + 'tgts.lp'
+    copyfile(instancefile, new_instance_file)
+
+    with open(new_instance_file, 'a') as f:
+        for elem in target_set:
+            f.write('target("' + elem + '").')
+
+    return new_instance_file
+
+def mincom(instancefile, output_dir):
+    """Run minimal community selection and analysis
+    
+    Args:
+        instancefile (str): filepath to instance file
+        output_dir (str): directory with results
+    
+    Returns:
+        [type]: [description]
+    """
+    miscoto_dir = output_dir + "/community_analysis"
+    if not utils.is_valid_dir(miscoto_dir):
+        logger.critical("Impossible to access/create output directory")
+        logger.info(pusage)
+        sys.exit(1)
+
+    results_dic = run_mincom(option="soup",
+                            lp_instance_file=instancefile,
+                            optsol=True,
+                            union=True,
+                            intersection=True)
+    return results_dic
 
 if __name__ == "__main__":
     run_workflow()
