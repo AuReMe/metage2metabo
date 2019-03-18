@@ -287,7 +287,7 @@ def add_targets_to_instance(instancefile, output_dir, target_set):
     Returns:
         str: new instance filepath
     """
-    new_instance_file = output_dir + utils.get_basename(instancefile) + 'tgts.lp'
+    new_instance_file = output_dir + "/community_analysis" + utils.get_basename(instancefile) + '__tgts.lp'
     copyfile(instancefile, new_instance_file)
 
     with open(new_instance_file, 'a') as f:
