@@ -90,21 +90,18 @@ def run_workflow():
         logger.info(pusage)
         sys.exit(1)
 
-    temp_res_dir = "/Users/cfrioux/wd/scripts/metage2metabo/toy_res/"
-    temp_seeds = "/Users/cfrioux/wd/ecosystems/bft_and_co/Seafile/sync_stage_enora/data/alga/seeds_modified_for_ions.xml"
-    temp_sbml = "/Users/cfrioux/wd/scripts/metage2metabo/toy_res/sbml"
+    temp_sbml = out_dir + "/sbml"
 
-    plop = indiv_scope_run(temp_sbml, temp_seeds, temp_res_dir)
-    uniontargets = analyze_indiv_scope(plop)
-    instance_com = instance_community(temp_sbml, temp_seeds, temp_res_dir)
-    microbiotascope = comm_scope_run(instance_com,
-                          temp_res_dir)
+    scope_json = indiv_scope_run(temp_sbml, seeds, out_dir)
+    uniontargets = analyze_indiv_scope(scope_json)
+    instance_com = instance_community(temp_sbml, seeds, out_dir)
+    microbiotascope = comm_scope_run(instance_com, out_dir)
     newtargets = set(microbiotascope) - uniontargets
     print(newtargets, str(len(newtargets)))
     instance_w_targets = add_targets_to_instance(
-        instance_com, temp_res_dir,
+        instance_com, out_dir,
         newtargets)
-    all_results = mincom(instance_w_targets,temp_res_dir)
+    all_results = mincom(instance_w_targets,out_dir)
     print(all_results)
     # print('Hello world, I do nothing more so far ¯\_(ツ)_/¯')
     # genomes_to_pgdb(inp_dir, out_dir, nb_cpu)
@@ -307,7 +304,7 @@ def mincom(instancefile, output_dir):
         output_dir (str): directory with results
     
     Returns:
-        [type]: [description]
+        dict: results of miscoto_mincom analysis
     """
     miscoto_dir = output_dir + "/community_analysis"
     if not utils.is_valid_dir(miscoto_dir):
