@@ -28,6 +28,8 @@ import mpwt
 from shutil import copyfile
 from menetools import run_menescope
 from miscoto import run_scopes, run_mincom, run_instance
+from padmet_utils.scripts.connection.pgdb_to_padmet import from_pgdb_to_padmet
+from padmet_utils.scripts.connection.sbmlGenerator import padmet_to_sbml
 
 logger = logging.getLogger(__name__)
 logging.getLogger("menetools").setLevel(logging.CRITICAL)
@@ -76,12 +78,17 @@ def run_workflow():
                         help="host metabolic model for community analysis",
                         required=False,
                         default=None)
+    parser.add_argument("--clean",
+                        help="clean PGDBs if already present",
+                        required=False,
+                        default=None)
 
     args = parser.parse_args()
     inp_dir = args.genomes
     out_dir = args.output
     seeds = args.seeds
     host = args.modelhost
+    clean = args.clean
 
     try:
         nb_cpu = int(args.cpu)
@@ -90,11 +97,12 @@ def run_workflow():
         logger.info(pusage)
         sys.exit(1)
 
-    temp_sbml = out_dir + "/sbml"
+    pgdb_dir = genomes_to_pgdb(inp_dir, out_dir, nb_cpu, clean)
+    sbml_dir = pgdb_to_sbml(pgdb_dir, out_dir)
 
-    scope_json = indiv_scope_run(temp_sbml, seeds, out_dir)
+    scope_json = indiv_scope_run(sbml_dir, seeds, out_dir)
     uniontargets = analyze_indiv_scope(scope_json)
-    instance_com = instance_community(temp_sbml, seeds, out_dir)
+    instance_com = instance_community(sbml_dir, seeds, out_dir)
     microbiotascope = comm_scope_run(instance_com, out_dir)
     newtargets = set(microbiotascope) - uniontargets
     print(newtargets, str(len(newtargets)))
@@ -104,9 +112,9 @@ def run_workflow():
     all_results = mincom(instance_w_targets,out_dir)
     print(all_results)
     # print('Hello world, I do nothing more so far ¯\_(ツ)_/¯')
-    # genomes_to_pgdb(inp_dir, out_dir, nb_cpu)
+    
 
-def genomes_to_pgdb(genomes_dir, output_dir, cpu):
+def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
     """Run Pathway Tools on each genome of the repository
     
     Args:
@@ -134,18 +142,22 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu):
         sys.exit(1)
 
     #TODO if PGDBs are already here: prepare clean option in main and erase them if this option is selected.
+    genomes_pgdbs = [genome_dir.lower() + 'cyc' for genome_dir in genomes_dir]
+    already_here_pgdbs = mpwt.list_pgdb()
+    if clean and set(genomes_pgdbs).issubset(set(already_here_pgdbs)):
+        mpwt.cleaning(cpu)
 
-    # try:
-    # mpwt.multiprocess_pwt(genomes_dir, pgdb_dir,
-    #                     patho_inference=True,
-    #                     dat_creation=True,
-    #                     dat_extraction=True,
-    #                     size_reduction=False,
-    #                     number_cpu=cpu,
-    #                     patho_log=False,
-    #                     verbose=True)
-    # except:
-    #     logger.critical("Oops, something went wrong running Pathway Tools")
+    try:
+        mpwt.multiprocess_pwt(genomes_dir, pgdb_dir,
+                            patho_inference=True,
+                            dat_creation=True,
+                            dat_extraction=True,
+                            size_reduction=False,
+                            number_cpu=cpu,
+                            patho_log=False,
+                            verbose=True)
+    except:
+        logger.critical("Oops, something went wrong running Pathway Tools")
 
     return (pgdb_dir)
 
@@ -164,6 +176,10 @@ def pgdb_to_sbml(pgdb_dir, output_dir):
         logger.info(pusage)
         sys.exit(1)
 
+    for species in os.listdir(pgdb_dir):
+        padmet = from_pgdb_to_padmet(pgdb_dir + '/' + species, 'metacyc', '22.5', None, True, None, None, None)
+
+        padmet_to_sbml(padmet, sbml_dir + '/' + species + '.sbml', sbml_lvl=2, verbose=True)
     return sbml_dir
 
 def indiv_scope_run(sbml_dir, seeds, output_dir):
