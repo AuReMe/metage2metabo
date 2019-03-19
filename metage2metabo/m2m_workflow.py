@@ -183,7 +183,7 @@ def run_pgdb_to_sbml(species_multiprocess_data):
     """
     species_pgdb_dir = species_multiprocess_data[0]
     species_sbml_file = species_multiprocess_data[1]
-    padmet = from_pgdb_to_padmet(species_pgdb_dir, 'metacyc', '22.5', False, True, None, None, None)
+    padmet = from_pgdb_to_padmet(species_pgdb_dir, 'metacyc', '22.5', arg_verbose=False, arg_with_genes=True, arg_source=None, enhanced_db=None, padmetRef_file=None)
 
     padmet_to_sbml(padmet, species_sbml_file, sbml_lvl=2, verbose=False)
 
