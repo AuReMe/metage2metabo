@@ -31,6 +31,7 @@ from miscoto import run_scopes, run_mincom, run_instance
 from multiprocessing import Pool
 from padmet_utils.scripts.connection.pgdb_to_padmet import from_pgdb_to_padmet
 from padmet_utils.scripts.connection.sbmlGenerator import padmet_to_sbml
+from padmet_utils.scripts.connection.sbml_to_padmet import from_sbml_to_padmet
 from shutil import copyfile
 
 logger = logging.getLogger(__name__)
@@ -224,6 +225,44 @@ def pgdb_to_sbml(pgdb_dir, output_dir, cpu):
         logger.critical("Error during padmet/sbml creation.")
         logger.info(pusage)
         sys.exit(1)
+
+def sbml3_to_sbml2(sbml_file, sbml_output_file, db, version):
+    """Turn sbml3 to sbml2.
+
+    Args:
+        sbml_file (string): pathname to species sbml file
+        sbml_output_file (string): pathname to output sbml file
+        db (string): name of the database ('metacyc')
+        version (string): version of tthe database
+
+    Returns:
+        sbml_check (bool): Check if sbml file exists
+    """
+    padmet = from_sbml_to_padmet(sbml=sbml_file, db=db, version=version, padmetSpec_file=None, source_tool=None, source_category=None, source_id=None, padmetRef_file=None, mapping=None, verbose=None)
+    padmet_to_sbml(padmet, sbml_output_file, sbml_lvl=2, verbose=False)
+
+    sbml_check = utils.is_valid_path(sbml_output_file)
+
+    return sbml_check
+
+def sbml2_to_sbml3(sbml_file, sbml_output_file, db, version):
+    """Turn sbml2 to sbml3.
+
+    Args:
+        sbml_file (string): pathname to species sbml file
+        sbml_output_file (string): pathname to output sbml file
+        db (string): name of the database ('metacyc')
+        version (string): version of tthe database
+
+    Returns:
+        sbml_check (bool): Check if sbml file exists
+    """
+    padmet = from_sbml_to_padmet(sbml=sbml_file, db=db, version=version, padmetSpec_file=None, source_tool=None, source_category=None, source_id=None, padmetRef_file=None, mapping=None, verbose=None)
+    padmet_to_sbml(padmet, sbml_output_file, sbml_lvl=3, verbose=False)
+
+    sbml_check = utils.is_valid_path(sbml_output_file)
+
+    return sbml_check
 
 def indiv_scope_run(sbml_dir, seeds, output_dir):
     """Run Menetools and analyse individual metabolic capabilities
