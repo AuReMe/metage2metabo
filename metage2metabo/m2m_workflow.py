@@ -98,22 +98,32 @@ def run_workflow():
         logger.info(pusage)
         sys.exit(1)
 
+    # METABOLIC NETWORK RECONSTRUCTION
+    # Create PGDBs
     pgdb_dir = genomes_to_pgdb(inp_dir, out_dir, nb_cpu, clean)
+    # Create SBMLs from PGDBs
     sbml_dir = pgdb_to_sbml(pgdb_dir, out_dir, nb_cpu)
-
+    # ANALYSIS
+    # Run individual scopes of metabolic networks
     scope_json = indiv_scope_run(sbml_dir, seeds, out_dir)
+    # Analyze the individual scopes results (json file)
     uniontargets = analyze_indiv_scope(scope_json)
+    # Create instance for community analysis
     instance_com = instance_community(sbml_dir, seeds, out_dir)
+    # Run community scope
     microbiotascope = comm_scope_run(instance_com, out_dir)
+    # Community targets = what can be produced only if cooperation occurs between species
     newtargets = set(microbiotascope) - uniontargets
-    print(newtargets, str(len(newtargets)))
+    logger.info(str(len(newtargets)) + "metabolites can only be produced through metabolic cooperation")
+    logger.info(newtargets)
+    # Add these targets to the instance
     instance_w_targets = add_targets_to_instance(
         instance_com, out_dir,
         newtargets)
+    # Compute community selection
     all_results = mincom(instance_w_targets,out_dir)
     print(all_results)
-    # print('Hello world, I do nothing more so far ¯\_(ツ)_/¯')
-    
+
 
 def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
     """Run Pathway Tools on each genome of the repository
@@ -142,7 +152,6 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
         logger.info(pusage)
         sys.exit(1)
 
-    #TODO if PGDBs are already here: prepare clean option in main and erase them if this option is selected.
     genomes_pgdbs = [genome_dir.lower() + 'cyc' for genome_dir in genomes_dir]
     already_here_pgdbs = mpwt.list_pgdb()
     if clean and set(genomes_pgdbs).issubset(set(already_here_pgdbs)):
@@ -158,7 +167,7 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
                             patho_log=False,
                             verbose=True)
     except:
-        logger.critical("Oops, something went wrong running Pathway Tools")
+        logger.critical("Something went wrong running Pathway Tools")
 
     return (pgdb_dir)
 
@@ -166,7 +175,7 @@ def run_pgdb_to_sbml(species_multiprocess_data):
     """Function used in multiprocess to turn PGDBs into SBML2.
 
     Args:
-        species_multiprocess_data (list): [pathname to species pgdb dir, pathname to species sbml file]
+        species_multiprocess_data (list): pathname to species pgdb dir, pathname to species sbml file
 
     Returns:
         sbml_check (bool): Check if sbml file exists
@@ -239,11 +248,11 @@ def indiv_scope_run(sbml_dir, seeds, output_dir):
     all_scopes = {}
     for f in all_files:
         bname = utils.get_basename(f)
-        # try:
-        all_scopes[bname] = run_menescope(
-            draft_sbml=os.path.join(sbml_dir, f), seeds_sbml=seeds)
-        # except:
-        #     logger.critical("Oops, something went wrong running Menetools")
+        try:
+            all_scopes[bname] = run_menescope(
+                draft_sbml=os.path.join(sbml_dir, f), seeds_sbml=seeds)
+        except:
+            logger.critical("Something went wrong running Menetools")
 
     with open(menetools_dir + "/indiv_scopes.json", 'w') as dumpfile:
         json.dump(all_scopes, dumpfile)
