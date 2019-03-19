@@ -18,19 +18,20 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import time
-from metage2metabo import utils, padmet2sbml
-import os, os.path
-import tempfile
 import json
 import logging
 import mpwt
-from shutil import copyfile
+import os, os.path
+import tempfile
+import time
+
 from menetools import run_menescope
+from metage2metabo import utils
 from miscoto import run_scopes, run_mincom, run_instance
+from multiprocessing import Pool
 from padmet_utils.scripts.connection.pgdb_to_padmet import from_pgdb_to_padmet
 from padmet_utils.scripts.connection.sbmlGenerator import padmet_to_sbml
-from multiprocessing import Pool
+from shutil import copyfile
 
 logger = logging.getLogger(__name__)
 logging.getLogger("menetools").setLevel(logging.CRITICAL)
@@ -213,10 +214,10 @@ def pgdb_to_sbml(pgdb_dir, output_dir, cpu):
 
     sbml_checks = pgdb_to_sbml_pool.map(run_pgdb_to_sbml, multiprocess_data)
 
-    if all(sbml_checks):
-        pgdb_to_sbml_pool.close()
-        pgdb_to_sbml_pool.join()
+    pgdb_to_sbml_pool.close()
+    pgdb_to_sbml_pool.join()
 
+    if all(sbml_checks):
         return sbml_dir
 
     else:
