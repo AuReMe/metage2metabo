@@ -48,7 +48,7 @@ Description here TODO
 """
 
 pusage = """
-Usage here TODO
+m2m_workflow -g genomes_folder -o output_folder -s seeds.sbml [-c cpu_number] [--clean]
 """
 
 requires = """
@@ -203,16 +203,26 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
         logger.info(pusage)
         sys.exit(1)
 
-    if not utils.check_ptools():
+    if not utils.check_program("pathway-tools"):
         logger.critical(
             "Pathway Tools is not in the PATH, please fix it before using the program"
         )
         logger.info(pusage)
         sys.exit(1)
 
-    #TODO test whether blast is in the PATH
+    if not utils.check_program("blastp"):
+        logger.critical(
+            "blastp is not in the PATH, please fix it before using the program"
+        )
+        logger.info(pusage)
+        sys.exit(1)
 
-    #TODO test is ncbirc is in home folder
+    if not utils.is_valid_file(os.path.expanduser("~") + "/.ncbirc"):
+        logger.critical(
+            "No ~/.ncbirc file, please fix it before using the program"
+        )
+        logger.info(pusage)
+        sys.exit(1)
 
     #TODO test whether not everything is run again in case some PGDBs already are in PDGB_dir and/or Ptools local
 
