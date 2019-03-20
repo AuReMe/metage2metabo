@@ -24,6 +24,7 @@ import mpwt
 import os, os.path
 import tempfile
 import time
+import sys
 
 from menetools import run_menescope
 from metage2metabo import utils
@@ -31,6 +32,7 @@ from miscoto import run_scopes, run_mincom, run_instance
 from multiprocessing import Pool
 from padmet_utils.scripts.connection.pgdb_to_padmet import from_pgdb_to_padmet
 from padmet_utils.scripts.connection.sbmlGenerator import padmet_to_sbml
+from padmet_utils.scripts.connection.sbml_to_sbml import from_sbml_to_sbml
 from shutil import copyfile
 
 logger = logging.getLogger(__name__)
@@ -40,15 +42,15 @@ logging.getLogger("miscoto").setLevel(logging.CRITICAL)
 ###############################################################################
 #
 message = """
-Description here
+Description here TODO
 """
 
 pusage = """
-Usage here
+Usage here TODO
 """
 
 requires = """
-Requirements here"
+Requirements here TODO
 """
 #
 ###############################################################################
@@ -83,7 +85,7 @@ def run_workflow():
     parser.add_argument("--clean",
                         help="clean PGDBs if already present",
                         required=False,
-                        default=None)
+                        action="store_true")
 
     args = parser.parse_args()
     inp_dir = args.genomes
@@ -101,29 +103,70 @@ def run_workflow():
 
     # METABOLIC NETWORK RECONSTRUCTION
     # Create PGDBs
-    pgdb_dir = genomes_to_pgdb(inp_dir, out_dir, nb_cpu, clean)
+    logger.info("######### Running metabolic network reconstruction with Pathway Tools #########")
+    try:
+        pgdb_dir = genomes_to_pgdb(inp_dir, out_dir, nb_cpu, clean)
+    except:
+        logger.info("Could not run Pathway Tools")
+        sys.exit(1)
     # Create SBMLs from PGDBs
+    logger.info("######### Creating SBML files #########")
     sbml_dir = pgdb_to_sbml(pgdb_dir, out_dir, nb_cpu)
     # ANALYSIS
-    # Run individual scopes of metabolic networks
-    scope_json = indiv_scope_run(sbml_dir, seeds, out_dir)
-    # Analyze the individual scopes results (json file)
-    uniontargets = analyze_indiv_scope(scope_json)
-    # Create instance for community analysis
-    instance_com = instance_community(sbml_dir, seeds, out_dir)
-    # Run community scope
-    microbiotascope = comm_scope_run(instance_com, out_dir)
-    # Community targets = what can be produced only if cooperation occurs between species
-    newtargets = set(microbiotascope) - uniontargets
-    logger.info(str(len(newtargets)) + "metabolites can only be produced through metabolic cooperation")
-    logger.info(newtargets)
-    # Add these targets to the instance
-    instance_w_targets = add_targets_to_instance(
-        instance_com, out_dir,
-        newtargets)
-    # Compute community selection
-    all_results = mincom(instance_w_targets,out_dir)
-    print(all_results)
+    # Run individual scopes of metabolic networks if any
+    if len([
+            name for name in os.listdir(sbml_dir) if os.path.isfile(sbml_dir + '/' + name)
+            and utils.get_extension(sbml_dir + '/' + name).lower() in ["xml", "sbml"]
+    ]) > 1:
+        logger.info("######### Running individual metabolic scopes #########")
+        scope_json = indiv_scope_run(sbml_dir, seeds, out_dir)
+        # Analyze the individual scopes results (json file)
+        uniontargets = analyze_indiv_scope(scope_json)
+        # Create instance for community analysis
+        logger.info(
+            "######### Creating metabolic instance for the whole community #########"
+        )
+        instance_com = instance_community(sbml_dir, seeds, out_dir)
+        # Run community scope
+        logger.info("Running whole-community metabolic scopes")
+        microbiotascope = comm_scope_run(instance_com, out_dir)
+        # Community targets = what can be produced only if cooperation occurs between species
+        newtargets = set(microbiotascope) - uniontargets
+        logger.info(str(len(newtargets)) + " metabolites can only be produced through metabolic cooperation")
+        logger.info(newtargets)
+        logger.info("Setting these " + str(len(newtargets)) + " as targets")
+        # Add these targets to the instance
+        instance_w_targets = add_targets_to_instance(
+            instance_com, out_dir,
+            newtargets)
+        # Compute community selection
+        logger.info("Running minimal community selection")
+        all_results = mincom(instance_w_targets, out_dir)
+        # Give one solution
+        onesol = all_results['one_model']
+        one_sol_bact = []
+        for a in onesol:
+            if a.pred() == 'chosen_bacteria':
+                one_sol_bact.append(a.arg(0).rstrip('"').lstrip('"'))
+        logger.info('######### One minimal community #########')
+        logger.info("# One minimal community enabling to produce the target metabolites given as inputs")
+        logger.info("Minimal number of bacteria in communities = " +
+                    str(len(one_sol_bact)))
+        logger.info("\n".join(one_sol_bact))
+        # Give union of solutions
+        union = all_results['union_bacteria']
+        logger.info('######### Union of minimal communities #########')
+        logger.info("# Bacteria occurring in at least one minimal community enabling to produce the target metabolites given as inputs")
+        logger.info("Union of bacteria in minimal communities = " +
+                    str(len(union)))
+        logger.info("\n".join(union))
+        # Give intersection of solutions
+        intersection = all_results['inter_bacteria']
+        logger.info('######### Union of minimal communities #########')
+        logger.info("# Bacteria occurring in ALL minimal community enabling to produce the target metabolites given as inputs")
+        logger.info("Intersection of bacteria in minimal communities = " +
+                    str(len(intersection)))
+        logger.info("\n".join(intersection))
 
 
 def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
@@ -153,10 +196,22 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
         logger.info(pusage)
         sys.exit(1)
 
-    genomes_pgdbs = [genome_dir.lower() + 'cyc' for genome_dir in genomes_dir]
+    #TODO test whether blast is in the PATH
+
+    #TODO test is ncbirc is in home folder
+
+    #TODO test whether not everything is run again in case some PGDBs already are in PDGB_dir and/or Ptools local
+
+    genomes_pgdbs = [genome_dir.lower() + 'cyc' for genome_dir in os.listdir(genomes_dir)]
     already_here_pgdbs = mpwt.list_pgdb()
     if clean and set(genomes_pgdbs).issubset(set(already_here_pgdbs)):
         mpwt.cleaning(cpu)
+
+    # Check whether PGDBs are already created. If yes and not --clean, pursue without running ptools again
+    pgdb_dirs = [pgdb_dir.lower() + 'cyc' for pgdb_dir in os.listdir(pgdb_dir)]
+    if set(pgdb_dirs) ==set(genomes_pgdbs):
+        logger.warning("PGDBs are already created and will be used. To overrun them, run m2m with --clean option")
+        return pgdb_dir
 
     try:
         mpwt.multiprocess_pwt(genomes_dir, pgdb_dir,
@@ -253,6 +308,7 @@ def indiv_scope_run(sbml_dir, seeds, output_dir):
             all_scopes[bname] = run_menescope(
                 draft_sbml=os.path.join(sbml_dir, f), seeds_sbml=seeds)
         except:
+            #TODO catch OSError and look for ASP binaries  pip install pyasp==1.4.3 --no-cache-dir --force-reinstall
             logger.critical("Something went wrong running Menetools")
 
     with open(menetools_dir + "/indiv_scopes.json", 'w') as dumpfile:
@@ -275,9 +331,10 @@ def analyze_indiv_scope(jsonfile):
         d_set[elem] = set(d[elem])
 
     intersection_scope = set.intersection(*list(d_set.values()))
-    logger.info(str(len(intersection_scope)) + " metabolites in intersection")
+    logger.info(str(len(intersection_scope)) + " metabolites in core reachable by all organisms (intersection)")
 
     union_scope = set.union(*list(d_set.values()))
+    logger.info(str(len(union_scope)) + " metabolites reachable by individual organisms altogether (union)")
     len_scope = [len(d[elem]) for elem in d]
     logger.info("max metabolites in scope " + str(max(len_scope)))
     logger.info("min metabolites in scope " + str(min(len_scope)))
