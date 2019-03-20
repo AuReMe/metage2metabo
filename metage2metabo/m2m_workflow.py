@@ -22,6 +22,7 @@ import json
 import logging
 import mpwt
 import os, os.path
+import pyasp
 import tempfile
 import time
 import sys
@@ -60,7 +61,18 @@ Requirements here TODO
 def run_workflow():
     """description
     """
-    #TODO check correct install of Pyasp by looking for ASP binaries else: pip install pyasp==1.4.3 --no-cache-dir --force-reinstall
+    # Check pyasp binaries.
+    pyasp_bin_path = pyasp.__path__[0] + '/bin/'
+    bin_check = []
+    for asp_bin in ['clasp', 'gringo3', 'gringo4']:
+        bin_check.append(utils.is_valid_path(pyasp_bin_path + asp_bin))
+
+    if not all(bin_check):
+        logger.critical("Error with pyasp installation, retry to install it:")
+        logger.critical("pip install pyasp==1.4.3 --no-cache-dir --force-reinstall")
+        logger.info(pusage)
+        sys.exit(1)
+
     parser = argparse.ArgumentParser(description=message, usage=pusage, epilog=requires)
     parser.add_argument("-g",
                         "--genomes",
