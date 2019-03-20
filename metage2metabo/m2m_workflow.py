@@ -60,6 +60,7 @@ Requirements here TODO
 def run_workflow():
     """description
     """
+    #TODO check correct install of Pyasp by looking for ASP binaries else: pip install pyasp==1.4.3 --no-cache-dir --force-reinstall
     parser = argparse.ArgumentParser(description=message, usage=pusage, epilog=requires)
     parser.add_argument("-g",
                         "--genomes",
@@ -281,7 +282,7 @@ def pgdb_to_sbml(pgdb_dir, output_dir, cpu):
         logger.info(pusage)
         sys.exit(1)
 
-def sbml3_to_sbml2(sbml_file, sbml_output_file, db, version):
+def sbml3_to_sbml2(sbml_file, sbml_output_file, cpu, version):
     """Turn sbml3 to sbml2.
 
     Args:
@@ -293,8 +294,7 @@ def sbml3_to_sbml2(sbml_file, sbml_output_file, db, version):
     Returns:
         sbml_check (bool): Check if sbml file exists
     """
-    padmet = from_sbml_to_padmet(sbml=sbml_file, db=db, version=version, padmetSpec_file=None, source_tool=None, source_category=None, source_id=None, padmetRef_file=None, mapping=None, verbose=None)
-    padmet_to_sbml(padmet, sbml_output_file, sbml_lvl=2, verbose=False)
+    from_sbml_to_sbml(sbml_file, sbml_output_file, version, cpu)
 
     sbml_check = utils.is_valid_path(sbml_output_file)
 
