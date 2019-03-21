@@ -4,7 +4,28 @@ from padmet_utils.scripts.connection.sbml_to_sbml import from_sbml_to_sbml
 from padmet_utils.scripts.connection.sbml_to_padmet import from_sbml_to_padmet
 from multiprocessing import Pool
 from metage2metabo import utils
+from libsbml import SBMLReader
 import os
+import logging
+
+
+logger = logging.getLogger(__name__)
+
+
+def get_sbml_level(sbml_file):
+    """Get SBML Level of a file
+    
+    Args:
+        sbml_file (str): SBML file
+    
+    Returns:
+        int: SBML Level
+    """
+    reader = SBMLReader()
+    document = reader.readSBML(sbml_file)
+
+    return document.getLevel()
+
 
 
 def run_pgdb_to_sbml(species_multiprocess_data):
@@ -27,6 +48,7 @@ def run_pgdb_to_sbml(species_multiprocess_data):
         arg_source=None,
         enhanced_db=None,
         padmetRef_file=None)
+    #TODO: remove the "metacyc" and "22.5" arguments?
 
     padmet_to_sbml(padmet, species_sbml_file, sbml_lvl=2, verbose=False)
 
@@ -69,49 +91,24 @@ def pgdb_to_sbml(pgdb_dir, output_dir, cpu):
         sys.exit(1)
 
 
-def sbml3_to_sbml2(sbml_file, sbml_output_file, cpu, version):
-    """Turn sbml3 to sbml2.
+def sbml_to_sbml(
+        sbml_file,
+        sbml_output_file,
+        level_wanted,
+        cpu=1
+):
+    """Transform a sbml into another level sbml
 
     Args:
         sbml_file (string): pathname to species sbml file
         sbml_output_file (string): pathname to output sbml file
-        db (string): name of the database ('metacyc')
+        level_wanted (int): SBML level of the output SBML
         version (string): version of tthe database
 
     Returns:
         sbml_check (bool): Check if sbml file exists
     """
-    from_sbml_to_sbml(sbml_file, sbml_output_file, version, cpu)
-
-    sbml_check = utils.is_valid_path(sbml_output_file)
-
-    return sbml_check
-
-
-def sbml2_to_sbml3(sbml_file, sbml_output_file, db, version):
-    """Turn sbml2 to sbml3.
-
-    Args:
-        sbml_file (string): pathname to species sbml file
-        sbml_output_file (string): pathname to output sbml file
-        db (string): name of the database ('metacyc')
-        version (string): version of tthe database
-
-    Returns:
-        sbml_check (bool): Check if sbml file exists
-    """
-    padmet = from_sbml_to_padmet(
-        sbml=sbml_file,
-        db=db,
-        version=version,
-        padmetSpec_file=None,
-        source_tool=None,
-        source_category=None,
-        source_id=None,
-        padmetRef_file=None,
-        mapping=None,
-        verbose=None)
-    padmet_to_sbml(padmet, sbml_output_file, sbml_lvl=3, verbose=False)
+    from_sbml_to_sbml(sbml_file, sbml_output_file, level_wanted, cpu)
 
     sbml_check = utils.is_valid_path(sbml_output_file)
 

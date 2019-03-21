@@ -1,10 +1,14 @@
 from metage2metabo.m2m_workflow import run_workflow
+from metage2metabo import sbml_management
 import logging
 import pkg_resources
 import argparse
 import pyasp
 from metage2metabo import utils
 import sys
+import os
+from shutil import copyfile
+
 
 VERSION = pkg_resources.get_distribution("metage2metabo").version
 LICENSE = """Copyright (C) Dyliss
@@ -28,7 +32,6 @@ pyasp_bin_path = pyasp.__path__[0] + '/bin/'
 bin_check = []
 for asp_bin in ['clasp', 'gringo3', 'gringo4']:
     bin_check.append(utils.is_valid_path(pyasp_bin_path + asp_bin))
-
 if not all(bin_check):
     logger.critical("Error with pyasp installation, retry to install it:")
     logger.critical("pip install pyasp==1.4.3 --no-cache-dir --force-reinstall (add --user if you are not in a virtualenv)")
@@ -163,10 +166,21 @@ def main():
     else:
         ch.setLevel(logging.INFO)
 
+    # test writing in out_directory if a subcommand is given else print version and help
+    if args.cmd:
+        if not utils.is_valid_dir(args.out):
+            logger.critical("Impossible to access/create output directory")
+            sys.exit(1)
+    else:
+        logger.info("m2m " + VERSION + "\n" + LICENSE)
+        parser.print_help()
+        sys.exit()
+    # deal with given subcommand
     if args.cmd == "workflow":
         main_workflow(args.genomes, args.out, args.cpu, args.clean, args.seeds, args.modelhost)
     elif args.cmd in ["iscope","cscope","addedvalue","mincom"]:
-        network_dir = check_sbml(args.networksdir)
+        network_dir = check_sbml(args.networksdir, args.out)
+        print(network_dir)
         if args.cmd == "iscope":
             print("¯\_(ツ)_/¯ running iscope")
         elif args.cmd == "cscope":
@@ -176,18 +190,43 @@ def main():
         elif args.cmd == "mincom":
             print("¯\_(ツ)_/¯ running mincom")
     elif args.cmd == "recon":
-            print("¯\_(ツ)_/¯ running recon")
-    else:
-        logger.info("m2m " + VERSION + "\n" + LICENSE)
-        parser.print_help()
-        sys.exit()
+        print("¯\_(ツ)_/¯ running recon")
 
 
 def main_workflow(*allargs):
     run_workflow(*allargs)
 
-def check_sbml(folder):
-    sbml_dir = folder
+
+def check_sbml(folder,outdir):
+    all_files = [
+        f for f in os.listdir(folder)
+        if os.path.isfile(os.path.join(folder, f)) and utils.get_extension(
+            os.path.join(folder, f)).lower() in ["xml", "sbml"]
+    ]
+    sbml_levels = {}
+    make_new_sbmls = False
+    for f in all_files:
+        sbml_levels[f] = sbml_management.get_sbml_level(os.path.join(folder, f))
+        if sbml_levels[f] != 2:
+            make_new_sbmls = True
+    if make_new_sbmls:
+        sbml_dir = outdir + "/new_sbml/"
+        logger.warning(
+            "At least one SBML has not a suitable level for the tools. They will be transformed and created in "
+            + sbml_dir + ". The others will be copied in this directory")
+        if not utils.is_valid_dir(sbml_dir):
+            logger.critical("Impossible to write in output directory")
+            sys.exit(1)
+        for f in all_files:
+            if sbml_levels[f] != 2:
+                #create level 2 SBML in sbml_dir
+                sbml_management.sbml_to_sbml(
+                    os.path.join(folder, f), os.path.join(sbml_dir, f), 2)
+            else:
+                #copy the original SBML in sbml_dir
+                copyfile(os.path.join(folder, f), os.path.join(sbml_dir, f))
+    else:
+        sbml_dir = folder
     return sbml_dir
 
 

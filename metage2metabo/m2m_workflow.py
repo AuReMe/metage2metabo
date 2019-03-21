@@ -25,15 +25,16 @@ import pyasp
 import tempfile
 import time
 import sys
-
 from menetools import run_menescope
 from metage2metabo import utils, sbml_management
 from miscoto import run_scopes, run_mincom, run_instance
 from shutil import copyfile
 
+
 logger = logging.getLogger(__name__)
 logging.getLogger("menetools").setLevel(logging.CRITICAL)
 logging.getLogger("miscoto").setLevel(logging.CRITICAL)
+
 
 def run_workflow(inp_dir,out_dir,nb_cpu,clean,seeds,host_mn):
     """Run the whole m2m workflow
@@ -175,6 +176,7 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
 
     return (pgdb_dir)
 
+
 def indiv_scope_run(sbml_dir, seeds, output_dir):
     """Run Menetools and analyse individual metabolic capabilities
     
@@ -235,6 +237,7 @@ def analyze_indiv_scope(jsonfile):
 
     return union_scope
 
+
 def instance_community(sbml_dir, seeds, output_dir, host_mn=None):
     """create ASP instance for community analysis
     
@@ -265,6 +268,7 @@ def instance_community(sbml_dir, seeds, output_dir, host_mn=None):
 
     return instance_filepath
 
+
 def comm_scope_run(instance, output_dir):
     """Run Miscoto_scope and analyse individual metabolic capabilities
     
@@ -284,6 +288,7 @@ def comm_scope_run(instance, output_dir):
     microbiota_scope = run_scopes(instance)
     return microbiota_scope['com_scope']
 
+
 def add_targets_to_instance(instancefile, output_dir, target_set):
     """Add targets to the ASP community instance file
     
@@ -294,7 +299,7 @@ def add_targets_to_instance(instancefile, output_dir, target_set):
     Returns:
         str: new instance filepath
     """
-    new_instance_file = output_dir + "/community_analysis" + utils.get_basename(instancefile) + '__tgts.lp'
+    new_instance_file = output_dir + "/community_analysis/" + utils.get_basename(instancefile) + '__tgts.lp'
     copyfile(instancefile, new_instance_file)
 
     with open(new_instance_file, 'a') as f:
@@ -302,6 +307,7 @@ def add_targets_to_instance(instancefile, output_dir, target_set):
             f.write('target("' + elem + '").')
 
     return new_instance_file
+
 
 def mincom(instancefile, output_dir, host):
     """Run minimal community selection and analysis
