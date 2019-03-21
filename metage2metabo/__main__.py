@@ -109,6 +109,7 @@ def main():
         "Run metabolic network reconstruction for each annotated genome of the input directory, using Pathway Tools"
     )
     #TODO chose the SBML level for the output 2 or 3, default = 2
+    #TODO create a seed command that creates a SBML file starting from a text file with compounds identifiers
     indivscope_parser = subparsers.add_parser(
         "iscope",
         help="individual scope computation",
