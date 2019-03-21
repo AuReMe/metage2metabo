@@ -42,10 +42,16 @@ logging.getLogger("menetools").setLevel(logging.CRITICAL)
 logging.getLogger("miscoto").setLevel(logging.CRITICAL)
 
 def run_workflow(inp_dir,out_dir,nb_cpu,clean,seeds,host_mn):
-    """description
+    """Run the whole m2m workflow
+    
+    Args:
+        inp_dir (str): genomes directory
+        out_dir (str): results directory
+        nb_cpu (int): cpu number for multi-processing
+        clean (bool): clean PGDB and re-run them
+        seeds (str): seeds file
+        host_mn (str): metabolic network file for host
     """
-
-
     # METABOLIC NETWORK RECONSTRUCTION
     # Create PGDBs
     logger.info("######### Running metabolic network reconstruction with Pathway Tools #########")
