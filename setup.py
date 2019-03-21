@@ -36,7 +36,7 @@ More information on usage and troubleshooting on Github: https://github.com/aure
     #package_data={'metage2metabo': []},
     entry_points={
         'console_scripts': [
-            'm2m_workflow = metage2metabo.__main__:main_workflow',
+            'm2m = metage2metabo.__main__:main',
         ]
     },
     install_requires=['miscoto', 'menetools', 'mpwt', 'padmet', 'padmet-utils'],

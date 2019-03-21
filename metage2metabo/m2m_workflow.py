@@ -41,79 +41,10 @@ logger = logging.getLogger(__name__)
 logging.getLogger("menetools").setLevel(logging.CRITICAL)
 logging.getLogger("miscoto").setLevel(logging.CRITICAL)
 
-###############################################################################
-#
-message = """
-Description here TODO
-"""
-
-pusage = """
-m2m_workflow -g genomes_folder -o output_folder -s seeds.sbml [-c cpu_number] [--clean]
-"""
-
-requires = """
-Requirements here TODO
-"""
-#
-###############################################################################
-
-
-def run_workflow():
+def run_workflow(inp_dir,out_dir,nb_cpu,clean,seeds,host_mn):
     """description
     """
-    # Check pyasp binaries.
-    pyasp_bin_path = pyasp.__path__[0] + '/bin/'
-    bin_check = []
-    for asp_bin in ['clasp', 'gringo3', 'gringo4']:
-        bin_check.append(utils.is_valid_path(pyasp_bin_path + asp_bin))
 
-    if not all(bin_check):
-        logger.critical("Error with pyasp installation, retry to install it:")
-        logger.critical("pip install pyasp==1.4.3 --no-cache-dir --force-reinstall")
-        logger.info(pusage)
-        sys.exit(1)
-
-    parser = argparse.ArgumentParser(description=message, usage=pusage, epilog=requires)
-    parser.add_argument("-g",
-                        "--genomes",
-                        help="annotated genomes directory",
-                        required=True)
-    parser.add_argument("-o",
-                        "--output",
-                        help="output directory",
-                        required=True)
-    parser.add_argument("-c",
-                        "--cpu",
-                        help="cpu number for multi-process Pathway Tools",
-                        required=False,
-                        default=1)
-    parser.add_argument("-s",
-                        "--seeds",
-                        help="seeds (growth medium) for metabolic analysis",
-                        required=True)
-    parser.add_argument("-m",
-                        "--modelhost",
-                        help="host metabolic model for community analysis",
-                        required=False,
-                        default=None)
-    parser.add_argument("--clean",
-                        help="clean PGDBs if already present",
-                        required=False,
-                        action="store_true")
-
-    args = parser.parse_args()
-    inp_dir = args.genomes
-    out_dir = args.output
-    seeds = args.seeds
-    host = args.modelhost
-    clean = args.clean
-
-    try:
-        nb_cpu = int(args.cpu)
-    except:
-        logger.critical("enter a valid number of CPU")
-        logger.info(pusage)
-        sys.exit(1)
 
     # METABOLIC NETWORK RECONSTRUCTION
     # Create PGDBs
@@ -155,7 +86,7 @@ def run_workflow():
             newtargets)
         # Compute community selection
         logger.info("Running minimal community selection")
-        all_results = mincom(instance_w_targets, out_dir)
+        all_results = mincom(instance_w_targets, out_dir, host_mn)
         # Give one solution
         onesol = all_results['one_model']
         one_sol_bact = []
@@ -473,7 +404,7 @@ def add_targets_to_instance(instancefile, output_dir, target_set):
 
     return new_instance_file
 
-def mincom(instancefile, output_dir):
+def mincom(instancefile, output_dir, host):
     """Run minimal community selection and analysis
     
     Args:
