@@ -126,7 +126,7 @@ def cscope(sbmldir, seeds, outdir, host=None):
         tuple: instance file (str) and community scope (set)
     """
     # Create instance for community analysis
-    instance_com = instance_community(sbmldir, seeds, outdir, host)
+    instance_com = instance_community(sbmldir, seeds, outdir, None, host)
     # Run community scope
     logger.info("Running whole-community metabolic scopes")
     community_reachable_metabolites = comm_scope_run(instance_com, outdir)
@@ -313,7 +313,7 @@ def analyze_indiv_scope(jsonfile, seeds):
     return union_scope
 
 
-def instance_community(sbml_dir, seeds, output_dir, host_mn=None):
+def instance_community(sbml_dir, seeds, output_dir, targets = None, host_mn=None):
     """create ASP instance for community analysis
     
     Args:
@@ -339,7 +339,7 @@ def instance_community(sbml_dir, seeds, output_dir, host_mn=None):
         bacteria_dir=sbml_dir,
         seeds_file=seeds,
         host_file=host_mn,
-        targets_file=None,
+        targets_file=targets,
         output=outputfile)
 
     logger.info("Created instance in " + instance_filepath)

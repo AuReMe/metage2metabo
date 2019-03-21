@@ -1,10 +1,12 @@
 from padmet_utils.scripts.connection.pgdb_to_padmet import from_pgdb_to_padmet
-from padmet_utils.scripts.connection.sbmlGenerator import padmet_to_sbml
+from padmet_utils.scripts.connection.sbmlGenerator import padmet_to_sbml, check
 from padmet_utils.scripts.connection.sbml_to_sbml import from_sbml_to_sbml
 from padmet_utils.scripts.connection.sbml_to_padmet import from_sbml_to_padmet
+from padmet.utils.sbmlPlugin import convert_from_coded_id
 from multiprocessing import Pool
 from metage2metabo import utils
-from libsbml import SBMLReader
+from libsbml import SBMLReader, writeSBMLToFile, SBMLDocument
+import libsbml
 import os
 import logging
 
@@ -24,6 +26,26 @@ def get_sbml_level(sbml_file):
     reader = SBMLReader()
     document = reader.readSBML(sbml_file)
     return document.getLevel()
+
+
+def create_species_sbml(metabolites, outputfile):
+    """Create a SBML files with a list of species containing metabolites of the input set
+    
+    Args:
+        metabolites (set): set of metabolites
+        outputfile (str): SBML file to be written
+    """
+    document = libsbml.SBMLDocument(2, 1)
+    model = document.createModel("metabolites")
+    for compound in metabolites:
+        name, stype, comp = convert_from_coded_id(compound)
+        s = model.createSpecies()
+        check(s, 'create species')
+        check(s.setId(compound), 'set species id')
+        check(s.setName(name), 'set species name')
+        check(s.setCompartment(comp), 'set species compartment')
+
+    libsbml.writeSBMLToFile(document, outputfile)
 
 
 def run_pgdb_to_sbml(species_multiprocess_data):

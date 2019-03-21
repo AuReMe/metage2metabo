@@ -1,4 +1,4 @@
-from metage2metabo.m2m_workflow import run_workflow, recon, iscope, cscope, addedvalue, mincom
+from metage2metabo.m2m_workflow import run_workflow, recon, iscope, cscope, addedvalue, mincom, instance_community
 from metage2metabo import sbml_management
 import logging
 import pkg_resources
@@ -197,7 +197,7 @@ def main():
             main_added_value(network_dir, args.seeds, args.out,
                              new_arg_modelhost)
         elif args.cmd == "mincom":
-            print("¯\_(ツ)_/¯ running mincom")
+            main_mincom(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
     elif args.cmd == "recon":
         main_recon(args.genomes, args.out, args.cpu, args.clean)
 
@@ -227,12 +227,15 @@ def main_added_value(sbmldir, seeds, outdir, host):
     iscope_metabolites = main_iscope(sbmldir, seeds, outdir)
     logger.info(", ".join(iscope_metabolites))
     cscope_metabolites = main_cscope(sbmldir, seeds, outdir, host)
-    addedvalue(iscope_metabolites, cscope_metabolites)
+    newtargets = addedvalue(iscope_metabolites, cscope_metabolites)
+    sbml_management.create_species_sbml(newtargets, outdir + "/community_analysis/targets.sbml")
+    logger.info("Target file created with the addedvalue targets in: " +
+                outdir + "/community_analysis/targets.sbml")
 
 
-def main_mincom():
+def main_mincom(sbmldir, seedsfiles, outdir, targets, host):
     #create instance
-    #instance =
+    instance = instance_community(sbmldir, seedsfiles, outdir, targets, host)
     #run mincom
     mincom(instance, outdir)
 
