@@ -18,6 +18,10 @@ Description here TODO
 REQUIRES = """
 Requirements here TODO
 """
+logging.basicConfig(
+        format='%(message)s', level=logging.INFO)  #%(name)s:%(message)s
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 # Check pyasp binaries.
 pyasp_bin_path = pyasp.__path__[0] + '/bin/'
@@ -152,11 +156,6 @@ def main():
 
 
     args = parser.parse_args()
-
-    logging.basicConfig(
-        format='%(message)s', level=logging.INFO)  #%(name)s:%(message)s
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
 
     ch = logging.StreamHandler()
     if args.quiet:
