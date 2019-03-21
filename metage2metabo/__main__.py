@@ -8,6 +8,7 @@ from metage2metabo import utils
 import sys
 import os
 from shutil import copyfile
+import re
 
 
 VERSION = pkg_resources.get_distribution("metage2metabo").version
@@ -126,8 +127,8 @@ def main():
             parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m,
             parent_parser_c
         ],
-        description="Compute the community scope of all metabolic networks")
-
+        description="Compute the community scope of all metabolic networks"
+    )
     added_value_parser = subparsers.add_parser(
         "addedvalue",
         help="added value of microbiota's metabolism over individual's",
@@ -153,6 +154,18 @@ def main():
         help="targets for metabolic analysis",
         required=True
         )
+    seeds_parser = subparsers.add_parser(
+        "seeds",
+        help="creation of seeds SBML file",
+        parents=[parent_parser_o],
+        description=
+        "Create a SBML file starting for a simple text file with metabolic compounds identifiers"
+    )
+    seeds_parser.add_argument(
+        "--metabolites",
+        help=
+        'metabolites file: one per line, encoded (XXX as in <species id="XXXX" .../> of SBML files)',
+        required=True)
     wkf_parser = subparsers.add_parser(
         "workflow",
         help="whole workflow",
@@ -201,6 +214,8 @@ def main():
             main_mincom(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
     elif args.cmd == "recon":
         main_recon(args.genomes, args.out, args.cpu, args.clean)
+    elif args.cmd == "seeds":
+        main_seeds(args.metabolites, args.out)
 
 
 def main_workflow(*allargs):
@@ -239,6 +254,22 @@ def main_mincom(sbmldir, seedsfiles, outdir, targets, host):
     instance = instance_community(sbmldir, seedsfiles, outdir, targets, host)
     #run mincom
     mincom(instance, outdir)
+
+
+def main_seeds(metabolites_file, outdir):
+    outfile = outdir + "/seeds.sbml"
+    with open(metabolites_file, "r") as f:
+        rawdata = f.readlines()
+    metabolites_set = set()
+    for elem in rawdata:
+        metabolites_set.add(elem.strip("\n"))
+    for metabolite in metabolites_set:
+        assert re.match(
+            "^[A-Za-z0-9_-]*$", metabolite
+        ) and not metabolite[0].isdigit(
+        ), "Seed file is not in the correct format. Error with %s. Example of a correct ID is M_OXYGEN__45__MOLECULE_c. Rules = only numbers, letters or underscore in IDs, not starting with a number. One ID per line." %(metabolite)
+    sbml_management.create_species_sbml(metabolites_set, outfile)
+    logger.info("Seeds SBML file created in " + outfile)
 
 
 def check_sbml(folder, outdir):

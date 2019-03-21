@@ -44,7 +44,6 @@ def create_species_sbml(metabolites, outputfile):
         check(s.setId(compound), 'set species id')
         check(s.setName(name), 'set species name')
         check(s.setCompartment(comp), 'set species compartment')
-
     libsbml.writeSBMLToFile(document, outputfile)
 
 
