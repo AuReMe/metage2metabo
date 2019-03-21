@@ -26,6 +26,7 @@ import tempfile
 import time
 import sys
 from menetools import run_menescope
+from menetools.sbml import readSBMLspecies
 from metage2metabo import utils, sbml_management
 from miscoto import run_scopes, run_mincom, run_instance
 from shutil import copyfile
@@ -36,7 +37,10 @@ logging.getLogger("menetools").setLevel(logging.CRITICAL)
 logging.getLogger("miscoto").setLevel(logging.CRITICAL)
 
 
-def run_workflow(inp_dir,out_dir,nb_cpu,clean,seeds,host_mn):
+#TODO create log files with miscoto regular outputs
+
+
+def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, host_mn):
     """Run the whole m2m workflow
     
     Args:
@@ -49,70 +53,121 @@ def run_workflow(inp_dir,out_dir,nb_cpu,clean,seeds,host_mn):
     """
     # METABOLIC NETWORK RECONSTRUCTION
     # Create PGDBs
-    logger.info("######### Running metabolic network reconstruction with Pathway Tools #########")
     try:
         pgdb_dir = genomes_to_pgdb(inp_dir, out_dir, nb_cpu, clean)
     except:
         logger.info("Could not run Pathway Tools")
         sys.exit(1)
     # Create SBMLs from PGDBs
-    logger.info("######### Creating SBML files #########")
     sbml_dir = sbml_management.pgdb_to_sbml(pgdb_dir, out_dir, nb_cpu)
-    # ANALYSIS
+    # INDIVIDUAL SCOPES
+    union_targets_iscope = iscope(sbml_dir, seeds, out_dir)
+    # COMMUNITY SCOPE
+    instance_com, targets_cscope = cscope(sbml_dir, seeds, out_dir, host_mn)
+    # ADDED VALUE
+    newtargets = addedvalue(union_targets_iscope, targets_cscope)
+    # Add these targets to the instance
+    logger.info("Setting these " + str(len(newtargets)) + " as targets")
+    instance_w_targets = add_targets_to_instance(
+        instance_com, out_dir,
+        newtargets)
+    # MINCOM
+    mincom(instance_w_targets, out_dir)
+
+def iscope(sbmldir, seeds, out_dir):
+    """Compute individual scopes (reachable metabolites) for SBML files in a directory
+    
+    Args:
+        sbmldir (str): SBML files directory
+        seeds (str): SBML seeds file
+    
+    Returns:
+        set: union of reachable metabolites for all metabolic networks
+    """
     # Run individual scopes of metabolic networks if any
     if len([
-            name for name in os.listdir(sbml_dir) if os.path.isfile(sbml_dir + '/' + name)
-            and utils.get_extension(sbml_dir + '/' + name).lower() in ["xml", "sbml"]
+            name for name in os.listdir(sbmldir) if os.path.isfile(sbmldir + '/' + name)
+            and utils.get_extension(sbmldir + '/' + name).lower() in ["xml", "sbml"]
     ]) > 1:
-        logger.info("######### Running individual metabolic scopes #########")
-        scope_json = indiv_scope_run(sbml_dir, seeds, out_dir)
+        scope_json = indiv_scope_run(sbmldir, seeds, out_dir)
+        logger.info("Individual scopes for all metabolic networks available in " + scope_json)
         # Analyze the individual scopes results (json file)
-        uniontargets = analyze_indiv_scope(scope_json)
-        # Create instance for community analysis
-        logger.info(
-            "######### Creating metabolic instance for the whole community #########"
-        )
-        instance_com = instance_community(sbml_dir, seeds, out_dir)
-        # Run community scope
-        logger.info("Running whole-community metabolic scopes")
-        microbiotascope = comm_scope_run(instance_com, out_dir)
-        # Community targets = what can be produced only if cooperation occurs between species
-        newtargets = set(microbiotascope) - uniontargets
-        logger.info(str(len(newtargets)) + " metabolites can only be produced through metabolic cooperation")
-        logger.info(newtargets)
-        logger.info("Setting these " + str(len(newtargets)) + " as targets")
-        # Add these targets to the instance
-        instance_w_targets = add_targets_to_instance(
-            instance_com, out_dir,
-            newtargets)
-        # Compute community selection
-        logger.info("Running minimal community selection")
-        all_results = mincom(instance_w_targets, out_dir, host_mn)
-        # Give one solution
-        onesol = all_results['one_model']
-        one_sol_bact = []
-        for a in onesol:
-            if a.pred() == 'chosen_bacteria':
-                one_sol_bact.append(a.arg(0).rstrip('"').lstrip('"'))
-        logger.info('######### One minimal community #########')
-        logger.info("# One minimal community enabling to produce the target metabolites given as inputs")
-        logger.info("Minimal number of bacteria in communities = " +
-                    str(len(one_sol_bact)))
-        logger.info("\n".join(one_sol_bact))
-        # Give union of solutions
-        union = all_results['union_bacteria']
-        logger.info('######### Union of minimal communities #########')
-        logger.info("# Bacteria occurring in at least one minimal community enabling to produce the target metabolites given as inputs")
-        logger.info("Union of bacteria in minimal communities = " +
-                    str(len(union)))
-        logger.info("\n".join(union))
-        # Give intersection of solutions
-        intersection = all_results['inter_bacteria']
-        logger.info('######### Union of minimal communities #########')
-        logger.info("# Bacteria occurring in ALL minimal community enabling to produce the target metabolites given as inputs")
-        logger.info("Intersection of bacteria in minimal communities = " +
-                    str(len(intersection)))
-        logger.info("\n".join(intersection))
+        reachable_metabolites_union = analyze_indiv_scope(scope_json, seeds)
+    return reachable_metabolites_union
+
+
+def cscope(sbmldir, seeds, outdir, host=None):
+    """Run community scope
+    
+    Args:
+        sbmldir (str): SBML files directory
+        seeds (str): SBML file for seeds
+        outdir (str): output directory
+        host (str, optional): Defaults to None. Host metabolic network (SBML)
+    
+    Returns:
+        tuple: instance file (str) and community scope (set)
+    """
+    # Create instance for community analysis
+    instance_com = instance_community(sbmldir, seeds, outdir, host)
+    # Run community scope
+    logger.info("Running whole-community metabolic scopes")
+    community_reachable_metabolites = comm_scope_run(instance_com, outdir)
+    return instance_com, community_reachable_metabolites
+
+
+def addedvalue(iscope_rm, cscope_rm):
+    """Compute the added value of considering interaction with microbiota metabolism rather than individual metabolisms
+    
+    Args:
+        iscope_rm (set): union of metabolites in all individual scopes
+        cscope_rm (set): metabolites reachable by community/microbiota
+    
+    Returns:
+        set: set of metabolites that can only be reached by a community
+    """
+    # Community targets = what can be produced only if cooperation occurs between species
+    newtargets = cscope_rm - iscope_rm
+    logger.info("Added value of cooperation over individual metabolism: " +
+                str(len(newtargets)) + " newly reachable metabolites:")
+    logger.info(', '.join(newtargets))
+    return newtargets
+
+def mincom(instance_w_targets, out_dir):
+    """Compute minimal community selection and show analyses
+    
+    Args:
+        instance_w_targets (str): ASP instance filepath
+        out_dir (str): results directory
+    """
+    # Compute community selection
+    logger.info("Running minimal community selection")
+    all_results = compute_mincom(instance_w_targets, out_dir)
+    # Give one solution
+    onesol = all_results['one_model']
+    one_sol_bact = []
+    for a in onesol:
+        if a.pred() == 'chosen_bacteria':
+            one_sol_bact.append(a.arg(0).rstrip('"').lstrip('"'))
+    logger.info('######### One minimal community #########')
+    logger.info("# One minimal community enabling to produce the target metabolites given as inputs")
+    logger.info("Minimal number of bacteria in communities = " +
+                str(len(one_sol_bact)))
+    logger.info("\n".join(one_sol_bact))
+    # Give union of solutions
+    union = all_results['union_bacteria']
+    logger.info('######### Union of minimal communities #########')
+    logger.info("# Bacteria occurring in at least one minimal community enabling to produce the target metabolites given as inputs")
+    logger.info("Union of bacteria in minimal communities = " +
+                str(len(union)))
+    logger.info("\n".join(union))
+    # Give intersection of solutions
+    intersection = all_results['inter_bacteria']
+    logger.info('######### Union of minimal communities #########')
+    logger.info("# Bacteria occurring in ALL minimal community enabling to produce the target metabolites given as inputs")
+    logger.info("Intersection of bacteria in minimal communities = " +
+                str(len(intersection)))
+    logger.info("\n".join(intersection))
 
 
 def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
@@ -124,6 +179,9 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
     Returns:
         pgdb_dir (str): pgdb repository
     """
+    logger.info(
+        "######### Running metabolic network reconstruction with Pathway Tools #########"
+    )
     if not os.path.isdir(genomes_dir):
         logger.critical("Genomes directory path does not exist.")
         sys.exit(1)
@@ -173,7 +231,6 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
                             verbose=True)
     except:
         logger.critical("Something went wrong running Pathway Tools")
-
     return (pgdb_dir)
 
 
@@ -187,6 +244,7 @@ def indiv_scope_run(sbml_dir, seeds, output_dir):
     Returns:
         str: output file for Menetools analysis
     """
+    logger.info("######### Running individual metabolic scopes #########")
     menetools_dir = output_dir + "/indiv_scopes"
     if not utils.is_valid_dir(menetools_dir):
         logger.critical("Impossible to access/create output directory")
@@ -204,16 +262,14 @@ def indiv_scope_run(sbml_dir, seeds, output_dir):
             all_scopes[bname] = run_menescope(
                 draft_sbml=os.path.join(sbml_dir, f), seeds_sbml=seeds)
         except:
-            #TODO catch OSError and look for ASP binaries  pip install pyasp==1.4.3 --no-cache-dir --force-reinstall
             logger.critical("Something went wrong running Menetools")
 
     with open(menetools_dir + "/indiv_scopes.json", 'w') as dumpfile:
         json.dump(all_scopes, dumpfile)
-
     return menetools_dir + "/indiv_scopes.json"
 
 
-def analyze_indiv_scope(jsonfile):
+def analyze_indiv_scope(jsonfile, seeds):
     """Analyze the output of Menescope, stored in a json
     
     Args:
@@ -226,15 +282,16 @@ def analyze_indiv_scope(jsonfile):
     for elem in d:
         d_set[elem] = set(d[elem])
 
+    seed_metabolites = readSBMLspecies(seeds, "seeds")
+
     intersection_scope = set.intersection(*list(d_set.values()))
     logger.info(str(len(intersection_scope)) + " metabolites in core reachable by all organisms (intersection)")
 
     union_scope = set.union(*list(d_set.values()))
-    logger.info(str(len(union_scope)) + " metabolites reachable by individual organisms altogether (union)")
+    logger.info(str(len(union_scope)) + " metabolites reachable by individual organisms altogether (union), among which " + str(len(seed_metabolites)) + " seeds (growth medium)")
     len_scope = [len(d[elem]) for elem in d]
     logger.info("max metabolites in scope " + str(max(len_scope)))
     logger.info("min metabolites in scope " + str(min(len_scope)))
-
     return union_scope
 
 
@@ -249,6 +306,9 @@ def instance_community(sbml_dir, seeds, output_dir, host_mn=None):
     Returns:
         str: instance filepath
     """
+    logger.info(
+            "######### Creating metabolic instance for the whole community #########"
+        )
     miscoto_dir = output_dir + "/community_analysis"
     if not utils.is_valid_dir(miscoto_dir):
         logger.critical("Impossible to access/create output directory")
@@ -265,7 +325,6 @@ def instance_community(sbml_dir, seeds, output_dir, host_mn=None):
         output=outputfile)
 
     logger.info("Created instance in " + instance_filepath)
-
     return instance_filepath
 
 
@@ -278,7 +337,7 @@ def comm_scope_run(instance, output_dir):
         output_dir (str): directory for results
     
     Returns:
-        lst: microbiota scope
+        set: microbiota scope
     """
     miscoto_dir = output_dir + "/community_analysis"
     if not utils.is_valid_dir(miscoto_dir):
@@ -286,7 +345,7 @@ def comm_scope_run(instance, output_dir):
         sys.exit(1)
 
     microbiota_scope = run_scopes(instance)
-    return microbiota_scope['com_scope']
+    return set(microbiota_scope['com_scope'])
 
 
 def add_targets_to_instance(instancefile, output_dir, target_set):
@@ -305,11 +364,10 @@ def add_targets_to_instance(instancefile, output_dir, target_set):
     with open(new_instance_file, 'a') as f:
         for elem in target_set:
             f.write('target("' + elem + '").')
-
     return new_instance_file
 
 
-def mincom(instancefile, output_dir, host):
+def compute_mincom(instancefile, output_dir):
     """Run minimal community selection and analysis
     
     Args:

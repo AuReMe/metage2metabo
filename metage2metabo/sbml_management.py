@@ -23,9 +23,7 @@ def get_sbml_level(sbml_file):
     """
     reader = SBMLReader()
     document = reader.readSBML(sbml_file)
-
     return document.getLevel()
-
 
 
 def run_pgdb_to_sbml(species_multiprocess_data):
@@ -53,7 +51,6 @@ def run_pgdb_to_sbml(species_multiprocess_data):
     padmet_to_sbml(padmet, species_sbml_file, sbml_lvl=2, verbose=False)
 
     sbml_check = utils.is_valid_path(species_sbml_file)
-
     return sbml_check
 
 
@@ -66,6 +63,7 @@ def pgdb_to_sbml(pgdb_dir, output_dir, cpu):
     Returns:
         sbml_dir (str): SBML directory
     """
+    logger.info("######### Creating SBML files #########")
     sbml_dir = output_dir + "/sbml"
     if not utils.is_valid_dir(sbml_dir):
         logger.critical("Impossible to access/create output directory")
@@ -85,7 +83,6 @@ def pgdb_to_sbml(pgdb_dir, output_dir, cpu):
 
     if all(sbml_checks):
         return sbml_dir
-
     else:
         logger.critical("Error during padmet/sbml creation.")
         sys.exit(1)
@@ -111,5 +108,4 @@ def sbml_to_sbml(
     from_sbml_to_sbml(sbml_file, sbml_output_file, level_wanted, cpu)
 
     sbml_check = utils.is_valid_path(sbml_output_file)
-
     return sbml_check

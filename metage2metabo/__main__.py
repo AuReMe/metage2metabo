@@ -1,4 +1,4 @@
-from metage2metabo.m2m_workflow import run_workflow
+from metage2metabo.m2m_workflow import run_workflow, iscope, cscope, addedvalue, mincom
 from metage2metabo import sbml_management
 import logging
 import pkg_resources
@@ -125,20 +125,20 @@ def main():
     comscope_parser = subparsers.add_parser(
         "cscope",
         help="community scope computation",
-        parents=[parent_parser_n, parent_parser_s, parent_parser_o],
+        parents=[parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m],
         description="Compute the community scope of all metabolic networks")
 
     added_value_parser = subparsers.add_parser(
         "addedvalue",
         help="added value of microbiota's metabolism over individual's",
-        parents=[parent_parser_n, parent_parser_s, parent_parser_o],
+        parents=[parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m],
         description=
         "Compute metabolites that are reachable by the community/microbiota and not by individual organisms"
     )
     mincom_parser = subparsers.add_parser(
         "mincom",
         help="minimal communtity selection",
-        parents=[parent_parser_n, parent_parser_s, parent_parser_o,parent_parser_m],
+        parents=[parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m],
         description=
         "Select minimal-size community to make reachable a set of metabolites")
     mincom_parser.add_argument(
@@ -175,18 +175,27 @@ def main():
         logger.info("m2m " + VERSION + "\n" + LICENSE)
         parser.print_help()
         sys.exit()
+
+    #if modelhost is given as an arg: check the SBML level and turn it into 2 if needed
+    if args.cmd in ["workflow", "mincom", "cscope", "addedvalue"] and args.modelhost:
+        new_arg_modelhost = args.modelhost
+    else:
+        new_arg_modelhost = None
+    #TODO
+
     # deal with given subcommand
     if args.cmd == "workflow":
-        main_workflow(args.genomes, args.out, args.cpu, args.clean, args.seeds, args.modelhost)
+        main_workflow(args.genomes, args.out, args.cpu, args.clean, args.seeds,
+                      new_arg_modelhost)
     elif args.cmd in ["iscope","cscope","addedvalue","mincom"]:
         network_dir = check_sbml(args.networksdir, args.out)
-        print(network_dir)
         if args.cmd == "iscope":
-            print("¯\_(ツ)_/¯ running iscope")
+            main_iscope(network_dir, args.seeds, args.out)
         elif args.cmd == "cscope":
-            print("¯\_(ツ)_/¯ running cscope")
+            main_cscope(network_dir, args.seeds, args.out, new_arg_modelhost)
         elif args.cmd == "addedvalue":
-            print("¯\_(ツ)_/¯ running addedvalue")
+            main_added_value(network_dir, args.seeds, args.out,
+                             new_arg_modelhost)
         elif args.cmd == "mincom":
             print("¯\_(ツ)_/¯ running mincom")
     elif args.cmd == "recon":
@@ -197,7 +206,32 @@ def main_workflow(*allargs):
     run_workflow(*allargs)
 
 
-def check_sbml(folder,outdir):
+def main_iscope(*allargs):
+    return iscope(*allargs)
+
+
+def main_cscope(*allargs):
+    comscope = cscope(*allargs)[1]
+    logger.info(str(len(comscope)) + " metabolites reachable by the whole community/microbiota:")
+    logger.info(', '.join(comscope))
+    return comscope
+
+
+def main_added_value(sbmldir, seeds, outdir, host):
+    iscope_metabolites = main_iscope(sbmldir, seeds, outdir)
+    logger.info(", ".join(iscope_metabolites))
+    cscope_metabolites = main_cscope(sbmldir, seeds, outdir, host)
+    addedvalue(iscope_metabolites, cscope_metabolites)
+
+
+def main_mincom():
+    #create instance
+    #instance =
+    #run mincom
+    mincom(instance, outdir)
+
+
+def check_sbml(folder, outdir):
     all_files = [
         f for f in os.listdir(folder)
         if os.path.isfile(os.path.join(folder, f)) and utils.get_extension(
