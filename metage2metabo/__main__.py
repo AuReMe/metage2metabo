@@ -1,4 +1,4 @@
-from metage2metabo.m2m_workflow import run_workflow, iscope, cscope, addedvalue, mincom
+from metage2metabo.m2m_workflow import run_workflow, recon, iscope, cscope, addedvalue, mincom
 from metage2metabo import sbml_management
 import logging
 import pkg_resources
@@ -39,26 +39,11 @@ if not all(bin_check):
 
 
 def main():
-
     parser = argparse.ArgumentParser(
         "m2m",
         description=MESSAGE + " For specific help on each subcommand use: m2m {cmd} --help",
         epilog=REQUIRES
     )
-    parser.add_argument(
-        "-c",
-        "--cpu",
-        help="cpu number for multi-process",
-        required=False,
-        type=int,
-        default=1)
-    parser.add_argument(
-        "-q",
-        "--quiet",
-        dest="quiet",
-        action="store_true",
-        default=False,
-        help="do not print anything to standard output")
     parser.add_argument(
         "-v",
         "--version",
@@ -66,6 +51,14 @@ def main():
         version="%(prog)s " + VERSION + "\n" + LICENSE)
 
     # parent parser
+    parent_parser_c = argparse.ArgumentParser(add_help=False)
+    parent_parser_c.add_argument(
+        "-c",
+        "--cpu",
+        help="cpu number for multi-process",
+        required=False,
+        type=int,
+        default=1)
     parent_parser_o = argparse.ArgumentParser(add_help=False)
     parent_parser_o.add_argument(
         "-o",
@@ -111,34 +104,46 @@ def main():
     ptools_parser = subparsers.add_parser(
         "recon",
         help="metabolic network reconstruction",
-        parents=[parent_parser_g, parent_parser_o],
+        parents=[parent_parser_g, parent_parser_o, parent_parser_c],
         description=
         "Run metabolic network reconstruction for each annotated genome of the input directory, using Pathway Tools"
     )
+    #TODO chose the SBML level for the output 2 or 3, default = 2
     indivscope_parser = subparsers.add_parser(
         "iscope",
         help="individual scope computation",
-        parents=[parent_parser_n, parent_parser_s, parent_parser_o],
+        parents=[
+            parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_c
+        ],
         description=
         "Compute individual scopes (reachable metabolites from seeds) for each metabolic network of the input directory"
     )
     comscope_parser = subparsers.add_parser(
         "cscope",
         help="community scope computation",
-        parents=[parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m],
+        parents=[
+            parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m,
+            parent_parser_c
+        ],
         description="Compute the community scope of all metabolic networks")
 
     added_value_parser = subparsers.add_parser(
         "addedvalue",
         help="added value of microbiota's metabolism over individual's",
-        parents=[parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m],
+        parents=[
+            parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m,
+            parent_parser_c
+        ],
         description=
         "Compute metabolites that are reachable by the community/microbiota and not by individual organisms"
     )
     mincom_parser = subparsers.add_parser(
         "mincom",
         help="minimal communtity selection",
-        parents=[parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m],
+        parents=[
+            parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m,
+            parent_parser_c
+        ],
         description=
         "Select minimal-size community to make reachable a set of metabolites")
     mincom_parser.add_argument(
@@ -151,20 +156,14 @@ def main():
         "workflow",
         help="whole workflow",
         parents=[
-            parent_parser_g, parent_parser_s, parent_parser_m, parent_parser_o
+            parent_parser_g, parent_parser_s, parent_parser_m, parent_parser_o,
+            parent_parser_c
         ],
         description=
         "Run the whole workflow: metabolic network reconstruction, individual and community scope analysis and community selection"
     )
 
-
     args = parser.parse_args()
-
-    ch = logging.StreamHandler()
-    if args.quiet:
-        ch.setLevel(logging.CRITICAL)
-    else:
-        ch.setLevel(logging.INFO)
 
     # test writing in out_directory if a subcommand is given else print version and help
     if args.cmd:
@@ -179,9 +178,10 @@ def main():
     #if modelhost is given as an arg: check the SBML level and turn it into 2 if needed
     if args.cmd in ["workflow", "mincom", "cscope", "addedvalue"] and args.modelhost:
         new_arg_modelhost = args.modelhost
+        #TODO new_arg_modelhost = SbML2 version of args.modelhost if args.modelhost.getLevel!=2
     else:
         new_arg_modelhost = None
-    #TODO
+
 
     # deal with given subcommand
     if args.cmd == "workflow":
@@ -199,11 +199,17 @@ def main():
         elif args.cmd == "mincom":
             print("¯\_(ツ)_/¯ running mincom")
     elif args.cmd == "recon":
-        print("¯\_(ツ)_/¯ running recon")
+        main_recon(args.genomes, args.out, args.cpu, args.clean)
 
 
 def main_workflow(*allargs):
     run_workflow(*allargs)
+
+
+def main_recon(*allargs):
+    pgdbdir, sbmldir = recon(*allargs)
+    logger.info("PGDB created in " + pgdbdir)
+    logger.info("SBML files created in " + sbmldir)
 
 
 def main_iscope(*allargs):

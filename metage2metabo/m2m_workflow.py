@@ -52,14 +52,7 @@ def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, host_mn):
         host_mn (str): metabolic network file for host
     """
     # METABOLIC NETWORK RECONSTRUCTION
-    # Create PGDBs
-    try:
-        pgdb_dir = genomes_to_pgdb(inp_dir, out_dir, nb_cpu, clean)
-    except:
-        logger.info("Could not run Pathway Tools")
-        sys.exit(1)
-    # Create SBMLs from PGDBs
-    sbml_dir = sbml_management.pgdb_to_sbml(pgdb_dir, out_dir, nb_cpu)
+    sbml_dir = recon(inp_dir, out_dir, nb_cpu, clean)[1]
     # INDIVIDUAL SCOPES
     union_targets_iscope = iscope(sbml_dir, seeds, out_dir)
     # COMMUNITY SCOPE
@@ -73,6 +66,30 @@ def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, host_mn):
         newtargets)
     # MINCOM
     mincom(instance_w_targets, out_dir)
+
+
+def recon(inp_dir, out_dir, nb_cpu, clean):
+    """Run metabolic network reconstruction with Pathway Tools and get SBMLs
+    
+    Args:
+        inp_dir (str): genomes directory
+        out_dir (str): results directory
+        nb_cpu (int): number of CPU for multiprocessing
+        clean (bool): re-run metabolic reconstructions that are already available if found
+
+    Returns:
+        tuple: PGDB directory (str), SBML directory (str)
+    """
+    # Create PGDBs
+    try:
+        pgdb_dir = genomes_to_pgdb(inp_dir, out_dir, nb_cpu, clean)
+    except:
+        logger.info("Could not run Pathway Tools")
+        sys.exit(1)
+    # Create SBMLs from PGDBs
+    sbml_dir = sbml_management.pgdb_to_sbml(pgdb_dir, out_dir, nb_cpu)
+    return pgdb_dir, sbml_dir
+
 
 def iscope(sbmldir, seeds, out_dir):
     """Compute individual scopes (reachable metabolites) for SBML files in a directory
@@ -231,6 +248,7 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
                             verbose=True)
     except:
         logger.critical("Something went wrong running Pathway Tools")
+        sys.exit(1)
     return (pgdb_dir)
 
 
