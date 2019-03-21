@@ -314,7 +314,7 @@ def analyze_indiv_scope(jsonfile, seeds):
 
 
 def instance_community(sbml_dir, seeds, output_dir, targets = None, host_mn=None):
-    """create ASP instance for community analysis
+    """Create ASP instance for community analysis
     
     Args:
         sbml_dir (str): directory of symbionts SBML files

@@ -18,10 +18,10 @@ m2m is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.\n
 """
 MESSAGE = """
-Description here TODO
+Description here #TODO
 """
 REQUIRES = """
-Requirements here TODO
+Requirements here #TODO
 """
 logging.basicConfig(
         format='%(message)s', level=logging.INFO)  #%(name)s:%(message)s
@@ -40,6 +40,8 @@ if not all(bin_check):
 
 
 def main():
+    """Run programm
+    """
     parser = argparse.ArgumentParser(
         "m2m",
         description=MESSAGE + " For specific help on each subcommand use: m2m {cmd} --help",
@@ -110,7 +112,6 @@ def main():
         "Run metabolic network reconstruction for each annotated genome of the input directory, using Pathway Tools"
     )
     #TODO chose the SBML level for the output 2 or 3, default = 2
-    #TODO create a seed command that creates a SBML file starting from a text file with compounds identifiers
     indivscope_parser = subparsers.add_parser(
         "iscope",
         help="individual scope computation",
@@ -219,20 +220,28 @@ def main():
 
 
 def main_workflow(*allargs):
+    """Run main workflow
+    """
     run_workflow(*allargs)
 
 
 def main_recon(*allargs):
+    """Run recon command
+    """
     pgdbdir, sbmldir = recon(*allargs)
     logger.info("PGDB created in " + pgdbdir)
     logger.info("SBML files created in " + sbmldir)
 
 
 def main_iscope(*allargs):
+    """Run iscope command
+    """
     return iscope(*allargs)
 
 
 def main_cscope(*allargs):
+    """Run cscope command
+    """
     comscope = cscope(*allargs)[1]
     logger.info(str(len(comscope)) + " metabolites reachable by the whole community/microbiota:")
     logger.info(', '.join(comscope))
@@ -240,6 +249,14 @@ def main_cscope(*allargs):
 
 
 def main_added_value(sbmldir, seeds, outdir, host):
+    """Run addedvalue command
+    
+    Args:
+        sbmldir (str): SBML file directory
+        seeds (str): SBML file for seeds
+        outdir (str): results directory
+        host (str): SBML file for host
+    """
     iscope_metabolites = main_iscope(sbmldir, seeds, outdir)
     logger.info(", ".join(iscope_metabolites))
     cscope_metabolites = main_cscope(sbmldir, seeds, outdir, host)
@@ -250,6 +267,15 @@ def main_added_value(sbmldir, seeds, outdir, host):
 
 
 def main_mincom(sbmldir, seedsfiles, outdir, targets, host):
+    """Run mincom command
+    
+    Args:
+        sbmldir (str): SBML files directory
+        seedsfiles (str): SBML file for seeds
+        outdir (str): results directory
+        targets (str): targets SBML file
+        host (str): SBML file for host
+    """
     #create instance
     instance = instance_community(sbmldir, seedsfiles, outdir, targets, host)
     #run mincom
@@ -257,6 +283,12 @@ def main_mincom(sbmldir, seedsfiles, outdir, targets, host):
 
 
 def main_seeds(metabolites_file, outdir):
+    """Run seeds command
+    
+    Args:
+        metabolites_file (str): text file with metabolites IDs, one per line
+        outdir (str): Results directory
+    """
     outfile = outdir + "/seeds.sbml"
     with open(metabolites_file, "r") as f:
         rawdata = f.readlines()
@@ -273,6 +305,15 @@ def main_seeds(metabolites_file, outdir):
 
 
 def check_sbml(folder, outdir):
+    """Check whether one or several SBML level 3 files are in directory. If yes, convert them into a new directory and copy the SBML files that are correct into this same directory
+    
+    Args:
+        folder (str): SBML files directory
+        outdir (str): Results directory
+    
+    Returns:
+        str: filepath of directory, same as input if all SBMLs are level2
+    """
     all_files = [
         f for f in os.listdir(folder)
         if os.path.isfile(os.path.join(folder, f)) and utils.get_extension(

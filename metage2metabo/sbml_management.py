@@ -9,6 +9,7 @@ from libsbml import SBMLReader, writeSBMLToFile, SBMLDocument
 import libsbml
 import os
 import logging
+import sys
 
 
 logger = logging.getLogger(__name__)
@@ -48,7 +49,7 @@ def create_species_sbml(metabolites, outputfile):
 
 
 def run_pgdb_to_sbml(species_multiprocess_data):
-    """Function used in multiprocess to turn PGDBs into SBML2.
+    """Turn PGDBs into SBML2 using multi-processing.
 
     Args:
         species_multiprocess_data (list): pathname to species pgdb dir, pathname to species sbml file
