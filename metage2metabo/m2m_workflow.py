@@ -17,7 +17,6 @@
 # along with metage2metabo.  If not, see <http://www.gnu.org/licenses/>.
 # -*- coding: utf-8 -*-
 
-import argparse
 import json
 import logging
 import mpwt
@@ -28,13 +27,8 @@ import time
 import sys
 
 from menetools import run_menescope
-from metage2metabo import utils
+from metage2metabo import utils, sbml_management
 from miscoto import run_scopes, run_mincom, run_instance
-from multiprocessing import Pool
-from padmet_utils.scripts.connection.pgdb_to_padmet import from_pgdb_to_padmet
-from padmet_utils.scripts.connection.sbmlGenerator import padmet_to_sbml
-from padmet_utils.scripts.connection.sbml_to_sbml import from_sbml_to_sbml
-from padmet_utils.scripts.connection.sbml_to_padmet import from_sbml_to_padmet
 from shutil import copyfile
 
 logger = logging.getLogger(__name__)
@@ -62,7 +56,7 @@ def run_workflow(inp_dir,out_dir,nb_cpu,clean,seeds,host_mn):
         sys.exit(1)
     # Create SBMLs from PGDBs
     logger.info("######### Creating SBML files #########")
-    sbml_dir = pgdb_to_sbml(pgdb_dir, out_dir, nb_cpu)
+    sbml_dir = sbml_management.pgdb_to_sbml(pgdb_dir, out_dir, nb_cpu)
     # ANALYSIS
     # Run individual scopes of metabolic networks if any
     if len([
@@ -131,37 +125,30 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
     """
     if not os.path.isdir(genomes_dir):
         logger.critical("Genomes directory path does not exist.")
-        logger.info(pusage)
         sys.exit(1)
 
     pgdb_dir = output_dir + "/pgdb"
     if not utils.is_valid_dir(pgdb_dir):
         logger.critical("Impossible to access/create output directory")
-        logger.info(pusage)
         sys.exit(1)
 
     if not utils.check_program("pathway-tools"):
         logger.critical(
             "Pathway Tools is not in the PATH, please fix it before using the program"
         )
-        logger.info(pusage)
         sys.exit(1)
 
     if not utils.check_program("blastp"):
         logger.critical(
             "blastp is not in the PATH, please fix it before using the program"
         )
-        logger.info(pusage)
         sys.exit(1)
 
     if not utils.is_valid_file(os.path.expanduser("~") + "/.ncbirc"):
         logger.critical(
             "No ~/.ncbirc file, please fix it before using the program"
         )
-        logger.info(pusage)
         sys.exit(1)
-
-    #TODO test whether not everything is run again in case some PGDBs already are in PDGB_dir and/or Ptools local
 
     genomes_pgdbs = [genome_dir.lower() + 'cyc' for genome_dir in os.listdir(genomes_dir)]
     already_here_pgdbs = mpwt.list_pgdb()
@@ -188,96 +175,6 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
 
     return (pgdb_dir)
 
-def run_pgdb_to_sbml(species_multiprocess_data):
-    """Function used in multiprocess to turn PGDBs into SBML2.
-
-    Args:
-        species_multiprocess_data (list): pathname to species pgdb dir, pathname to species sbml file
-
-    Returns:
-        sbml_check (bool): Check if sbml file exists
-    """
-    species_pgdb_dir = species_multiprocess_data[0]
-    species_sbml_file = species_multiprocess_data[1]
-    padmet = from_pgdb_to_padmet(species_pgdb_dir, 'metacyc', '22.5', arg_verbose=False, arg_with_genes=True, arg_source=None, enhanced_db=None, padmetRef_file=None)
-
-    padmet_to_sbml(padmet, species_sbml_file, sbml_lvl=2, verbose=False)
-
-    sbml_check = utils.is_valid_path(species_sbml_file)
-
-    return sbml_check
-
-def pgdb_to_sbml(pgdb_dir, output_dir, cpu):
-    """Turn Pathway Tools PGDBs into SBML2 files using Padmet
-    
-    Args:
-        pgdb_dir (str): PGDB directory
-
-    Returns:
-        sbml_dir (str): SBML directory
-    """
-    sbml_dir = output_dir + "/sbml"
-    if not utils.is_valid_dir(sbml_dir):
-        logger.critical("Impossible to access/create output directory")
-        logger.info(pusage)
-        sys.exit(1)
-
-    pgdb_to_sbml_pool = Pool(processes=cpu)
-
-    multiprocess_data = []
-    for species in os.listdir(pgdb_dir):
-        multiprocess_data.append([pgdb_dir + '/' + species, sbml_dir + '/' + species + '.sbml'])
-
-    sbml_checks = pgdb_to_sbml_pool.map(run_pgdb_to_sbml, multiprocess_data)
-
-    pgdb_to_sbml_pool.close()
-    pgdb_to_sbml_pool.join()
-
-    if all(sbml_checks):
-        return sbml_dir
-
-    else:
-        logger.critical("Error during padmet/sbml creation.")
-        logger.info(pusage)
-        sys.exit(1)
-
-def sbml3_to_sbml2(sbml_file, sbml_output_file, cpu, version):
-    """Turn sbml3 to sbml2.
-
-    Args:
-        sbml_file (string): pathname to species sbml file
-        sbml_output_file (string): pathname to output sbml file
-        db (string): name of the database ('metacyc')
-        version (string): version of tthe database
-
-    Returns:
-        sbml_check (bool): Check if sbml file exists
-    """
-    from_sbml_to_sbml(sbml_file, sbml_output_file, version, cpu)
-
-    sbml_check = utils.is_valid_path(sbml_output_file)
-
-    return sbml_check
-
-def sbml2_to_sbml3(sbml_file, sbml_output_file, db, version):
-    """Turn sbml2 to sbml3.
-
-    Args:
-        sbml_file (string): pathname to species sbml file
-        sbml_output_file (string): pathname to output sbml file
-        db (string): name of the database ('metacyc')
-        version (string): version of tthe database
-
-    Returns:
-        sbml_check (bool): Check if sbml file exists
-    """
-    padmet = from_sbml_to_padmet(sbml=sbml_file, db=db, version=version, padmetSpec_file=None, source_tool=None, source_category=None, source_id=None, padmetRef_file=None, mapping=None, verbose=None)
-    padmet_to_sbml(padmet, sbml_output_file, sbml_lvl=3, verbose=False)
-
-    sbml_check = utils.is_valid_path(sbml_output_file)
-
-    return sbml_check
-
 def indiv_scope_run(sbml_dir, seeds, output_dir):
     """Run Menetools and analyse individual metabolic capabilities
     
@@ -291,7 +188,6 @@ def indiv_scope_run(sbml_dir, seeds, output_dir):
     menetools_dir = output_dir + "/indiv_scopes"
     if not utils.is_valid_dir(menetools_dir):
         logger.critical("Impossible to access/create output directory")
-        logger.info(pusage)
         sys.exit(1)
 
     all_files = [
@@ -353,7 +249,6 @@ def instance_community(sbml_dir, seeds, output_dir, host_mn=None):
     miscoto_dir = output_dir + "/community_analysis"
     if not utils.is_valid_dir(miscoto_dir):
         logger.critical("Impossible to access/create output directory")
-        logger.info(pusage)
         sys.exit(1)
 
     # create tempfile
@@ -370,7 +265,6 @@ def instance_community(sbml_dir, seeds, output_dir, host_mn=None):
 
     return instance_filepath
 
-
 def comm_scope_run(instance, output_dir):
     """Run Miscoto_scope and analyse individual metabolic capabilities
     
@@ -385,7 +279,6 @@ def comm_scope_run(instance, output_dir):
     miscoto_dir = output_dir + "/community_analysis"
     if not utils.is_valid_dir(miscoto_dir):
         logger.critical("Impossible to access/create output directory")
-        logger.info(pusage)
         sys.exit(1)
 
     microbiota_scope = run_scopes(instance)
@@ -423,7 +316,6 @@ def mincom(instancefile, output_dir, host):
     miscoto_dir = output_dir + "/community_analysis"
     if not utils.is_valid_dir(miscoto_dir):
         logger.critical("Impossible to access/create output directory")
-        logger.info(pusage)
         sys.exit(1)
 
     results_dic = run_mincom(option="soup",
@@ -432,6 +324,3 @@ def mincom(instancefile, output_dir, host):
                             union=True,
                             intersection=True)
     return results_dic
-
-if __name__ == "__main__":
-    run_workflow()

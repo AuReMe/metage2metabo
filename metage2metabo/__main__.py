@@ -165,16 +165,18 @@ def main():
 
     if args.cmd == "workflow":
         main_workflow(args.genomes, args.out, args.cpu, args.clean, args.seeds, args.modelhost)
+    elif args.cmd in ["iscope","cscope","addedvalue","mincom"]:
+        network_dir = check_sbml(args.networksdir)
+        if args.cmd == "iscope":
+            print("¯\_(ツ)_/¯ running iscope")
+        elif args.cmd == "cscope":
+            print("¯\_(ツ)_/¯ running cscope")
+        elif args.cmd == "addedvalue":
+            print("¯\_(ツ)_/¯ running addedvalue")
+        elif args.cmd == "mincom":
+            print("¯\_(ツ)_/¯ running mincom")
     elif args.cmd == "recon":
-        print("¯\_(ツ)_/¯ running recon")
-    elif args.cmd == "iscope":
-        print("¯\_(ツ)_/¯ running iscope")
-    elif args.cmd == "cscope":
-        print("¯\_(ツ)_/¯ running cscope")
-    elif args.cmd == "addedvalue":
-        print("¯\_(ツ)_/¯ running addedvalue")
-    elif args.cmd == "mincom":
-        print("¯\_(ツ)_/¯ running mincom")
+            print("¯\_(ツ)_/¯ running recon")
     else:
         logger.info("m2m " + VERSION + "\n" + LICENSE)
         parser.print_help()
@@ -183,6 +185,10 @@ def main():
 
 def main_workflow(*allargs):
     run_workflow(*allargs)
+
+def check_sbml(folder):
+    sbml_dir = folder
+    return sbml_dir
 
 
 if __name__ == "__main__":
