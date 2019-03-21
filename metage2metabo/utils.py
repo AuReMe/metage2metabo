@@ -54,6 +54,23 @@ def is_valid_path(filepath):
     else:  # path is accessible
         return True
 
+
+def is_valid_file(filepath):
+    """Return True if filepath exists
+
+    Args:
+        filepath (str): path to file
+
+    Returns:
+        bool: True if path exists, False otherwise
+    """
+    try:
+        open(filepath, 'r').close()
+        return True
+    except OSError:
+        return False
+
+
 def is_valid_dir(dirpath):
     """Return True if directory exists or can be created (then create it)
     
@@ -72,7 +89,7 @@ def is_valid_dir(dirpath):
     else:
         return True
 
-def check_ptools():
+def check_program(program):
     """Check whether Pathway Tools is in the PATH
 
     Returns:
@@ -81,7 +98,6 @@ def check_ptools():
     def is_exe(fpath):
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
-    program = "pathway-tools"
     if is_exe(program):
         return True
     else:

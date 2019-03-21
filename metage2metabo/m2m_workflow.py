@@ -22,6 +22,7 @@ import json
 import logging
 import mpwt
 import os, os.path
+import pyasp
 import tempfile
 import time
 import sys
@@ -40,69 +41,17 @@ logger = logging.getLogger(__name__)
 logging.getLogger("menetools").setLevel(logging.CRITICAL)
 logging.getLogger("miscoto").setLevel(logging.CRITICAL)
 
-###############################################################################
-#
-message = """
-Description here TODO
-"""
-
-pusage = """
-Usage here TODO
-"""
-
-requires = """
-Requirements here TODO
-"""
-#
-###############################################################################
-
-
-def run_workflow():
-    """description
+def run_workflow(inp_dir,out_dir,nb_cpu,clean,seeds,host_mn):
+    """Run the whole m2m workflow
+    
+    Args:
+        inp_dir (str): genomes directory
+        out_dir (str): results directory
+        nb_cpu (int): cpu number for multi-processing
+        clean (bool): clean PGDB and re-run them
+        seeds (str): seeds file
+        host_mn (str): metabolic network file for host
     """
-    #TODO check correct install of Pyasp by looking for ASP binaries else: pip install pyasp==1.4.3 --no-cache-dir --force-reinstall
-    parser = argparse.ArgumentParser(description=message, usage=pusage, epilog=requires)
-    parser.add_argument("-g",
-                        "--genomes",
-                        help="annotated genomes directory",
-                        required=True)
-    parser.add_argument("-o",
-                        "--output",
-                        help="output directory",
-                        required=True)
-    parser.add_argument("-c",
-                        "--cpu",
-                        help="cpu number for multi-process Pathway Tools",
-                        required=False,
-                        default=1)
-    parser.add_argument("-s",
-                        "--seeds",
-                        help="seeds (growth medium) for metabolic analysis",
-                        required=True)
-    parser.add_argument("-m",
-                        "--modelhost",
-                        help="host metabolic model for community analysis",
-                        required=False,
-                        default=None)
-    parser.add_argument("--clean",
-                        help="clean PGDBs if already present",
-                        required=False,
-                        action="store_true")
-
-    args = parser.parse_args()
-    inp_dir = args.genomes
-    out_dir = args.output
-    seeds = args.seeds
-    host = args.modelhost
-    clean = args.clean
-
-    try:
-        nb_cpu = int(args.cpu)
-    except:
-        logger.critical("enter a valid number of CPU")
-        logger.info(pusage)
-        sys.exit(1)
-
     # METABOLIC NETWORK RECONSTRUCTION
     # Create PGDBs
     logger.info("######### Running metabolic network reconstruction with Pathway Tools #########")
@@ -143,7 +92,7 @@ def run_workflow():
             newtargets)
         # Compute community selection
         logger.info("Running minimal community selection")
-        all_results = mincom(instance_w_targets, out_dir)
+        all_results = mincom(instance_w_targets, out_dir, host_mn)
         # Give one solution
         onesol = all_results['one_model']
         one_sol_bact = []
@@ -191,16 +140,26 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
         logger.info(pusage)
         sys.exit(1)
 
-    if not utils.check_ptools():
+    if not utils.check_program("pathway-tools"):
         logger.critical(
             "Pathway Tools is not in the PATH, please fix it before using the program"
         )
         logger.info(pusage)
         sys.exit(1)
 
-    #TODO test whether blast is in the PATH
+    if not utils.check_program("blastp"):
+        logger.critical(
+            "blastp is not in the PATH, please fix it before using the program"
+        )
+        logger.info(pusage)
+        sys.exit(1)
 
-    #TODO test is ncbirc is in home folder
+    if not utils.is_valid_file(os.path.expanduser("~") + "/.ncbirc"):
+        logger.critical(
+            "No ~/.ncbirc file, please fix it before using the program"
+        )
+        logger.info(pusage)
+        sys.exit(1)
 
     #TODO test whether not everything is run again in case some PGDBs already are in PDGB_dir and/or Ptools local
 
@@ -451,7 +410,7 @@ def add_targets_to_instance(instancefile, output_dir, target_set):
 
     return new_instance_file
 
-def mincom(instancefile, output_dir):
+def mincom(instancefile, output_dir, host):
     """Run minimal community selection and analysis
     
     Args:
