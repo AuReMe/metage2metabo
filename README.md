@@ -3,7 +3,7 @@
 <table>
 <tr>
 <td>
-Metage2metabo is a Python3 tool to perform graph-based metabolic analysis starting from annotated genomes. It uses Pathway Tools in a automatic and parallel way to reconstruct metabolic networks for a large number of genomes. The obtained metabolic networks are then analyzed individually and collectively in order to get the added value of cooperation in microbiota over individual metabolism, and to identify and screen interesting organisms among all. 
+Metage2metabo is a Python3 tool to perform graph-based metabolic analysis starting from annotated genomes (**reference genomes or metagenome-assembled genomes **. It uses **Pathway Tools** in a automatic and parallel way to *reconstruct metabolic networks* for a large number of genomes. The obtained metabolic networks are then *analyzed individually and collectively* in order to get the *added value of metabolic cooperation in microbiota* over individual metabolism, and to *identify and screen interesting organisms* among all. 
 </td>
 </tr>
 </table>
