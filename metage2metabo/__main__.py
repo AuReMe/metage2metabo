@@ -192,8 +192,7 @@ def main():
 
     #if modelhost is given as an arg: check the SBML level and turn it into 2 if needed
     if args.cmd in ["workflow", "mincom", "cscope", "addedvalue"] and args.modelhost:
-        new_arg_modelhost = args.modelhost
-        #TODO new_arg_modelhost = SbML2 version of args.modelhost if args.modelhost.getLevel!=2
+        new_arg_modelhost = check_sbml(args.modelhost, args.out, folder=False)
     else:
         new_arg_modelhost = None
 
@@ -264,6 +263,7 @@ def main_added_value(sbmldir, seeds, outdir, host):
     sbml_management.create_species_sbml(newtargets, outdir + "/community_analysis/targets.sbml")
     logger.info("Target file created with the addedvalue targets in: " +
                 outdir + "/community_analysis/targets.sbml")
+#TODO tests
 
 
 def main_mincom(sbmldir, seedsfiles, outdir, targets, host):
@@ -280,6 +280,10 @@ def main_mincom(sbmldir, seedsfiles, outdir, targets, host):
     instance = instance_community(sbmldir, seedsfiles, outdir, targets, host)
     #run mincom
     mincom(instance, outdir)
+    #TODO produce a json with results dic
+
+
+#TODO tests
 
 
 def main_seeds(metabolites_file, outdir):
@@ -304,46 +308,58 @@ def main_seeds(metabolites_file, outdir):
     logger.info("Seeds SBML file created in " + outfile)
 
 
-def check_sbml(folder, outdir):
+def check_sbml(inpt, outdir, folder = True):
     """Check whether one or several SBML level 3 files are in directory. If yes, convert them into a new directory and copy the SBML files that are correct into this same directory
     
     Args:
-        folder (str): SBML files directory
+        inpt (str): SBML files directory
         outdir (str): Results directory
+        folder (bool): Defaults to True. Change function behavior is input is a file or a folder
     
     Returns:
-        str: filepath of directory, same as input if all SBMLs are level2
+        str: filepath of file or directory, same as input if all SBMLs are level2
     """
-    all_files = [
-        f for f in os.listdir(folder)
-        if os.path.isfile(os.path.join(folder, f)) and utils.get_extension(
-            os.path.join(folder, f)).lower() in ["xml", "sbml"]
-    ]
-    sbml_levels = {}
-    make_new_sbmls = False
-    for f in all_files:
-        sbml_levels[f] = sbml_management.get_sbml_level(os.path.join(folder, f))
-        if sbml_levels[f] != 2:
-            make_new_sbmls = True
-    if make_new_sbmls:
-        sbml_dir = outdir + "/new_sbml/"
-        logger.warning(
-            "At least one SBML has not a suitable level for the tools. They will be transformed and created in "
-            + sbml_dir + ". The others will be copied in this directory")
-        if not utils.is_valid_dir(sbml_dir):
-            logger.critical("Impossible to write in output directory")
-            sys.exit(1)
+    if folder:
+        all_files = [
+            f for f in os.listdir(inpt)
+            if os.path.isfile(os.path.join(inpt, f)) and utils.get_extension(
+                os.path.join(inpt, f)).lower() in ["xml", "sbml"]
+        ]
+        sbml_levels = {}
+        make_new_sbmls = False
         for f in all_files:
+            sbml_levels[f] = sbml_management.get_sbml_level(
+                os.path.join(inpt, f))
             if sbml_levels[f] != 2:
-                #create level 2 SBML in sbml_dir
-                sbml_management.sbml_to_sbml(
-                    os.path.join(folder, f), os.path.join(sbml_dir, f), 2)
-            else:
-                #copy the original SBML in sbml_dir
-                copyfile(os.path.join(folder, f), os.path.join(sbml_dir, f))
+                make_new_sbmls = True
+        if make_new_sbmls:
+            sbml_dir = outdir + "/new_sbml/"
+            logger.warning(
+                "At least one SBML has not a suitable level for the tools. They will be transformed and created in "
+                + sbml_dir + ". The others will be copied in this directory")
+            if not utils.is_valid_dir(sbml_dir):
+                logger.critical("Impossible to write in output directory")
+                sys.exit(1)
+            for f in all_files:
+                if sbml_levels[f] != 2:
+                    #create level 2 SBML in sbml_dir
+                    sbml_management.sbml_to_sbml(
+                        os.path.join(inpt, f), os.path.join(sbml_dir, f), 2)
+                else:
+                    #copy the original SBML in sbml_dir
+                    copyfile(os.path.join(inpt, f), os.path.join(sbml_dir, f))
+        else:
+            sbml_dir = inpt
+        return sbml_dir
     else:
-        sbml_dir = folder
-    return sbml_dir
+        sbml_level = sbml_management.get_sbml_level(inpt)
+        if sbml_level != 2:
+            newsbml = outdir + utils.get_basename(inpt) + "_lvl2.sbml"
+            logger.warning(inpt + " was not in a suitable level for analysis. A converted file is created in " + newsbml)
+            sbml_management.sbml_to_sbml(inpt, newsbml, 2)
+        else:
+            newsbml = inpt
+        return newsbml
 
 
 if __name__ == "__main__":
