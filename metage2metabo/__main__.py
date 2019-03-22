@@ -180,6 +180,8 @@ def main():
 
     args = parser.parse_args()
 
+    #TODO ensure that -t -t -m are valid filepaths before doing anything
+
     # test writing in out_directory if a subcommand is given else print version and help
     if args.cmd:
         if not utils.is_valid_dir(args.out):
@@ -202,20 +204,35 @@ def main():
         main_workflow(args.genomes, args.out, args.cpu, args.clean, args.seeds,
                       new_arg_modelhost)
     elif args.cmd in ["iscope","cscope","addedvalue","mincom"]:
+        if not os.path.isdir(args.networksdir):
+            logger.critical(args.networksdir + " is not a correct directory path")
+            sys.exit(1)
         network_dir = check_sbml(args.networksdir, args.out)
-        if args.cmd == "iscope":
-            main_iscope(network_dir, args.seeds, args.out)
-        elif args.cmd == "cscope":
-            main_cscope(network_dir, args.seeds, args.out, new_arg_modelhost)
-        elif args.cmd == "addedvalue":
-            main_added_value(network_dir, args.seeds, args.out,
-                             new_arg_modelhost)
-        elif args.cmd == "mincom":
-            main_mincom(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
+        if not utils.is_valid_file(args.seeds):
+            logger.critical(args.seeds + " is not a correct filepath")
+            sys.exit(1)
+        else:
+            if args.cmd == "iscope":
+                main_iscope(network_dir, args.seeds, args.out)
+            elif args.cmd == "cscope":
+                main_cscope(network_dir, args.seeds, args.out, new_arg_modelhost)
+            elif args.cmd == "addedvalue":
+                main_added_value(network_dir, args.seeds, args.out,
+                                new_arg_modelhost)
+            elif args.cmd == "mincom":
+                if not utils.is_valid_file(args.targets):
+                    logger.critical(args.targets + " is not a correct filepath")
+                    sys.exit(1)
+                else:
+                    main_mincom(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
     elif args.cmd == "recon":
         main_recon(args.genomes, args.out, args.cpu, args.clean)
     elif args.cmd == "seeds":
-        main_seeds(args.metabolites, args.out)
+        if not utils.is_valid_file(args.metabolites):
+            logger.critical(args.metabolites + " is not a correct filepath")
+            sys.exit(1)
+        else:
+            main_seeds(args.metabolites, args.out)
 
 
 def main_workflow(*allargs):
@@ -352,14 +369,18 @@ def check_sbml(inpt, outdir, folder = True):
             sbml_dir = inpt
         return sbml_dir
     else:
-        sbml_level = sbml_management.get_sbml_level(inpt)
-        if sbml_level != 2:
-            newsbml = outdir + utils.get_basename(inpt) + "_lvl2.sbml"
-            logger.warning(inpt + " was not in a suitable level for analysis. A converted file is created in " + newsbml)
-            sbml_management.sbml_to_sbml(inpt, newsbml, 2)
+        if not utils.is_valid_file(inpt):
+            logger.critical(inpt + " is not a correct filepath")
+            sys.exit(1)
         else:
-            newsbml = inpt
-        return newsbml
+            sbml_level = sbml_management.get_sbml_level(inpt)
+            if sbml_level != 2:
+                newsbml = outdir + utils.get_basename(inpt) + "_lvl2.sbml"
+                logger.warning(inpt + " was not in a suitable level for analysis. A converted file is created in " + newsbml)
+                sbml_management.sbml_to_sbml(inpt, newsbml, 2)
+            else:
+                newsbml = inpt
+            return newsbml
 
 
 if __name__ == "__main__":
