@@ -63,6 +63,15 @@ Python 3 (Python 3.6 is tested).
 
         Dmg installer with a graphical interface.
 
+        * **Warning** 
+    
+        /!\ For all OS, Pathway Tools must be in ```$PATH```. 
+        On Linux and MacOS: ```export PATH=$PATH:your/install/directory/pathway-tools```. 
+        Consider adding Pathway Tools in ```$PATH``` permanently by running
+        ````sh
+        echo 'export PATH="$PATH:your/install/directory/pathway-tools:"' >> ~/.bashrc
+        ````
+
 ## Installation
 
 Tested on Linux (Ubuntu, Fedora, Debian) and MacOs (version 10.14).
