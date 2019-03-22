@@ -23,3 +23,9 @@ Utils
     :members:
     :undoc-members:
 
+Main
+-----
+
+.. automodule::  metage2metabo.__main__
+    :members:
+    :undoc-members:
