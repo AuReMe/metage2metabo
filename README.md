@@ -1,4 +1,4 @@
-[![https://pypi.org/project/Metage2Metabo/](https://img.shields.io/pypi/v/metage2metabo.svg)](https://img.shields.io/pypi/v/metage2metabo.svg) [![PyPI license](https://img.shields.io/pypi/l/metage2metabo.svg)](https://pypi.python.org/pypi/Metage2Metabo/)
+[![https://pypi.org/project/Metage2Metabo/](https://img.shields.io/pypi/v/metage2metabo.svg)](https://img.shields.io/pypi/v/metage2metabo.svg) [![GitHub license](https://img.shields.io/github/license/AuReMe/metage2metabo.svg)](https://github.com/AuReMe/metage2metabo/blob/master/LICENSE)
 # M2M - metage2metabo
 <table>
 <tr>
