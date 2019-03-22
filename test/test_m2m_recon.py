@@ -32,6 +32,7 @@ def test_m2m_recon_call():
     subprocess.call(['mpwt', '--delete', 'fatty_acid_beta_oxydation_icyc,tca_cycle_ecolicyc'])
     subprocess.call(['m2m', 'recon', '-g', 'test', '-o', 'test_output', '-c', '1'])
 
+    #TODO uncomment when issue is fixed in pgdb_to_padmet.
     '''
     reader = SBMLReader()
     document = reader.readSBML('test_output/sbml/tca_cycle_ecoli.sbml')
