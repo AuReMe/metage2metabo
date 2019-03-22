@@ -1,3 +1,4 @@
+[![https://pypi.org/project/Metage2Metabo/](https://badge.fury.io/py/ansicolortags.svg)](https://img.shields.io/pypi/v/metage2metabo.svg)
 # M2M - metage2metabo
 <table>
 <tr>
