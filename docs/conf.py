@@ -100,7 +100,7 @@ html_static_path = ['_static']
 # html_sidebars = {}
 
 autodoc_mock_imports = [
-    "padmet", "mpwt""
+    "padmet", "mpwt"
 ]
 
 # -- Options for HTMLHelp output ---------------------------------------------
