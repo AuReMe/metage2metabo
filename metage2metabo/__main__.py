@@ -18,10 +18,10 @@ m2m is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.\n
 """
 MESSAGE = """
-Description here #TODO
+From metabolic network reconstruction with annotated genomes to metabolic capabilities screening to identify organisms of interest in a large microbiota.
 """
 REQUIRES = """
-Requirements here #TODO
+Requirements here Pathway Tools installed and in $PATH, and NCBI Blast
 """
 logging.basicConfig(
         format='%(message)s', level=logging.INFO)  #%(name)s:%(message)s
