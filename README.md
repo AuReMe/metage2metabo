@@ -32,7 +32,11 @@ This project is licensed under the GNU General Public License - see the [LICENSE
 
 ## Technologies
 
-Python 3 (Python 3.6 is tested).
+Python 3 (Python 3.6 is tested). M2M uses a certain number of Python dependencies. An example of all these dependencies working for Ubuntu 18.04 is available in [requirements.txt](https://github.com/AuReMe/metage2metabo/blob/master/requirements.txt).
+They can be installed with:
+````sh
+pip install -r requirements.txt --no-cache-dir
+````
 
 ## Requirements
 

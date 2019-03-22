@@ -295,6 +295,9 @@ def analyze_indiv_scope(jsonfile, seeds):
     """
     with open(jsonfile) as json_data:
         d = json.load(json_data)
+        if not d:
+            logger.critical("Json file is empty. Individual scopes calculation failed. Please fill an issue on Github")
+            sys.exit(1)
     d_set = {}
 
     for elem in d:
