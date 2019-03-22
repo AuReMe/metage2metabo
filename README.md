@@ -104,7 +104,8 @@ subcommands:
 Requirements here Pathway Tools installed and in $PATH, and NCBI Blast
 ````
 
-* m2m recon
+### m2m recon
+
 ````
 usage: m2m recon [-h] -g GENOMES [--clean] -o OUPUT_DIR [-c CPU]
 
@@ -121,7 +122,8 @@ optional arguments:
   -c CPU, --cpu CPU     cpu number for multi-process
   ````
 
-* m2m iscope
+### m2m iscope
+
 ````
 usage: m2m iscope [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR [-c CPU]
 
@@ -139,7 +141,8 @@ optional arguments:
   -c CPU, --cpu CPU     cpu number for multi-process
   ````
 
-* m2m cscope
+### m2m cscope
+
 ````
 usage: m2m cscope [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR [-m MODELHOST]
                   [-c CPU]
@@ -159,7 +162,8 @@ optional arguments:
   -c CPU, --cpu CPU     cpu number for multi-process
   ````
 
-* m2m addedvalue
+### m2m addedvalue
+
 ````
 usage: m2m addedvalue [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR
                       [-m MODELHOST] [-c CPU]
@@ -180,7 +184,8 @@ optional arguments:
   -c CPU, --cpu CPU     cpu number for multi-process
   ````
 
-* m2m mincom
+### m2m mincom
+
 ````
 usage: m2m mincom [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR [-m MODELHOST]
                   [-c CPU] -t TARGETS
@@ -202,7 +207,8 @@ optional arguments:
                         targets for metabolic analysis
 ````
 
-* m2m workflow
+### m2m workflow
+
 ````
 usage: m2m workflow [-h] -g GENOMES [--clean] -s SEEDS [-m MODELHOST] -o
                     OUPUT_DIR [-c CPU]
@@ -224,7 +230,8 @@ optional arguments:
   -c CPU, --cpu CPU     cpu number for multi-process
   ````
 
-* m2m seeds
+### m2m seeds
+
 ````
 usage: m2m seeds [-h] -o OUPUT_DIR --metabolites METABOLITES
 
