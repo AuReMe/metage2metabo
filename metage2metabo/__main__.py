@@ -179,9 +179,6 @@ def main():
     )
 
     args = parser.parse_args()
-
-    #TODO ensure that -t -t -m are valid filepaths before doing anything
-
     # test writing in out_directory if a subcommand is given else print version and help
     if args.cmd:
         if not utils.is_valid_dir(args.out):
