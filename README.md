@@ -51,7 +51,7 @@ In particular, m2m relies on:
             apt-get update && apt-get install gnome-terminal libxm4 ncbi-blast+ 
             echo "[ncbi]\nData=/usr/bin/data" > ~/.ncbirc
             ```
-            * Install with a dmg installer on MacOS
+            * Install with a [dmg installer](ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/) on MacOS
     * Pathway Tools install
         * **Linux**
         ```sh
@@ -61,7 +61,6 @@ In particular, m2m relies on:
         and follow the instructions during the interactive install
 
         *For a silent install*: ```./pathway-tools-22.5-linux-64-tier1-install --InstallDir your/install/directory/pathway-tools --PTOOLS_LOCAL_PATH your/chosen/directory/for/data/ptools --InstallDesktopShortcuts 0 --mode unattended```
-        
         * **MacOS**
 
         Dmg installer with a graphical interface.
