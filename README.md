@@ -16,6 +16,13 @@ m2m can be used as a whole workflow ( ``` m2m workflow ``` ) or steps can be per
 * [Requirements](#Requirements)
 * [Installation](#Installation)
 * [Features](#Features)
+    * [m2m recon](#m2m-recon)
+    * [m2m iscope](#m2m-iscope)
+    * [m2m cscope](#m2m-cscope)
+    * [m2m addedvalue](#m2m-addedvalue)
+    * [m2m mincom](#m2m-mincom)
+    * [m2m workflow](#m2m-workflow)
+    * [m2m seeds](#m2m-seeds)
 * [Authors](#Authors)
 * [Acknowledgement](#Acknowledgement)
 
