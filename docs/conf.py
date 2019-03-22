@@ -100,9 +100,9 @@ html_static_path = ['_static']
 # html_sidebars = {}
 
 autodoc_mock_imports = [
-    "padmet", "mpwt"
+    "padmet", "grequests", "seaborn", "sklearn", "fastcluster", "matplotlib",
+    "networkx", "panda", "libsbml", "docopt", "pyasp", "menetools", "miscoto", "mpwt"
 ]
-
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
