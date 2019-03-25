@@ -364,8 +364,11 @@ def comm_scope_run(instance, output_dir):
     if not utils.is_valid_dir(miscoto_dir):
         logger.critical("Impossible to access/create output directory")
         sys.exit(1)
-
     microbiota_scope = run_scopes(instance)
+    with open(miscoto_dir + "/comm_scopes.json", 'w') as dumpfile:
+        json.dump(microbiota_scope, dumpfile)
+    logger.info("Community scopes for all metabolic networks available in " +
+                miscoto_dir + "/comm_scopes.json")
     return set(microbiota_scope['com_scope'])
 
 
