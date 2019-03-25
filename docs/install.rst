@@ -78,5 +78,88 @@ Installation with pip
 Installation with Docker
 ========================
 
+To create the image using the Dockerfile in the github repository (in recipes), you need a Pathway-Tools installer placed in the same folder than the dockerfile.
+The name of the file is currently hardcoded (so if you use another version it must be changed).
+
+
+.. code:: sh
+
+    # Launch docker.
+    sudo systemctl start docker
+
+    sudo docker build -t my_image .
+
+To launch the container in interactive mode:
+
+.. code:: sh
+
+    sudo docker run -ti -v /my/path/to/my/data:/shared --name="my_container" my_image bash
+
 Installation with Singularity
 =============================
+
+To launch m2m in a cluster we use Singularity.
+First, we need to create the Singularity file locally.
+But to use the image on the cluster, we have to put the cluster path in the Singularity recipe.
+
+To create the image (using the Singularity file in the recipes folder):
+
+.. code:: sh
+
+    sudo singularity build m2m.sif Singularity
+
+To use Pathway-Tools, you need a file named .ncbirc in your home and containing the path to Blast:
+
+.. code:: sh
+
+    [ncbi]\nData=/usr/bin/data
+
+So in a cluster you need to create this file in your home.
+
+To have an external ptools-local folder (mandatory when using the image on cluster), we have implemented an ugly hack.
+The idea is that it creates the ptools-local inside the home then it moves it inside the Singularity image.
+So you have to move it outside the Singularity image after it has been built.
+
+First, enter the Singularity image:
+
+.. code:: sh
+
+    singularity run m2m.sif
+
+
+Then move the ptools-local folder from the Singularity folder to the folder in your local environment.
+
+.. code:: sh
+
+    cp -r /opt/ptools /home/your/external/folder/ptools
+
+This will move the ptools-local folder (with permissions) from Singularity container to the local machine.
+
+In this way, PGDBs can be stored in the home folder outside your container.
+
+Then you can launch jobs with the Singularity image by giving a sh file containg m2m commands.
+
+.. code:: sh
+
+    m2m.sh:
+
+    m2m workflow -g genomes_dir -s seeds.sbml -o output_dir -c cpu_number
+
+So you can encapsulate it in a sh script:
+
+.. code:: sh
+
+    my_script.sh:
+
+    #!/bin/bash
+
+    # Don't forget to source the Singularity environment.
+    . /local/env/envsingularity.sh
+
+    singularity exec m2m.sif bash m2m.sh
+
+This file can now be launched on a cluster, for example (in SLURM):
+
+.. code:: sh
+
+    sbatch my_script.sh

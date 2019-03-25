@@ -9,4 +9,4 @@ install:
   - pip install Metage2Metabo
 
 script:
-- pytest test/test_m2m.py
+- pytest test/test_m2m.py --disable-pytest-warnings
