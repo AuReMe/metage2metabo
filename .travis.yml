@@ -2,8 +2,6 @@ dist: trusty
 sudo: required
 language: python
 python:
-  - "3.4"
-  - "3.5"
   - "3.6"
 
 # Install packages
@@ -11,4 +9,4 @@ install:
   - pip install Metage2Metabo
 
 script:
-- pytest pyasp
+- pytest test/test_m2m.py
