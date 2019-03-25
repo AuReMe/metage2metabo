@@ -157,9 +157,18 @@ def mincom(instance_w_targets, out_dir):
         instance_w_targets (str): ASP instance filepath
         out_dir (str): results directory
     """
+    # miscoto_dir = out_dir + "/community_analysis"
+    # if not utils.is_valid_dir(miscoto_dir):
+    #     logger.critical("Impossible to access/create output directory")
+    #     sys.exit(1)
     # Compute community selection
     logger.info("Running minimal community selection")
     all_results = compute_mincom(instance_w_targets, out_dir)
+    # with open(miscoto_dir + "/mincom.json", 'w') as dumpfile:
+    #     json.dump(all_results, dumpfile)
+    # logger.info("Community scopes for all metabolic networks available in " +
+    #             miscoto_dir + "/comm_scopes.json")
+    #TODO deal with the TermSet for json export
     # Give one solution
     onesol = all_results['one_model']
     one_sol_bact = []
