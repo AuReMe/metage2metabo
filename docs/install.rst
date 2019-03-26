@@ -54,7 +54,7 @@ Requirements
 
             echo 'export PATH="$PATH:your/install/directory/pathway-tools:"' >> ~/.bashrc
 
-m2m relies on python package:
+m2m relies on several Python packages:
 
 * `mpwt <https://github.com/AuReMe/mpwt>`__ to automatize metabolic network reconstruction with Pathway-Tools.
 
