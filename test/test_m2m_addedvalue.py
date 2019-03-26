@@ -12,7 +12,6 @@ import subprocess
 import tarfile
 import json
 from libsbml import SBMLReader
-import logging
 
 
 EXPECTED_TARGETS = {
