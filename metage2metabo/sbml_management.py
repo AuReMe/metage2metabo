@@ -68,14 +68,14 @@ def run_pgdb_to_sbml(species_multiprocess_data):
         arg_source=None,
         enhanced_db=None,
         padmetRef_file=None)
-
+    #TODO give variable for sbml_lvl
     padmet_to_sbml(padmet, species_sbml_file, sbml_lvl=2, verbose=False)
 
     sbml_check = utils.is_valid_path(species_sbml_file)
     return sbml_check
 
 
-def pgdb_to_sbml(pgdb_dir, output_dir, cpu):
+def pgdb_to_sbml(pgdb_dir, output_dir, sbml_level, cpu):
     """Turn Pathway Tools PGDBs into SBML2 files using Padmet
     
     Args:
@@ -96,7 +96,7 @@ def pgdb_to_sbml(pgdb_dir, output_dir, cpu):
     for species in os.listdir(pgdb_dir):
         multiprocess_data.append(
             [pgdb_dir + '/' + species, sbml_dir + '/' + species + '.sbml'])
-
+    #TODO give variable for sbml_lvl
     sbml_checks = pgdb_to_sbml_pool.map(run_pgdb_to_sbml, multiprocess_data)
 
     pgdb_to_sbml_pool.close()

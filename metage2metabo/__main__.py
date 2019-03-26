@@ -110,6 +110,14 @@ def main():
         help="host metabolic model for community analysis",
         required=False,
         default=None)
+    parent_parser_l = argparse.ArgumentParser(add_help=False)
+    parent_parser_l.add_argument(
+        "-l",
+        "--level",
+        help="Level for SBML creation, 2 or 3",
+        required=False,
+        choices=[2,3],
+        default=2)
 
     # subparsers
     subparsers = parser.add_subparsers(
@@ -120,12 +128,12 @@ def main():
         "recon",
         help="metabolic network reconstruction",
         parents=[
-            parent_parser_g, parent_parser_o, parent_parser_c, parent_parser_q
+            parent_parser_g, parent_parser_o, parent_parser_c, parent_parser_q,
+            parent_parser_l
         ],
         description=
         "Run metabolic network reconstruction for each annotated genome of the input directory, using Pathway Tools"
     )
-    #TODO chose the SBML level for the output 2 or 3, default = 2
     indivscope_parser = subparsers.add_parser(
         "iscope",
         help="individual scope computation",
@@ -243,7 +251,7 @@ def main():
                 else:
                     main_mincom(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
     elif args.cmd == "recon":
-        main_recon(args.genomes, args.out, args.cpu, args.clean)
+        main_recon(args.genomes, args.out, args.level, args.cpu, args.clean)
     elif args.cmd == "seeds":
         if not utils.is_valid_file(args.metabolites):
             logger.critical(args.metabolites + " is not a correct filepath")
@@ -297,7 +305,6 @@ def main_added_value(sbmldir, seeds, outdir, host):
     sbml_management.create_species_sbml(newtargets, outdir + "/community_analysis/targets.sbml")
     logger.info("Target file created with the addedvalue targets in: " +
                 outdir + "/community_analysis/targets.sbml")
-#TODO tests
 
 
 def main_mincom(sbmldir, seedsfiles, outdir, targets, host):

@@ -68,7 +68,7 @@ def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, host_mn):
     mincom(instance_w_targets, out_dir)
 
 
-def recon(inp_dir, out_dir, nb_cpu, clean):
+def recon(inp_dir, out_dir, sbml_level, nb_cpu, clean):
     """Run metabolic network reconstruction with Pathway Tools and get SBMLs
     
     Args:
@@ -87,7 +87,7 @@ def recon(inp_dir, out_dir, nb_cpu, clean):
         logger.info("Could not run Pathway Tools")
         sys.exit(1)
     # Create SBMLs from PGDBs
-    sbml_dir = sbml_management.pgdb_to_sbml(pgdb_dir, out_dir, nb_cpu)
+    sbml_dir = sbml_management.pgdb_to_sbml(pgdb_dir, out_dir, sbml_level, nb_cpu)
     return pgdb_dir, sbml_dir
 
 
