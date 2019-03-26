@@ -99,10 +99,11 @@ Installation with Singularity
 =============================
 
 To launch m2m in a cluster we use Singularity.
-First, we need to create the Singularity file locally.
+First, we need to create the Singularity image locally.
 But to use the image on the cluster, we have to put the cluster path in the Singularity recipe.
+So you have to replace '/external/folder/ptools' with the path where you want to put the ptools-local folder (which contains PGDB for Pathway-Tools).
 
-To create the image (using the Singularity file in the recipes folder):
+To create the image named m2m.sif (using the Singularity file in the recipes folder):
 
 .. code:: sh
 
@@ -112,12 +113,14 @@ To use Pathway-Tools, you need a file named .ncbirc in your home and containing 
 
 .. code:: sh
 
+    .ncbirc:
+
     [ncbi]\nData=/usr/bin/data
 
 So in a cluster you need to create this file in your home.
 
 To have an external ptools-local folder (mandatory when using the image on cluster), we have implemented an ugly hack.
-The idea is that it creates the ptools-local inside the home then it moves it inside the Singularity image.
+The idea is that it creates the ptools-local in a local folder then it moves it inside the Singularity image.
 So you have to move it outside the Singularity image after it has been built.
 
 First, enter the Singularity image:
@@ -131,11 +134,11 @@ Then move the ptools-local folder from the Singularity folder to the folder in y
 
 .. code:: sh
 
-    cp -r /opt/ptools /home/your/external/folder/ptools
+    cp -r /opt/ptools /external/folder/ptools
 
 This will move the ptools-local folder (with permissions) from Singularity container to the local machine.
 
-In this way, PGDBs can be stored in the home folder outside your container.
+In this way, PGDBs can be stored in the folder outside your container.
 
 Then you can launch jobs with the Singularity image by giving a sh file containg m2m commands.
 
@@ -162,4 +165,4 @@ This file can now be launched on a cluster, for example (in SLURM):
 
 .. code:: sh
 
-    sbatch my_script.sh
+    sbatch --cpus-per-task=4 --mem=8G my_script.sh
