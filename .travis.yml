@@ -8,6 +8,8 @@ python:
 install:
   - pip install Metage2Metabo
 
+before_script: cd test
+
 script:
-- pytest test/test_m2m_addedvalue.py --disable-pytest-warnings
-- pytest test/test_m2m_mincom.py --disable-pytest-warnings
+- pytest test_m2m_addedvalue.py --disable-pytest-warnings
+- pytest test_m2m_mincom.py --disable-pytest-warnings
