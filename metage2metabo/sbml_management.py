@@ -59,6 +59,7 @@ def run_pgdb_to_sbml(species_multiprocess_data):
     """
     species_pgdb_dir = species_multiprocess_data[0]
     species_sbml_file = species_multiprocess_data[1]
+    sbml_level = species_multiprocess_data[2]
     padmet = from_pgdb_to_padmet(
         species_pgdb_dir,
         db='NA',
@@ -68,8 +69,8 @@ def run_pgdb_to_sbml(species_multiprocess_data):
         arg_source=None,
         enhanced_db=None,
         padmetRef_file=None)
-    #TODO give variable for sbml_lvl
-    padmet_to_sbml(padmet, species_sbml_file, sbml_lvl=2, verbose=False)
+
+    padmet_to_sbml(padmet, species_sbml_file, sbml_lvl=sbml_level, verbose=False)
 
     sbml_check = utils.is_valid_path(species_sbml_file)
     return sbml_check
@@ -95,8 +96,10 @@ def pgdb_to_sbml(pgdb_dir, output_dir, sbml_level, cpu):
     multiprocess_data = []
     for species in os.listdir(pgdb_dir):
         multiprocess_data.append(
-            [pgdb_dir + '/' + species, sbml_dir + '/' + species + '.sbml'])
-    #TODO give variable for sbml_lvl
+            [pgdb_dir + '/' + species,
+            sbml_dir + '/' + species + '.sbml',
+            sbml_level])
+
     sbml_checks = pgdb_to_sbml_pool.map(run_pgdb_to_sbml, multiprocess_data)
 
     pgdb_to_sbml_pool.close()
