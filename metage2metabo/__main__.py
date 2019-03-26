@@ -321,10 +321,6 @@ def main_mincom(sbmldir, seedsfiles, outdir, targets, host):
     instance = instance_community(sbmldir, seedsfiles, outdir, targets, host)
     #run mincom
     mincom(instance, outdir)
-    #TODO produce a json with results dic
-
-
-#TODO tests
 
 
 def main_seeds(metabolites_file, outdir):
