@@ -15,8 +15,6 @@ from libsbml import SBMLReader
 import logging
 
 
-logging.getLogger("metage2metabo").setLevel(logging.CRITICAL)
-
 EXPECTED_TARGETS = {
         'M_3__45__OCTAPRENYL__45__4__45__HYDROXYBENZOATE_c',
         'M_CPD__45__16607_c', 'M_CPD__45__221_c', 'M_CPD__45__16020_c',
@@ -100,7 +98,7 @@ def test_m2m_addedvalue_call():
         tar.extractall(path=respath)
     subprocess.call([
         'm2m', 'addedvalue', '-n', respath + '/toy_bact', '-o',
-        respath, '-c', '1', '-s', inppath + '/seeds_toy.sbml'
+        respath, '-c', '1', '-s', inppath + '/seeds_toy.sbml', '-q'
     ])
     target_file = respath + 'community_analysis/targets.sbml'
     iscope_file = respath + 'indiv_scopes/indiv_scopes.json'

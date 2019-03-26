@@ -23,10 +23,12 @@ From metabolic network reconstruction with annotated genomes to metabolic capabi
 REQUIRES = """
 Requirements here Pathway Tools installed and in $PATH, and NCBI Blast
 """
+
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.INFO)
 logging.basicConfig(
         format='%(message)s', level=logging.INFO)  #%(name)s:%(message)s
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 # Check pyasp binaries.
 pyasp_bin_path = pyasp.__path__[0] + '/bin/'
@@ -54,6 +56,16 @@ def main():
         version="%(prog)s " + VERSION + "\n" + LICENSE)
 
     # parent parser
+    parent_parser_q = argparse.ArgumentParser(add_help=False)
+    parent_parser_q.add_argument(
+        "-q",
+        "--quiet",
+        dest="quiet",
+        help="quiet mode",
+        required=False,
+        action="store_true",
+        default=None,
+    )
     parent_parser_c = argparse.ArgumentParser(add_help=False)
     parent_parser_c.add_argument(
         "-c",
@@ -107,7 +119,9 @@ def main():
     ptools_parser = subparsers.add_parser(
         "recon",
         help="metabolic network reconstruction",
-        parents=[parent_parser_g, parent_parser_o, parent_parser_c],
+        parents=[
+            parent_parser_g, parent_parser_o, parent_parser_c, parent_parser_q
+        ],
         description=
         "Run metabolic network reconstruction for each annotated genome of the input directory, using Pathway Tools"
     )
@@ -116,7 +130,8 @@ def main():
         "iscope",
         help="individual scope computation",
         parents=[
-            parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_c
+            parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_c,
+            parent_parser_q
         ],
         description=
         "Compute individual scopes (reachable metabolites from seeds) for each metabolic network of the input directory"
@@ -126,16 +141,15 @@ def main():
         help="community scope computation",
         parents=[
             parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m,
-            parent_parser_c
+            parent_parser_c, parent_parser_q
         ],
-        description="Compute the community scope of all metabolic networks"
-    )
+        description="Compute the community scope of all metabolic networks")
     added_value_parser = subparsers.add_parser(
         "addedvalue",
         help="added value of microbiota's metabolism over individual's",
         parents=[
             parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m,
-            parent_parser_c
+            parent_parser_c, parent_parser_q
         ],
         description=
         "Compute metabolites that are reachable by the community/microbiota and not by individual organisms"
@@ -145,7 +159,7 @@ def main():
         help="minimal communtity selection",
         parents=[
             parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m,
-            parent_parser_c
+            parent_parser_c, parent_parser_q
         ],
         description=
         "Select minimal-size community to make reachable a set of metabolites")
@@ -158,7 +172,7 @@ def main():
     seeds_parser = subparsers.add_parser(
         "seeds",
         help="creation of seeds SBML file",
-        parents=[parent_parser_o],
+        parents=[parent_parser_o, parent_parser_q],
         description=
         "Create a SBML file starting for a simple text file with metabolic compounds identifiers"
     )
@@ -172,13 +186,19 @@ def main():
         help="whole workflow",
         parents=[
             parent_parser_g, parent_parser_s, parent_parser_m, parent_parser_o,
-            parent_parser_c
+            parent_parser_c, parent_parser_q
         ],
         description=
         "Run the whole workflow: metabolic network reconstruction, individual and community scope analysis and community selection"
     )
 
     args = parser.parse_args()
+    # set up the logger
+    if args.quiet:
+        root_logger.setLevel(logging.CRITICAL)
+    else:
+        root_logger.setLevel(logging.INFO)
+
     # test writing in out_directory if a subcommand is given else print version and help
     if args.cmd:
         if not utils.is_valid_dir(args.out):
