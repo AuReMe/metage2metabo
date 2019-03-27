@@ -50,7 +50,7 @@ def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, host_mn):
         host_mn (str): metabolic network file for host
     """
     # METABOLIC NETWORK RECONSTRUCTION
-    sbml_dir = recon(inp_dir, out_dir, nb_cpu, clean)[1]
+    sbml_dir = recon(inp_dir, out_dir, 2, nb_cpu, clean)[1]
     # INDIVIDUAL SCOPES
     union_targets_iscope = iscope(sbml_dir, seeds, out_dir)
     # COMMUNITY SCOPE
