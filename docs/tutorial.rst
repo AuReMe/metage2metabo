@@ -6,7 +6,19 @@ It contains enough data to run the different subcommands.
 
 m2m recon
 ---------
-``m2m recon`` can be 
+``m2m recon`` runs metabolic network reconstruction for all annotated genomes, using Pathway Tools. It can be done with multi-processing, in which case the number of allocated/available CPU has to be given as a optional argument. 
+
+It uses the following mandatory inputs (run ``m2m recon --help`` for optional arguments):
+
+-g directory           directory of annotated genomes
+-s file                seeds SBML file
+-o directory           output directory for results
+
+Optional arguments:
+
+-c int           number of CPU for multi-processing
+--clean          option to rerun every reconstruction 
+                 even if found in ptools-local
 
 m2m iscope, cscope and addedvalue
 ---------------------------------
@@ -63,8 +75,20 @@ It uses the following mandatory inputs (run ``m2m mincom --help`` for optional a
     m2m iscope -n toy_bact -s metabolic_data/seeds_toy.sbml -o output_directory/
 
 * standard output
+    .. code:: 
+
+        ######### Running individual metabolic scopes #########
+        Individual scopes for all metabolic networks available in output_directory/indiv_scopes/indiv_scopes.json
+        17 metabolic models considered.
+        135 metabolites in core reachable by all organisms (intersection)
+        625 metabolites reachable by individual organisms altogether (union), among which 93 seeds (growth medium)
+        max metabolites in scope 477
+        min metabolites in scope 195
+        average number of metabolites in scope 308.71 (±82.59)
+
+    These results mean that 135 metabolites can be reached by all organisms. When gathering reachable metabolites for all organisms, the union consists of 625 metabolites (including the seeds). Finally metrics show the min, max and average number of compounds in all scopes
 * files outputs
-    * In `output_directory/indiv_scopes/indiv_scopes.json`. A json file that can be easily loaded as a dictionary (or humanly read as it it) that contains the set of reachable metabolites for each organism. /!\ Warning: the seeds are included in the scopes, hence they will never be empty. 
+    * In `output_directory/indiv_scopes/indiv_scopes.json`. A json file that can be easily loaded as a dictionary (or humanly read as it it) that contains the set of reachable metabolites for each organism. /!\\ Warning: the seeds are included in the scopes, hence they will never be empty. 
 
 cscope
 *******
@@ -81,6 +105,20 @@ It uses the following mandatory inputs (run ``m2m mincom --help`` for optional a
 
     m2m cscope -n toy_bact -s metabolic_data/seeds_toy.sbml -o output_directory/
 
+* standard output
+    .. code::
+
+        ######### Creating metabolic instance for the whole community #########
+        Created instance in output_directory/community_analysis/miscoto_om6hubmz.lp
+        Running whole-community metabolic scopes
+        Community scopes for all metabolic networks available in output_directory/community_analysis/comm_scopes.json
+        651 metabolites reachable by the whole community/microbiota:
+        M_CPD__45__5802_c, M_XANTHOSINE__45__5__45__PHOSPHATE_c, M_INDOLEYL__45__CPD_c, M_CPD__45__470_c, M_5__45__HYDROXYISOURATE_c, [...]
+
+    651 metabolites are reachable by the microbiota. This does not include the seeds. The list of metabolites is given in output. 
+* files outputs
+    * In addition, a json file with the results is created in `output_directory/community_analysis/indiv_scopes.json`.
+
 addedvalue
 **********
 
@@ -96,9 +134,35 @@ It uses the following mandatory inputs (run ``m2m addedvalue --help`` for option
 
     m2m addedvalue -n toy_bact -s metabolic_data/seeds_toy.sbml -o output_directory/
 
+* standard output
+    .. code::
+
+        ######### Running individual metabolic scopes #########
+        Individual scopes for all metabolic networks available in output_directory/indiv_scopes/indiv_scopes.json
+        17 metabolic models considered.
+        135 metabolites in core reachable by all organisms (intersection)
+        625 metabolites reachable by individual organisms altogether (union), among which 93 seeds (growth medium)
+        max metabolites in scope 477
+        min metabolites in scope 195
+        average number of metabolites in scope 308.71 (±82.59)
+        M_D__45__RIBULOSE__45__1__45__P_c, M_ISOGLUTAMINE_c, M_RIBULOSE__45__5P_c, M_MET_c, M_CPD__45__10775_c, M_DGDP_c, M_5__45__PHOSPHO__45__RIBOSYL__45__GLYCINEAMIDE_c, M_ADENYLOSUCC_c, M_ISOCHORISMATE_c, [...]
+        ######### Creating metabolic instance for the whole community #########
+        Created instance in output_directory/community_analysis/miscoto_j9khdvzz.lp
+        Running whole-community metabolic scopes
+        Community scopes for all metabolic networks available in output_directory/community_analysis/comm_scopes.json
+        651 metabolites reachable by the whole community/microbiota:
+        M_D__45__RIBULOSE__45__1__45__P_c, M_ISOGLUTAMINE_c, M_RIBULOSE__45__5P_c, M_CPD__45__10775_c, M_DGDP_c, M_5__45__PHOSPHO__45__RIBOSYL__45__GLYCINEAMIDE_c, M_OH__45__HEXANOYL__45__COA_c, M_ADENYLOSUCC_c,[...]
+        Added value of cooperation over individual metabolism: 119 newly reachable metabolites:
+        M_OH__45__HEXANOYL__45__COA_c, M_CPD__45__12307_c, M_CPD__45__12173_c, M_2__45__METHYL__45__ACETO__45__ACETYL__45__COA_c, [...]
+        Target file created with the addedvalue targets in: output_directory/community_analysis/targets.sbml
+
+    As you can see, the individual and community scopes are run again. In addition to the previous outputs, the union of all individual scopes and the community scopes are printed. Finally, the difference between the two sets, that is to say the metabolites that can only be produced collectively (i.e. by at least two bacteria cooperating) is displayed. Here it consists of 119 metabolites. 
+* files outputs
+    * A targets SBML file is generated. It can be used with `` m2m mincom`` . The json files associated to ``iscope`` and ``cscope`` are also produced.
+
 m2m mincom
 ----------
-`m2m mincom` requires and additional target file that is available in `metabolic/data` or can be generated by `m2m addedvalue` in which case it will be stored in `result_directory/community_analysis/targets.sbml`
+`m2m mincom` requires an additional target file that is available in `metabolic/data` or can be generated by `m2m addedvalue` in which case it will be stored in `result_directory/community_analysis/targets.sbml`
 
 It uses the following mandatory inputs (run ``m2m mincom --help`` for optional arguments):
 
@@ -112,5 +176,81 @@ It uses the following mandatory inputs (run ``m2m mincom --help`` for optional a
 
     m2m mincom -n toy_bact -s metabolic_data/seeds_toy.sbml -t metabolic_data/targets_toy.sbml -o output_directory/
 
+* standard output
+    .. code::
+
+        ######### Creating metabolic instance for the whole community #########
+        Created instance in output_directory/community_analysis/miscoto_36t8lqe_.lp
+        Running minimal community selection
+        Community scopes for all metabolic networks available in output_directory/community_analysis/comm_scopes.json
+        ######### One minimal community #########
+        # One minimal community enabling to produce the target metabolites given as inputs
+        Minimal number of bacteria in communities = 13
+        GCA_003437905
+        GCA_003437255
+        GCA_003437055
+        GCA_003437885
+        GCA_003437815
+        GCA_003437595
+        GCA_003437375
+        GCA_003438055
+        GCA_003437665
+        GCA_003437945
+        GCA_003437295
+        GCA_003437195
+        GCA_003437715
+        ######### Union of minimal communities #########
+        # Bacteria occurring in at least one minimal community enabling to produce the target metabolites given as inputs
+        Union of bacteria in minimal communities = 17
+        GCA_003437345
+        GCA_003437905
+        GCA_003437255
+        GCA_003437055
+        GCA_003437175
+        GCA_003437885
+        GCA_003437325
+        GCA_003437815
+        GCA_003437595
+        GCA_003437375
+        GCA_003438055
+        GCA_003437665
+        GCA_003437945
+        GCA_003437295
+        GCA_003437195
+        GCA_003437715
+        GCA_003437785
+        ######### Intersection of minimal communities #########
+        # Bacteria occurring in ALL minimal community enabling to produce the target metabolites given as inputs
+        Intersection of bacteria in minimal communities = 12
+        GCA_003437905
+        GCA_003437255
+        GCA_003437055
+        GCA_003437885
+        GCA_003437815
+        GCA_003437595
+        GCA_003437375
+        GCA_003438055
+        GCA_003437665
+        GCA_003437295
+        GCA_003437195
+        GCA_003437715
+
+    This output gives the result of minimal community selection. It means that for producing the 119 metabolic targets, a minimum of 13 bacteria out of the 17 is required. One example of such minimal community is given. In addition, the whole space of solution is studied. All bacteria (17) occur in at least one minimal community. Finally, the intersection gives the following information: a set of 12 bacteria occurs in each minimal communtity. This means that these 12 bacteria are needed in any case, and that any of the remaining 5 bacteria can complete the missing function(s).
+* files outputs
+    * As for other commands, a json file with the results is produced in ``output_directory/community_analysis/comm_scopes.json ``
+
 m2m workflow
 ------------
+`m2m workflow` starts from metabolic network reconstruction and runs all analyses: individual scopes, community scopes, and minimal community selection based on the metabolic added-value of the microbiota.
+
+It uses the following mandatory inputs (run ``m2m workflow --help`` for optional arguments):
+
+-g directory           directory of annotated genomes
+-s file                seeds SBML file
+-o directory           output directory for results
+
+Optional arguments:
+
+-c int           number of CPU for multi-processing
+--clean          option to rerun every reconstruction 
+                 even if found in ptools-local
