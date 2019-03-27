@@ -130,6 +130,22 @@ The inputs genomic data has to follow a strict strure, that can be observed in t
             ├── fatty_acid_beta_oxydation_I.sbml
             └── tca_cycle_ecoli.sbml
 
+        * Finally, in the input directory, some files are also generated automatically by Pathway Tools
+        ::
+            
+            recon_data/
+            ├── fatty_acid_beta_oxydation_I
+            │   ├── dat_creation.lisp
+            │   ├── fatty_acid_beta_oxydation_I.gbk
+            │   ├── genetic-elements.dat
+            │   ├── organism-params.dat
+            │   └── pathologic.log
+            └── tca_cycle_ecoli
+                ├── dat_creation.lisp
+                ├── genetic-elements.dat
+                ├── organism-params.dat
+                ├── pathologic.log
+                └── tca_cycle_ecoli.gbk
 
 
 m2m iscope, cscope and addedvalue
@@ -360,7 +376,7 @@ It uses the following mandatory inputs (run ``m2m mincom --help`` for optional a
 
     This output gives the result of minimal community selection. It means that for producing the 119 metabolic targets, a minimum of 13 bacteria out of the 17 is required. One example of such minimal community is given. In addition, the whole space of solution is studied. All bacteria (17) occur in at least one minimal community. Finally, the intersection gives the following information: a set of 12 bacteria occurs in each minimal communtity. This means that these 12 bacteria are needed in any case, and that any of the remaining 5 bacteria can complete the missing function(s).
 * files outputs
-    * As for other commands, a json file with the results is produced in ``output_directory/community_analysis/comm_scopes.json ``
+    * As for other commands, a json file with the results is produced in ``output_directory/community_analysis/comm_scopes.json``
 
 m2m workflow
 ------------
@@ -377,3 +393,19 @@ Optional arguments:
 -c int           number of CPU for multi-processing
 --clean          option to rerun every reconstruction 
                  even if found in ptools-local
+
+
+Including a host in the picture
+-------------------------------
+
+It is possible to consider a host in addition to the microbiota for the ``workflow``, ``cscope`` and ``mincom`` commands. **What does it change?**
+
+First note that adding the host in the SBML repository will enable you to get the individual scope for the host. Another solution is to directly use ``menescope`` from the `MeneTools
+<https://github.com/cfrioux/MeneTools>`_ `Python package <https://pypi.org/project/MeneTools/>`_ on which m2m relies, and that can be used as a standalone tool.
+
+Then back to the effect of the host in the other commands.
+* For ``cscope`` and ``addedvalue``, the host metabolism will be taken into account. That is to say that it will be considered as a member of the community. Among the newly producible targets, some will be exclusive to the host metabolism. This is not displayed in the standard output of the software but can be retrieved in the json file output under the `'comhost_scope'`key of the dictionary. 
+* For ``mincom``, the host will always be considered in the community. This means that the selected bacteria need to be associated to the host in order to ensure the producibility of all the targets. Therefore, if the minimal community computed for 10 targets is of 3 bacteria and that a host was provided, it means that the host + these three bacteria can produce the 10 targets. 
+
+More generally, for more information and analysis on the usage of hosts in addition to the microbiota, we refer the interested user to the `Miscoto
+<https://github.com/cfrioux/miscoto>`_ `Python package <https://pypi.org/project/Miscoto/>`_, on which m2m relies. Miscoto can be used as a standalone package for such analyses, with additional options, such as the identification of putative exchanges among the minimal communities. 

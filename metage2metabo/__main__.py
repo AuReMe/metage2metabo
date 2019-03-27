@@ -395,7 +395,7 @@ def check_sbml(inpt, outdir, folder = True):
         else:
             sbml_level = sbml_management.get_sbml_level(inpt)
             if sbml_level != 2:
-                newsbml = outdir + utils.get_basename(inpt) + "_lvl2.sbml"
+                newsbml = outdir + '/' + utils.get_basename(inpt) + "_lvl2.sbml"
                 logger.warning(inpt + " was not in a suitable level for analysis. A converted file is created in " + newsbml)
                 sbml_management.sbml_to_sbml(inpt, newsbml, 2)
             else:
