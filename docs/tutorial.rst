@@ -20,6 +20,118 @@ Optional arguments:
 --clean          option to rerun every reconstruction 
                  even if found in ptools-local
 
+The inputs genomic data has to follow a strict strure, that can be observed in the `recon_data` directory of tests in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/test>`__. It is reproduced below:
+
+::
+
+    recon_data
+        ├── organism #1          
+        │   └── gbk
+        ├── organism #2          
+        │   └── gbk
+        ├── organism #3          
+        │   └── gbk
+        ..
+        └── organism #n         
+            └── gbk
+
+.. code:: sh
+
+    m2m recon -g test/recon_data -o output_directory -c cpu_number [--clean]
+
+* standard output
+    .. code:: 
+
+        ######### Running metabolic network reconstruction with Pathway Tools #########
+        tca_cycle_ecolicyc (at xxxx/ptools-local/pgdbs/user/tca_cycle_ecolicyc) has been removed.
+        425hofleacyc (at xxxx/ptools-local/pgdbs/user/425hofleacyc) has been removed.
+        fatty_acid_beta_oxydation_icyc (at xxxx/ptools-local/pgdbs/user/fatty_acid_beta_oxydation_icyc) has been removed.
+        404rhizobiumcyc (at xxxx/ptools-local/pgdbs/user/404rhizobiumcyc) has been removed.
+        ~~~~~~~~~~Creation of input data from Genbank/GFF~~~~~~~~~~
+        Checking inputs for tca_cycle_ecoli: missing organism-params.dat; genetic-elements.dat; dat_creation.lisp. Inputs file created for tca_cycle_ecoli.
+        Checking inputs for fatty_acid_beta_oxydation_I: missing organism-params.dat; genetic-elements.dat; dat_creation.lisp. Inputs file created for fatty_acid_beta_oxydation_I.
+        ~~~~~~~~~~Inference on the data~~~~~~~~~~
+        pathway-tools -no-web-cel-overview -no-cel-overview -no-patch-download -disable-metadata-saving -nologfile -patho recon_data//tca_cycle_ecoli/
+        pathway-tools -no-web-cel-overview -no-cel-overview -no-patch-download -disable-metadata-saving -nologfile -patho recon_data//fatty_acid_beta_oxydation_I/
+        ~~~~~~~~~~Check inference~~~~~~~~~~
+
+        2 builds have passed!
+
+        ~~~~~~~~~~Creation of the .dat files~~~~~~~~~~
+        pathway-tools -no-patch-download -disable-metadata-saving -nologfile -load recon_data//tca_cycle_ecoli//dat_creation.lisp
+        pathway-tools -no-patch-download -disable-metadata-saving -nologfile -load recon_data//fatty_acid_beta_oxydation_I//dat_creation.lisp
+        ~~~~~~~~~~Check .dat ~~~~~~~~~~
+        tca_cycle_ecolicyc: 23 on 23 dat files create.
+        fatty_acid_beta_oxydation_icyc: 23 on 23 dat files create.
+        ~~~~~~~~~~End of the Pathway-Tools Inference~~~~~~~~~~
+        ~~~~~~~~~~Moving result files~~~~~~~~~~
+        ~~~~~~~~~~The script have finished! Thank you for using it.
+        ######### Creating SBML files #########
+        PGDB created in output_directory//pgdb
+        SBML files created in output_directory//sbml
+
+        Here the ``--clean`` option was used. The output shows that PGDB are created with Pathway Tools. Then the .dat files are extracted and used to build SBML files of the metabolic models. 
+* files outputs
+    * In `output_directory/pgdb` are found the .dat files of Pathway Tools. The corresponding SBMLs are in `output_directory/sbml`. The structure of the output directory after this ``recon`` command is shown below :
+
+    ::
+
+        output_directory/
+        ├── pgdb
+        │   ├── fatty_acid_beta_oxydation_I
+        │   │   ├── classes.dat
+        │   │   ├── compound-links.dat
+        │   │   ├── compounds.dat
+        │   │   ├── dnabindsites.dat
+        │   │   ├── enzrxns.dat
+        │   │   ├── gene-links.dat
+        │   │   ├── genes.dat
+        │   │   ├── pathway-links.dat
+        │   │   ├── pathways.dat
+        │   │   ├── promoters.dat
+        │   │   ├── protein-features.dat
+        │   │   ├── protein-links.dat
+        │   │   ├── proteins.dat
+        │   │   ├── protligandcplxes.dat
+        │   │   ├── pubs.dat
+        │   │   ├── reaction-links.dat
+        │   │   ├── reactions.dat
+        │   │   ├── regulation.dat
+        │   │   ├── regulons.dat
+        │   │   ├── rnas.dat
+        │   │   ├── species.dat
+        │   │   ├── terminators.dat
+        │   │   └── transunits.dat
+        │   └── tca_cycle_ecoli
+        │       ├── classes.dat
+        │       ├── compound-links.dat
+        │       ├── compounds.dat
+        │       ├── dnabindsites.dat
+        │       ├── enzrxns.dat
+        │       ├── gene-links.dat
+        │       ├── genes.dat
+        │       ├── pathway-links.dat
+        │       ├── pathways.dat
+        │       ├── promoters.dat
+        │       ├── protein-features.dat
+        │       ├── protein-links.dat
+        │       ├── proteins.dat
+        │       ├── protligandcplxes.dat
+        │       ├── pubs.dat
+        │       ├── reaction-links.dat
+        │       ├── reactions.dat
+        │       ├── regulation.dat
+        │       ├── regulons.dat
+        │       ├── rnas.dat
+        │       ├── species.dat
+        │       ├── terminators.dat
+        │       └── transunits.dat
+        └── sbml
+            ├── fatty_acid_beta_oxydation_I.sbml
+            └── tca_cycle_ecoli.sbml
+
+
+
 m2m iscope, cscope and addedvalue
 ---------------------------------
 The three subcommands require metabolic networks under the SBML format. Some metabolic networks are available as a compressed archive in `metabolic_data`. Uncompress the file and the directory can be fed to the subcommands. These commands also require a seeds file comprising the metabolic compounds available to assess reachability/producibility in the models. This seeds file needs to be in SBML format. You can use the one in the `metabolic data` directory.
@@ -159,6 +271,17 @@ It uses the following mandatory inputs (run ``m2m addedvalue --help`` for option
     As you can see, the individual and community scopes are run again. In addition to the previous outputs, the union of all individual scopes and the community scopes are printed. Finally, the difference between the two sets, that is to say the metabolites that can only be produced collectively (i.e. by at least two bacteria cooperating) is displayed. Here it consists of 119 metabolites. 
 * files outputs
     * A targets SBML file is generated. It can be used with `` m2m mincom`` . The json files associated to ``iscope`` and ``cscope`` are also produced.
+
+    ::
+
+        output_directory/
+        ├── community_analysis
+        │   ├── comm_scopes.json
+        │   ├── miscoto_om6hubmz.lp
+        │   └── targets.sbml
+        ├── indiv_scopes
+        │   └── indiv_scopes.json
+
 
 m2m mincom
 ----------
