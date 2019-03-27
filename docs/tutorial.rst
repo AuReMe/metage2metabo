@@ -25,15 +25,15 @@ The inputs genomic data has to follow a strict strure, that can be observed in t
 ::
 
     recon_data
-        ├── organism #1          
-        │   └── gbk
-        ├── organism #2          
-        │   └── gbk
-        ├── organism #3          
-        │   └── gbk
+        ├── organism_1          
+        │   └── organism_1.gbk
+        ├── organism_2          
+        │   └── organism_2.gbk
+        ├── organism_3          
+        │   └── organism_3.gbk
         ..
-        └── organism #n         
-            └── gbk
+        └── organism_n         
+            └── organism_n.gbk
 
 .. code:: sh
 
@@ -404,7 +404,9 @@ First note that adding the host in the SBML repository will enable you to get th
 <https://github.com/cfrioux/MeneTools>`_ `Python package <https://pypi.org/project/MeneTools/>`_ on which m2m relies, and that can be used as a standalone tool.
 
 Then back to the effect of the host in the other commands.
+
 * For ``cscope`` and ``addedvalue``, the host metabolism will be taken into account. That is to say that it will be considered as a member of the community. Among the newly producible targets, some will be exclusive to the host metabolism. This is not displayed in the standard output of the software but can be retrieved in the json file output under the `'comhost_scope'`key of the dictionary. 
+
 * For ``mincom``, the host will always be considered in the community. This means that the selected bacteria need to be associated to the host in order to ensure the producibility of all the targets. Therefore, if the minimal community computed for 10 targets is of 3 bacteria and that a host was provided, it means that the host + these three bacteria can produce the 10 targets. 
 
 More generally, for more information and analysis on the usage of hosts in addition to the microbiota, we refer the interested user to the `Miscoto
