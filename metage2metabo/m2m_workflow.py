@@ -108,7 +108,10 @@ def iscope(sbmldir, seeds, out_dir):
         logger.info("Individual scopes for all metabolic networks available in " + scope_json)
         # Analyze the individual scopes results (json file)
         reachable_metabolites_union = analyze_indiv_scope(scope_json, seeds)
-    return reachable_metabolites_union
+        return reachable_metabolites_union
+    else:
+        logger.critical("The number of SBML files is <= 1 in the input directory")
+        sys.exit(1)
 
 
 def cscope(sbmldir, seeds, outdir, host=None):
