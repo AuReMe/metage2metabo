@@ -20,6 +20,7 @@ m2m's documentation
     install
     command
     tutorial
+    suppinformation
     api
 
 

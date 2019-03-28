@@ -96,7 +96,7 @@ To launch the container in interactive mode:
 Installation with Singularity (e.g. on a cluster)
 =================================================
 
-Singularity can be used to launch m2m on a cluster. Please refer to the `recipe <https://github.com/AuReMe/metage2metabo/tree/master/recipes>`__   of the Github repository of the project.
+Singularity [Ku2017]_ can be used to launch m2m on a cluster. Please refer to the `recipe <https://github.com/AuReMe/metage2metabo/tree/master/recipes>`__   of the Github repository of the project.
 The Singularity image has to be created from the recipe. You might need to do it on a personal computer since it requires administrator priviledges.
 To use the image on a cluster, the path to Pathway Tools ptools folder should be indicated in the recipe. Therefore, you have to replace '/external/folder/ptools' with the path where you want to put the ptools-local folder (which will contain the PGDB created by Pathway-Tools).
 
@@ -156,8 +156,14 @@ So you can encapsulate it in a sh script:
 
     singularity exec m2m.sif bash m2m.sh
 
-This file can now be launched on a cluster, for example with SLURM:
+This file can now be launched on a cluster, for example with SLURM [Yo2003]_:
 
 .. code:: sh
 
     sbatch --cpus-per-task=4 --mem=8G my_script.sh
+
+
+
+.. [Ku2017] Kurtzer GM, Sochat V, Bauer MW (2017) Singularity: Scientific containers for mobility of compute. PLOS ONE 12(5): e0177459.
+
+.. [Yo2003] Yoo, Andy B., Jette, Morris A., Grondona, Mark (2003). SLURM: Simple Linux Utility for Resource Management. Job Scheduling Strategies for Parallel Processing. Lecture Notes in Computer Science. 2862. p. 44. 
