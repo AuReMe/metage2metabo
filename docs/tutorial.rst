@@ -396,11 +396,12 @@ Optional arguments:
 
 You can run the workflow analysis with the two genbanks files available in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/test>`__ (`workflow_data`). Two genomes are available in the compressed archive workflow_genomes.tar.gz. The archive has to be uncompressed before testing.
 
-    .. code:: sh
+.. code:: sh
 
-        m2m workflow -g workflow_genomes -s workflow_data/seeds_workflow.sbml -o output_directory/
+    m2m workflow -g workflow_genomes -s workflow_data/seeds_workflow.sbml -o output_directory/
 
 * standard outputs
+
     .. code ::
 
         ######### Running metabolic network reconstruction with Pathway Tools #########
