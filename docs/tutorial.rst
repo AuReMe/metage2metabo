@@ -457,6 +457,7 @@ You can run the workflow analysis with the two genbanks files available in the `
         Intersection of bacteria in minimal communities = 2
         GCA_900318805
         GCA_900315385
+        
 * files outputs
     * Numerous files are created in the output_directory
     
