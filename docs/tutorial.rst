@@ -394,6 +394,134 @@ Optional arguments:
 --clean          option to rerun every reconstruction 
                  even if found in ptools-local
 
+You can run the workflow analysis with the two genbanks files available in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/test>`__ (`workflow_data`). Two genomes are available in the compressed archive workflow_genomes.tar.gz. The archive has to be uncompressed before testing.
+
+    .. code:: sh
+
+        m2m workflow -g workflow_genomes -s workflow_data/seeds_workflow.sbml -o output_directory/
+
+* standard outputs
+    .. code ::
+
+        ######### Running metabolic network reconstruction with Pathway Tools #########
+        ~~~~~~~~~~Creation of input data from Genbank/GFF~~~~~~~~~~
+        Checking inputs for GCA_900318805: missing organism-params.dat; genetic-elements.dat; dat_creation.lisp. Inputs file created for GCA_900318805.
+        Checking inputs for GCA_900315385: missing organism-params.dat; genetic-elements.dat; dat_creation.lisp. Inputs file created for GCA_900315385.
+        ~~~~~~~~~~Inference on the data~~~~~~~~~~
+        pathway-tools -no-web-cel-overview -no-cel-overview -no-patch-download -disable-metadata-saving -nologfile -patho workflow_genomes/GCA_900318805/
+        pathway-tools -no-web-cel-overview -no-cel-overview -no-patch-download -disable-metadata-saving -nologfile -patho workflow_genomes/GCA_900315385/
+        ~~~~~~~~~~Check inference~~~~~~~~~~
+
+        2 builds have passed!
+
+        ~~~~~~~~~~Creation of the .dat files~~~~~~~~~~
+        pathway-tools -no-patch-download -disable-metadata-saving -nologfile -load workflow_genomes/GCA_900318805//dat_creation.lisp
+        pathway-tools -no-patch-download -disable-metadata-saving -nologfile -load workflow_genomes/GCA_900315385//dat_creation.lisp
+        ~~~~~~~~~~Check .dat ~~~~~~~~~~
+        gca_900318805cyc: 23 on 23 dat files create.
+        gca_900315385cyc: 23 on 23 dat files create.
+        ~~~~~~~~~~End of the Pathway-Tools Inference~~~~~~~~~~
+        ~~~~~~~~~~Moving result files~~~~~~~~~~
+        ~~~~~~~~~~The script have finished! Thank you for using it.
+        ######### Creating SBML files #########
+        ######### Running individual metabolic scopes #########
+        Individual scopes for all metabolic networks available in output_directory//indiv_scopes/indiv_scopes.json
+        2 metabolic models considered.
+        29 metabolites in core reachable by all organisms (intersection)
+        37 metabolites reachable by individual organisms altogether (union), among which 26 seeds (growth medium)
+        max metabolites in scope 36
+        min metabolites in scope 30
+        average number of metabolites in scope 33.00 (±4.24)
+        ######### Creating metabolic instance for the whole community #########
+        Created instance in output_directory/community_analysis/miscoto_ena_9l33.lp
+        Running whole-community metabolic scopes
+        Community scopes for all metabolic networks available in output_directory//community_analysis/comm_scopes.json
+        Added value of cooperation over individual metabolism: 25 newly reachable metabolites:
+        M_2__45__PG_c, M_METHYL__45__GLYOXAL_c, M_D__45__SEDOHEPTULOSE__45__7__45__P_c, M_NITRITE_c, M_DIHYDROXY__45__ACETONE__45__PHOSPHATE_c, M_FRUCTOSE__45__16__45__DIPHOSPHATE_c, M_GAP_c, M_RIBOSE__45__5P_c, M_RIBULOSE__45__5P_c, M_CPD__45__12079_c, M_G3P_c, M_PHOSPHORIBOSYL__45__FORMIMINO__45__AICAR__45__P_c, M_NADH_c, M_PRPP_c, M_DPG_c, M_3__45__P__45__HYDROXYPYRUVATE_c, M_PHOSPHORIBULOSYL__45__FORMIMINO__45__AICAR__45__P_c, M_PHOSPHORIBOSYL__45__AMP_c, M_L__45__LACTATE_c, M_ERYTHROSE__45__4P_c, M_PHOSPHORIBOSYL__45__ATP_c, M_D__45__LACTATE_c, M_XYLULOSE__45__5__45__PHOSPHATE_c, M_BETA__45__D__45__FRUCTOSE_c, M_FRUCTOSE__45__6P_c
+        Setting these 25 as targets
+        Running minimal community selection
+        Community scopes for all metabolic networks available in output_directory//community_analysis/comm_scopes.json
+        ######### One minimal community #########
+        # One minimal community enabling to produce the target metabolites given as inputs
+        Minimal number of bacteria in communities = 2
+        GCA_900318805
+        GCA_900315385
+        ######### Union of minimal communities #########
+        # Bacteria occurring in at least one minimal community enabling to produce the target metabolites given as inputs
+        Union of bacteria in minimal communities = 2
+        GCA_900318805
+        GCA_900315385
+        ######### Intersection of minimal communities #########
+        # Bacteria occurring in ALL minimal community enabling to produce the target metabolites given as inputs
+        Intersection of bacteria in minimal communities = 2
+        GCA_900318805
+        GCA_900315385
+* files outputs
+    * Numerous files are created in the output_directory
+    
+    .. code ::
+
+        output_directory/
+        ├── community_analysis
+        │   ├── comm_scopes.json
+        │   ├── mincom.json
+        │   ├── miscoto_ena_9l33.lp
+        │   ├── miscoto_ena_9l33__tgts.lp
+        ├── indiv_scopes
+        │   └── indiv_scopes.json
+        ├── pgdb
+        │   ├── GCA_900315385
+        │   │   ├── classes.dat
+        │   │   ├── compound-links.dat
+        │   │   ├── compounds.dat
+        │   │   ├── dnabindsites.dat
+        │   │   ├── enzrxns.dat
+        │   │   ├── gene-links.dat
+        │   │   ├── genes.dat
+        │   │   ├── pathway-links.dat
+        │   │   ├── pathways.dat
+        │   │   ├── promoters.dat
+        │   │   ├── protein-features.dat
+        │   │   ├── protein-links.dat
+        │   │   ├── proteins.dat
+        │   │   ├── protligandcplxes.dat
+        │   │   ├── pubs.dat
+        │   │   ├── reaction-links.dat
+        │   │   ├── reactions.dat
+        │   │   ├── regulation.dat
+        │   │   ├── regulons.dat
+        │   │   ├── rnas.dat
+        │   │   ├── species.dat
+        │   │   ├── terminators.dat
+        │   │   └── transunits.dat
+        │   └── GCA_900318805
+        │       ├── classes.dat
+        │       ├── compound-links.dat
+        │       ├── compounds.dat
+        │       ├── dnabindsites.dat
+        │       ├── enzrxns.dat
+        │       ├── gene-links.dat
+        │       ├── genes.dat
+        │       ├── pathway-links.dat
+        │       ├── pathways.dat
+        │       ├── promoters.dat
+        │       ├── protein-features.dat
+        │       ├── protein-links.dat
+        │       ├── proteins.dat
+        │       ├── protligandcplxes.dat
+        │       ├── pubs.dat
+        │       ├── reaction-links.dat
+        │       ├── reactions.dat
+        │       ├── regulation.dat
+        │       ├── regulons.dat
+        │       ├── rnas.dat
+        │       ├── species.dat
+        │       ├── terminators.dat
+        │       └── transunits.dat
+        └── sbml
+            ├── GCA_900315385.sbml
+            └── GCA_900318805.sbml
+
 
 Including a host in the picture
 -------------------------------
@@ -401,13 +529,13 @@ Including a host in the picture
 It is possible to consider a host in addition to the microbiota for the ``workflow``, ``cscope`` and ``mincom`` commands. **What does it change?**
 
 First note that adding the host in the SBML repository will enable you to get the individual scope for the host. Another solution is to directly use ``menescope`` from the `MeneTools
-<https://github.com/cfrioux/MeneTools>`_ `Python package <https://pypi.org/project/MeneTools/>`_ on which m2m relies, and that can be used as a standalone tool.
+<https://github.com/cfrioux/MeneTools>`_ `Python package <https://pypi.org/project/MeneTools/>`__ on which m2m relies, and that can be used as a standalone tool.
 
 Then back to the effect of the host in the other commands.
 
-* For ``cscope`` and ``addedvalue``, the host metabolism will be taken into account. That is to say that it will be considered as a member of the community. Among the newly producible targets, some will be exclusive to the host metabolism. This is not displayed in the standard output of the software but can be retrieved in the json file output under the `'comhost_scope'`key of the dictionary. 
+* For ``cscope`` and ``addedvalue``, the host metabolism will be taken into account. That is to say that it will be considered as a member of the community. Among the newly producible targets, some will be exclusive to the host metabolism. This is not displayed in the standard output of the software but can be retrieved in the json file output under the `"comhost_scope"` key of the dictionary. 
 
 * For ``mincom``, the host will always be considered in the community. This means that the selected bacteria need to be associated to the host in order to ensure the producibility of all the targets. Therefore, if the minimal community computed for 10 targets is of 3 bacteria and that a host was provided, it means that the host + these three bacteria can produce the 10 targets. 
 
 More generally, for more information and analysis on the usage of hosts in addition to the microbiota, we refer the interested user to the `Miscoto
-<https://github.com/cfrioux/miscoto>`_ `Python package <https://pypi.org/project/Miscoto/>`_, on which m2m relies. Miscoto can be used as a standalone package for such analyses, with additional options, such as the identification of putative exchanges among the minimal communities. 
+<https://github.com/cfrioux/miscoto>`_ `Python package <https://pypi.org/project/Miscoto/>`__, on which m2m relies. Miscoto can be used as a standalone package for such analyses, with additional options, such as the identification of putative exchanges among the minimal communities. 

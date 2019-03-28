@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbml xmlns="http://www.sbml.org/sbml/level2" level="2" version="1">
+  <model id="seeds" names="seeds">
+    <listOfUnitDefinitions>
+      <unitDefinition id="mmol_per_gDW_per_hr">
+        <listOfUnits>
+          <unit kind="mole" scale="-3" multiplier="1" offset="0"/>
+          <unit kind="gram" exponent="-1" multiplier="1" offset="0"/>
+          <unit kind="second" exponent="-1" multiplier="0.00027777" offset="0"/>
+        </listOfUnits>
+      </unitDefinition>
+    </listOfUnitDefinitions>
+    <listOfCompartments>
+      <compartment id="c"/>
+      <compartment id="e"/>
+    </listOfCompartments>
+    <listOfSpecies>
+        <species id="M_NAD_c" name="NAD" compartment="c" boundaryCondition="false"/>
+        <species id="M_NADP_c" name="NADP" compartment="c" boundaryCondition="false"/>
+        <species id="M_ADP_c" name="ADP" compartment="c" boundaryCondition="false"/>
+        <species id="M_GLC_c" name="&amp;beta;-D-glucopyranose" compartment="c" boundaryCondition="false"/>
+        <species id="M_CELLOBIOSE_c" name="&amp;beta;-D-cellobiose" compartment="c" boundaryCondition="false"/>
+        <species id="M_AMMONIA_c" name="AMMONIA" compartment="c" boundaryCondition="false"/>
+        <species id="M_WATER_c" name="WATER" compartment="c" boundaryCondition="false"/>
+        <species id="M_CARBON__45__DIOXIDE_c" name="CARBON-DIOXIDE" compartment="c" boundaryCondition="false"/>
+        <species id="M_MN__43__2_c" name="MN__43__2" compartment="c" boundaryCondition="false"/>
+        <species id="M_CO__43__2_c" name="CO__43__2" compartment="c" boundaryCondition="false"/>
+        <species id="M_NITRATE_c" name="NITRATE" compartment="c" boundaryCondition="false"/>
+        <species id="M_SULFATE_c" name="SULFATE" compartment="c" boundaryCondition="false"/>
+        <species id="M_CPD__45__3_c" name="CPD-3" compartment="c" boundaryCondition="false"/>
+        <species id="M_CL__45___c" name="CL-" compartment="c" boundaryCondition="false"/>
+        <species id="M_Pi_c" name="Pi" compartment="c" boundaryCondition="false"/>
+        <species id="M_PPI_c" name="PPI" compartment="c" boundaryCondition="false"/>
+        <species id="M_ZN__43__2_c" name="ZN__43__2" compartment="c" boundaryCondition="false"/>
+        <species id="M_CU__43__2_c" name="CU__43__2" compartment="c" boundaryCondition="false"/>
+        <species id="M_CA__43__2_c" name="CA__43__2" compartment="c" boundaryCondition="false"/>
+        <species id="M_MG__43__2_c" name="MG__43__2" compartment="c" boundaryCondition="false"/>
+        <species id="M_CU__43___c" name="CU__43__" compartment="c" boundaryCondition="false"/>
+        <species id="M_PROTON_c" name="PROTON" compartment="c" boundaryCondition="false"/>
+        <species id="M_NA__43___c" name="NA__43__" compartment="c" boundaryCondition="false"/>
+        <species id="M_K__43___c" name="K__43__" compartment="c" boundaryCondition="false"/>
+        <species id="M_FE__43__2_c" name="FE__43__2" compartment="c" boundaryCondition="false"/>
+        <species id="M_FE__43__3_c" name="FE__43__3" compartment="c" boundaryCondition="false"/>
+    </listOfSpecies>
+    <listOfReactions>
+    </listOfReactions>
+  </model>
+</sbml>
