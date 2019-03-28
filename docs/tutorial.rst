@@ -457,7 +457,7 @@ You can run the workflow analysis with the two genbanks files available in the `
         Intersection of bacteria in minimal communities = 2
         GCA_900318805
         GCA_900315385
-        
+
 * files outputs
     * Numerous files are created in the output_directory
     
@@ -523,6 +523,8 @@ You can run the workflow analysis with the two genbanks files available in the `
         └── sbml
             ├── GCA_900315385.sbml
             └── GCA_900318805.sbml
+
+    These files are the same as the ones presented in the previous commands: metabolic networks reconstructions (Pathway Tools data, SBML), individual and collective scopes, minimal community selection. 
 
 
 Including a host in the picture
