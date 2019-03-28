@@ -9,6 +9,7 @@ import sys
 import os
 from shutil import copyfile
 import re
+import time
 
 
 VERSION = pkg_resources.get_distribution("metage2metabo").version
@@ -44,6 +45,7 @@ if not all(bin_check):
 def main():
     """Run programm
     """
+    start_time = time.time()
     parser = argparse.ArgumentParser(
         "m2m",
         description=MESSAGE + " For specific help on each subcommand use: m2m {cmd} --help",
@@ -258,6 +260,8 @@ def main():
             sys.exit(1)
         else:
             main_seeds(args.metabolites, args.out)
+
+    logger.info("--- %.2f seconds ---" % (time.time() - start_time))
 
 
 def main_workflow(*allargs):
