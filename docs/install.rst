@@ -73,7 +73,7 @@ Installation with pip
 
 .. code:: sh
 
-    pip install metage2metabo
+    pip install Metage2Metabo
 
 Installation with Docker
 ========================

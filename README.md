@@ -91,7 +91,7 @@ Tested with Python3.6
 
 ### Installation with pip
 
-```pip install metage2metabo```
+```pip install Metage2Metabo```
 
 ### Availability on Docker and Singularity
 
