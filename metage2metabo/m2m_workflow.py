@@ -78,6 +78,7 @@ def recon(inp_dir, out_dir, sbml_level, nb_cpu, clean):
     Returns:
         tuple: PGDB directory (str), SBML directory (str)
     """
+    starttime = time.time()
     # Create PGDBs
     try:
         pgdb_dir = genomes_to_pgdb(inp_dir, out_dir, nb_cpu, clean)
@@ -86,6 +87,8 @@ def recon(inp_dir, out_dir, sbml_level, nb_cpu, clean):
         sys.exit(1)
     # Create SBMLs from PGDBs
     sbml_dir = sbml_management.pgdb_to_sbml(pgdb_dir, out_dir, sbml_level, nb_cpu)
+    logger.info(
+        "--- Recon runtime %.2f seconds ---" % (time.time() - starttime))
     return pgdb_dir, sbml_dir
 
 
@@ -100,6 +103,7 @@ def iscope(sbmldir, seeds, out_dir):
         set: union of reachable metabolites for all metabolic networks
     """
     # Run individual scopes of metabolic networks if any
+    starttime = time.time()
     if len([
             name for name in os.listdir(sbmldir) if os.path.isfile(sbmldir + '/' + name)
             and utils.get_extension(sbmldir + '/' + name).lower() in ["xml", "sbml"]
@@ -108,6 +112,8 @@ def iscope(sbmldir, seeds, out_dir):
         logger.info("Individual scopes for all metabolic networks available in " + scope_json)
         # Analyze the individual scopes results (json file)
         reachable_metabolites_union = analyze_indiv_scope(scope_json, seeds)
+        logger.info("--- Indiv scopes runtime %.2f seconds ---" %
+                    (time.time() - starttime))
         return reachable_metabolites_union
     else:
         logger.critical("The number of SBML files is <= 1 in the input directory")
@@ -126,11 +132,14 @@ def cscope(sbmldir, seeds, outdir, host=None):
     Returns:
         tuple: instance file (str) and community scope (set)
     """
+    starttime = time.time()
     # Create instance for community analysis
     instance_com = instance_community(sbmldir, seeds, outdir, None, host)
     # Run community scope
     logger.info("Running whole-community metabolic scopes")
     community_reachable_metabolites = comm_scope_run(instance_com, outdir)
+    logger.info("--- Community scope runtime %.2f seconds ---" %
+                (time.time() - starttime))
     return instance_com, community_reachable_metabolites
 
 
@@ -158,6 +167,7 @@ def mincom(instance_w_targets, out_dir):
         instance_w_targets (str): ASP instance filepath
         out_dir (str): results directory
     """
+    starttime = time.time()
     miscoto_dir = out_dir + "/community_analysis"
     if not utils.is_valid_dir(miscoto_dir):
         logger.critical("Impossible to access/create output directory")
@@ -194,6 +204,8 @@ def mincom(instance_w_targets, out_dir):
     logger.info("Intersection of bacteria in minimal communities = " +
                 str(len(intersection)))
     logger.info("\n".join(intersection))
+    logger.info(
+        "--- Mincom runtime %.2f seconds ---" % (time.time() - starttime))
 
 
 def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):

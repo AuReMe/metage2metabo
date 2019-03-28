@@ -261,13 +261,14 @@ def main():
         else:
             main_seeds(args.metabolites, args.out)
 
-    logger.info("--- %.2f seconds ---" % (time.time() - start_time))
+    logger.info("--- Total runtime %.2f seconds ---" % (time.time() - start_time))
 
 
 def main_workflow(*allargs):
     """Run main workflow
     """
     run_workflow(*allargs)
+
 
 
 def main_recon(*allargs):
