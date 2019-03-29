@@ -16,6 +16,13 @@ A metabolite is considered producible or reachable from the seeds if it belongs 
 Similarly, a reaction is considered activable if all of its reactants are in the scope, that is to say are reachable. 
 It is important to notice the conjunction in this rule : *all* the reactants need to be in the scope.
 
+Therefore, the scope is computed following these two conditions:
+
+* initiation condition: a metabolite is in the scope if it belongs to the seeds.
+* recursive condition: a metabolite is in the scope if it is the product of a reaction whose reactants are in the scopes (all of them).
+
+The computation of the scope in m2m is performed with logic programming: `Answer Set Programming <https://potassco.org/>`_.
+
 .. image:: scope.gif
    :width: 350pt
 
