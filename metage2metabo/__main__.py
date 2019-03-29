@@ -84,6 +84,14 @@ def main():
         required=True,
         help="output directory path",
         metavar="OUPUT_DIR")
+    parent_parser_no = argparse.ArgumentParser(add_help=False)
+    parent_parser_no.add_argument(
+        "--noorphan",
+        help="use this option to ignore reactions without gene or protein association",
+        required=False,
+        action="store_true",
+        default=False,
+    )
     parent_parser_s = argparse.ArgumentParser(add_help=False)
     parent_parser_s.add_argument(
         "-s",
@@ -131,7 +139,7 @@ def main():
         help="metabolic network reconstruction",
         parents=[
             parent_parser_g, parent_parser_o, parent_parser_c, parent_parser_q,
-            parent_parser_l
+            parent_parser_l, parent_parser_no
         ],
         description=
         "Run metabolic network reconstruction for each annotated genome of the input directory, using Pathway Tools"
@@ -196,7 +204,7 @@ def main():
         help="whole workflow",
         parents=[
             parent_parser_g, parent_parser_s, parent_parser_m, parent_parser_o,
-            parent_parser_c, parent_parser_q
+            parent_parser_c, parent_parser_q, parent_parser_no
         ],
         description=
         "Run the whole workflow: metabolic network reconstruction, individual and community scope analysis and community selection"
@@ -229,8 +237,8 @@ def main():
     # deal with given subcommand
     if args.cmd == "workflow":
         main_workflow(args.genomes, args.out, args.cpu, args.clean, args.seeds,
-                      new_arg_modelhost)
-    elif args.cmd in ["iscope","cscope","addedvalue","mincom"]:
+                      args.noorphan, new_arg_modelhost)
+    elif args.cmd in ["iscope", "cscope", "addedvalue", "mincom"]:
         if not os.path.isdir(args.networksdir):
             logger.critical(args.networksdir + " is not a correct directory path")
             sys.exit(1)
@@ -253,7 +261,8 @@ def main():
                 else:
                     main_mincom(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
     elif args.cmd == "recon":
-        main_recon(args.genomes, args.out, args.level, args.cpu, args.clean)
+        main_recon(args.genomes, args.out, args.noorphan, args.level, args.cpu,
+                   args.clean)
     elif args.cmd == "seeds":
         if not utils.is_valid_file(args.metabolites):
             logger.critical(args.metabolites + " is not a correct filepath")

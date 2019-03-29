@@ -60,12 +60,13 @@ def run_pgdb_to_sbml(species_multiprocess_data):
     species_pgdb_dir = species_multiprocess_data[0]
     species_sbml_file = species_multiprocess_data[1]
     sbml_level = species_multiprocess_data[2]
+    noorphan_bool = species_multiprocess_data[3]
     padmet = from_pgdb_to_padmet(
         species_pgdb_dir,
         db='NA',
         version='NA',
         arg_verbose=False,
-        arg_with_genes=True,
+        arg_with_genes=noorphan_bool,
         arg_source=None,
         enhanced_db=None,
         padmetRef_file=None)
@@ -76,15 +77,20 @@ def run_pgdb_to_sbml(species_multiprocess_data):
     return sbml_check
 
 
-def pgdb_to_sbml(pgdb_dir, output_dir, sbml_level, cpu):
+def pgdb_to_sbml(pgdb_dir, output_dir, noorphan_bool, sbml_level, cpu):
     """Turn Pathway Tools PGDBs into SBML2 files using Padmet
     
     Args:
         pgdb_dir (str): PGDB directory
-
+        output_dir (str): results directory
+        noorphan_bool (bool): ignores orphan reactions if True
+        sbml_level (int): SBML level
+        cpu (int): number of CPU for multi-process
+    
     Returns:
-        sbml_dir (str): SBML directory
+        sbml_dir (str): SBML directory if successful
     """
+
     logger.info("######### Creating SBML files #########")
     sbml_dir = output_dir + "/sbml"
     if not utils.is_valid_dir(sbml_dir):
@@ -98,7 +104,7 @@ def pgdb_to_sbml(pgdb_dir, output_dir, sbml_level, cpu):
         multiprocess_data.append(
             [pgdb_dir + '/' + species,
             sbml_dir + '/' + species + '.sbml',
-            sbml_level])
+            sbml_level, noorphan_bool])
 
     sbml_checks = pgdb_to_sbml_pool.map(run_pgdb_to_sbml, multiprocess_data)
 
