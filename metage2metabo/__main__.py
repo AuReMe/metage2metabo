@@ -126,6 +126,7 @@ def main():
         "--level",
         help="Level for SBML creation, 2 or 3",
         required=False,
+        type = int,
         choices=[2,3],
         default=2)
 
