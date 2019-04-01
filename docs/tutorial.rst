@@ -19,6 +19,8 @@ Optional arguments:
 -c int           number of CPU for multi-processing
 --clean          option to rerun every reconstruction 
                  even if found in ptools-local
+--noorphan       ignore the reactions without gene or 
+                 protein association in final metabolic networks
 
 The inputs genomic data has to follow a strict strure, that can be observed in the `recon_data` directory of tests in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/test>`__. It is reproduced below:
 
@@ -37,7 +39,7 @@ The inputs genomic data has to follow a strict strure, that can be observed in t
 
 .. code:: sh
 
-    m2m recon -g test/recon_data -o output_directory -c cpu_number [--clean]
+    m2m recon -g test/recon_data -o output_directory -c cpu_number [--clean] [--orphan]
 
 * standard output
     .. code:: 
@@ -393,6 +395,8 @@ Optional arguments:
 -c int           number of CPU for multi-processing
 --clean          option to rerun every reconstruction 
                  even if found in ptools-local
+--noorphan       ignore the reactions without gene or 
+                 protein association in final metabolic networks
 
 You can run the workflow analysis with the two genbanks files available in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/test>`__ (`workflow_data`). Two genomes are available in the compressed archive workflow_genomes.tar.gz. The archive has to be uncompressed before testing.
 
