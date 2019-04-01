@@ -79,19 +79,29 @@ Installation with Docker
 ========================
 
 To create the m2m image, use the Dockerfile found in `Recipes <https://github.com/AuReMe/metage2metabo/tree/master/recipes>`__ of the Github repository. Note that the Pathway-Tools installer needs to be placed in the same folder than the Dockerfile.
-The name of the installer file is currently hardcoded in the Dockerfile. Hence it must be changed should you use a different version of Pathway Tools. Please note that the following commands (especially due to the use of root privileges) apply to Linux OS.
+The name of the installer file is currently hardcoded in the Dockerfile. Hence it must be changed if you use a different version of Pathway-Tools. Please note that the following commands (especially due to the use of root privileges) apply to Linux OS.
 
 .. code:: sh
 
     # Launch docker.
     sudo systemctl start docker
+
+    " Build image locally.
     sudo docker build -t my_image .
 
-To launch the container in interactive mode:
+To create and launch the container in interactive mode:
 
 .. code:: sh
 
     sudo docker run -ti -v /my/path/to/my/data:/shared --name="my_container" my_image bash
+
+Then you can exit the contanier with ``exit``. You can launch again the container with:
+
+.. code:: sh
+
+    sudo docker start my_container
+
+    sudo docker exec -ti my_container bash
 
 Installation with Singularity (e.g. on a cluster)
 =================================================
@@ -99,6 +109,9 @@ Installation with Singularity (e.g. on a cluster)
 Singularity [Ku2017]_ can be used to launch m2m on a cluster. Please refer to the `recipe <https://github.com/AuReMe/metage2metabo/tree/master/recipes>`__   of the Github repository of the project.
 The Singularity image has to be created from the recipe. You might need to do it on a personal computer since it requires administrator priviledges.
 To use the image on a cluster, the path to Pathway Tools ptools folder should be indicated in the recipe. Therefore, you have to replace '/external/folder/ptools' with the path where you want to put the ptools-local folder (which will contain the PGDB created by Pathway-Tools).
+
+Like for the Dockerfile, Pathway-Tools installer is hardcoded in the recipe so if you use another version, you have to modify the recipe.
+And the installer must be stored in the same folder than the Singularity recipe.
 
 To create the image named m2m.sif:
 

@@ -14,7 +14,7 @@ m2m can be used as a whole workflow ( ``` m2m workflow ``` ) or steps can be per
   - [Installation](#installation)
     - [Installation with pip](#installation-with-pip)
     - [Availability on Docker and Singularity](#availability-on-docker-and-singularity)
-  - [Features](#features)
+  - [Features`](#features)
     - [m2m recon](#m2m-recon)
     - [m2m iscope](#m2m-iscope)
     - [m2m cscope](#m2m-cscope)
@@ -95,7 +95,12 @@ Tested with Python3.6
 
 ### Availability on Docker and Singularity
 
-```details ```
+Due to Pathway-Tools license, Docker or Singularity images are not available publicly.
+
+But you can create these images by using the Dockerfile and Singularity recipes available inside the recipes folder.
+With these files, you can create container with Pathway-Tools and m2m.
+
+More informations in the [Docker and Singularity Documentation](https://metage2metabo.readthedocs.io/en/latest/install.html#installation-with-docker).
 
 ## Features
 ````
