@@ -14,7 +14,7 @@ m2m can be used as a whole workflow ( ``` m2m workflow ``` ) or steps can be per
   - [Installation](#installation)
     - [Installation with pip](#installation-with-pip)
     - [Availability on Docker and Singularity](#availability-on-docker-and-singularity)
-  - [Features`](#features)
+  - [Features](#features)
     - [m2m recon](#m2m-recon)
     - [m2m iscope](#m2m-iscope)
     - [m2m cscope](#m2m-cscope)
