@@ -338,7 +338,7 @@ def analyze_indiv_scope(jsonfile, seeds):
     len_scope = [len(d[elem]) for elem in d]
     logger.info("max metabolites in scope " + str(max(len_scope)))
     logger.info("min metabolites in scope " + str(min(len_scope)))
-    logger.info("average number of metabolites in scope %.2f (±%.2f)" %
+    logger.info("average number of metabolites in scope %.2f (+/- %.2f)" %
                 (statistics.mean(len_scope), statistics.stdev(len_scope)))
     return union_scope
 
