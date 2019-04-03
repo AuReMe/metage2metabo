@@ -1,7 +1,7 @@
-from padmet_utils.scripts.connection.pgdb_to_padmet import from_pgdb_to_padmet
-from padmet_utils.scripts.connection.sbmlGenerator import padmet_to_sbml, check
-from padmet_utils.scripts.connection.sbml_to_sbml import from_sbml_to_sbml
-from padmet_utils.scripts.connection.sbml_to_padmet import from_sbml_to_padmet
+from padmet_utils.connection.pgdb_to_padmet import from_pgdb_to_padmet
+from padmet_utils.connection.sbmlGenerator import padmet_to_sbml, check
+from padmet_utils.connection.sbml_to_sbml import from_sbml_to_sbml
+from padmet_utils.connection.sbml_to_padmet import from_sbml_to_padmet
 from padmet.utils.sbmlPlugin import convert_from_coded_id
 from multiprocessing import Pool
 from metage2metabo import utils
@@ -62,14 +62,9 @@ def run_pgdb_to_sbml(species_multiprocess_data):
     sbml_level = species_multiprocess_data[2]
     noorphan_bool = species_multiprocess_data[3]
     padmet = from_pgdb_to_padmet(
-        species_pgdb_dir,
-        db='NA',
-        version='NA',
-        arg_verbose=False,
-        arg_with_genes=noorphan_bool,
-        arg_source=None,
-        enhanced_db=None,
-        padmetRef_file=None)
+        pgdb_folder=species_pgdb_dir,
+        extract_gene=True,
+        no_orphan=noorphan_bool)
 
     padmet_to_sbml(padmet, species_sbml_file, sbml_lvl=sbml_level, verbose=False)
 

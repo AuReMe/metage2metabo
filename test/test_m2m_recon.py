@@ -16,7 +16,7 @@ from padmet.utils.sbmlPlugin import convert_from_coded_id
 
 
 def tca_reactions():
-    return ["SUCCINATE-DEHYDROGENASE-UBIQUINONE-RXN", "MALATE-DEH-RXN", "ISOCITDEH-RXN", "MALATE-DEHYDROGENASE-ACCEPTOR-RXN",
+    return ["RXN-14971", "MALATE-DEH-RXN", "ISOCITDEH-RXN", "MALATE-DEHYDROGENASE-ACCEPTOR-RXN",
                     "ACONITATEDEHYDR-RXN", "CITSYN-RXN", "ACONITATEHYDR-RXN", "2OXOGLUTARATEDEH-RXN", "SUCCCOASYN-RXN", "FUMHYDR-RXN"]
 
 
@@ -32,13 +32,11 @@ def test_m2m_recon_call():
     subprocess.call(['mpwt', '--delete', 'fatty_acid_beta_oxydation_icyc,tca_cycle_ecolicyc'])
     subprocess.call(['m2m', 'recon', '-g', 'recon_data', '-o', 'recon_data_output', '-c', '1'])
 
-    #TODO uncomment when issue is fixed in pgdb_to_padmet.
-    '''
     reader = SBMLReader()
     document = reader.readSBML('recon_data_output/sbml/tca_cycle_ecoli.sbml')
     expected_tca_reactions = [convert_from_coded_id(reaction.getId())[0] for reaction in document.getModel().getListOfReactions()]
     assert set(tca_reactions()).issubset(set(expected_tca_reactions))
-    '''
+
     reader = SBMLReader()
     document = reader.readSBML('recon_data_output/sbml/fatty_acid_beta_oxydation_I.sbml')
     expected_fabo_reactions = [convert_from_coded_id(reaction.getId())[0] for reaction in document.getModel().getListOfReactions()]
