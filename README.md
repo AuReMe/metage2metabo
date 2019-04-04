@@ -49,7 +49,7 @@ In particular, m2m relies on:
 
 ## Requirements
 
-* [Pathway Tools](http://bioinformatics.ai.sri.com/ptools/) version 22.5 or higher (free for [academic users](https://biocyc.org/download-bundle.shtml))
+* [Pathway Tools](http://bioinformatics.ai.sri.com/ptools/) version 22.5 or higher (free for [academic users](https://biocyc.org/download-bundle.shtml)) is **required for m2m workflow and m2m recon**
     * Pathway Tools requirements
         * **Linux**: Gnome terminal and Libxm4
         ```sh
