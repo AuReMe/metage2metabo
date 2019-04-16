@@ -101,8 +101,8 @@ html_static_path = ['_static']
 
 autodoc_mock_imports = [
     "padmet", "grequests", "seaborn", "sklearn", "fastcluster", "matplotlib",
-    "networkx", "panda", "libsbml", "docopt", "pyasp", "menetools", "miscoto",
-    "mpwt", "padmet_utils"
+    "networkx", "pandas", "libsbml", "docopt", "pyasp", "menetools", "metage2metabo"
+    "miscoto", "mpwt", "padmet_utils"
 ]
 # -- Options for HTMLHelp output ---------------------------------------------
 
