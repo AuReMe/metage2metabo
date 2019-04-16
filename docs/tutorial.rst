@@ -398,11 +398,17 @@ Optional arguments:
 --noorphan       ignore the reactions without gene or 
                  protein association in final metabolic networks
 
-You can run the workflow analysis with the two genbanks files available in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/test>`__ (`workflow_data`). Two genomes are available in the compressed archive workflow_genomes.tar.gz. The archive has to be uncompressed before testing.
+You can run the workflow analysis with the two genbanks files available in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/metage2metabo>`__ (`workflow_data`). Two genomes are available in the compressed archive workflow_genomes.tar.gz. The archive has to be uncompressed before testing.
 
 .. code:: sh
 
     m2m workflow -g workflow_genomes -s workflow_data/seeds_workflow.sbml -o output_directory/
+
+Or you can run the test argument (which use the same data):
+
+.. code:: sh
+
+    m2m test -o output_directory
 
 * standard outputs
 

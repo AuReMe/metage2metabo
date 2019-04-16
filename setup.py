@@ -21,7 +21,7 @@ from setuptools import setup
 
 setup(
     name='Metage2Metabo',
-    version='0.0.7',
+    version='0.0.8',
     url='https://github.com/aureme/metage2metabo',
     license='GPLv3+',
     description=
@@ -33,7 +33,8 @@ More information on usage and troubleshooting on Github: https://github.com/aure
     author_email='gem-aureme@inria.fr',
     packages=['metage2metabo'],
     package_dir={'metage2metabo': 'metage2metabo'},
-    #package_data={'metage2metabo': []},
+    package_data={'metage2metabo': ['workflow_data/workflow_genomes.tar.gz',
+                                    'workflow_data/seeds_workflow.sbml']},
     entry_points={
         'console_scripts': [
             'm2m = metage2metabo.__main__:main',

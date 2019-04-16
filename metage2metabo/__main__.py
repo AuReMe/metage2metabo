@@ -1,16 +1,17 @@
-from metage2metabo.m2m_workflow import run_workflow, recon, iscope, cscope, addedvalue, mincom, instance_community
-from metage2metabo import sbml_management
-import logging
-import pkg_resources
 import argparse
-import pyasp
-from metage2metabo import utils
-import sys
+import logging
 import os
-from shutil import copyfile
+import pkg_resources
+import pyasp
 import re
+import sys
+import tarfile
 import time
 
+from shutil import copyfile
+
+from metage2metabo.m2m_workflow import run_workflow, recon, iscope, cscope, addedvalue, mincom, instance_community
+from metage2metabo import sbml_management, utils
 
 VERSION = pkg_resources.get_distribution("metage2metabo").version
 LICENSE = """Copyright (C) Dyliss
@@ -22,7 +23,7 @@ MESSAGE = """
 From metabolic network reconstruction with annotated genomes to metabolic capabilities screening to identify organisms of interest in a large microbiota.
 """
 REQUIRES = """
-Requirements here Pathway Tools installed and in $PATH, and NCBI Blast
+Pathway Tools installed and in $PATH, and NCBI Blast
 """
 
 root_logger = logging.getLogger()
@@ -32,14 +33,18 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Check pyasp binaries.
-pyasp_bin_path = pyasp.__path__[0] + '/bin/'
-bin_check = []
-for asp_bin in ['clasp', 'gringo3', 'gringo4']:
-    bin_check.append(utils.is_valid_file(pyasp_bin_path + asp_bin))
-if not all(bin_check):
-    logger.critical("Error with pyasp installation, retry to install it:")
+if pyasp.__path__:
+    pyasp_bin_path = pyasp.__path__[0] + '/bin/'
+    bin_check = []
+    for asp_bin in ['clasp', 'gringo3', 'gringo4']:
+        bin_check.append(utils.is_valid_file(pyasp_bin_path + asp_bin))
+    if not all(bin_check):
+        logger.critical("Error with pyasp installation, retry to install it:")
+        logger.critical("pip install pyasp==1.4.3 --no-cache-dir --force-reinstall (add --user if you are not in a virtualenv)")
+        sys.exit(1)
+else:
+    logger.critical("Error with pyasp install, retry to install it:")
     logger.critical("pip install pyasp==1.4.3 --no-cache-dir --force-reinstall (add --user if you are not in a virtualenv)")
-    sys.exit(1)
 
 
 def main():
@@ -210,8 +215,22 @@ def main():
         description=
         "Run the whole workflow: metabolic network reconstruction, individual and community scope analysis and community selection"
     )
+    test_parser = subparsers.add_parser(
+        "test",
+        help="test on sample data from rumen experiments",
+        parents=[
+            parent_parser_q, parent_parser_c, parent_parser_o
+        ],
+        description=
+        "Test the whole workflow on a data sample")
 
     args = parser.parse_args()
+
+    # If no argument print the help.
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
+
     # set up the logger
     if args.quiet:
         root_logger.setLevel(logging.CRITICAL)
@@ -270,6 +289,8 @@ def main():
             sys.exit(1)
         else:
             main_seeds(args.metabolites, args.out)
+    elif args.cmd == 'test':
+        main_test(args.out, args.cpu)
 
     logger.info("--- Total runtime %.2f seconds ---" % (time.time() - start_time))
 
@@ -358,6 +379,30 @@ def main_seeds(metabolites_file, outdir):
         ), "Seed file is not in the correct format. Error with %s. Example of a correct ID is M_OXYGEN__45__MOLECULE_c. Rules = only numbers, letters or underscore in IDs, not starting with a number. One ID per line." %(metabolite)
     sbml_management.create_species_sbml(metabolites_set, outfile)
     logger.info("Seeds SBML file created in " + outfile)
+
+
+def main_test(outdir, cpu):
+    """Run test command
+
+    Args:
+        outdir (str): directory containing the test data and the test output
+        cpu (int): number of cpu to use (recommended: 2)
+    """
+    # Retrieve package path and path to test data.
+    package_path = '/'.join(os.path.realpath(__file__).split('/')[:-1])+ '/workflow_data/'
+
+    genome_file = package_path + 'workflow_genomes.tar.gz'
+    seeds_sbml_file = package_path + 'seeds_workflow.sbml'
+
+    logger.info("Uncompressing test data to " + outdir)
+    tar = tarfile.open(genome_file, "r:gz")
+    tar.extractall(outdir)
+    tar.close()
+
+    logger.info("Launch workflow on test data")
+    input_genome = outdir + '/workflow_genomes'
+    main_workflow(input_genome, outdir, cpu, None, seeds_sbml_file,
+                    None, None)
 
 
 def check_sbml(inpt, outdir, folder = True):
