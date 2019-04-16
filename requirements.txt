@@ -7,7 +7,7 @@ docopt==0.6.2
 future==0.17.1
 gffutils==0.9
 MeneTools==1.1.3
-Metage2Metabo==0.0.8
+Metage2Metabo
 Miscoto==1.1.6
 mpmath==1.1.0
 mpwt==0.4.2
