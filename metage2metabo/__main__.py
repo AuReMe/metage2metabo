@@ -399,7 +399,7 @@ def main_test(outdir, cpu):
     tar.extractall(outdir)
     tar.close()
 
-    logger.info("Launch workflow on test data")
+    logger.info("Launching workflow on test data")
     input_genome = outdir + '/workflow_genomes'
     main_workflow(input_genome, outdir, cpu, None, seeds_sbml_file,
                     None, None)
