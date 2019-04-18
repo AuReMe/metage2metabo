@@ -40,5 +40,4 @@ More information on usage and troubleshooting on Github: https://github.com/aure
             'm2m = metage2metabo.__main__:main',
         ]
     },
-    install_requires=['miscoto', 'menetools', 'mpwt', 'padmet', 'padmet-utils'],
 )
