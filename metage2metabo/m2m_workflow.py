@@ -21,13 +21,12 @@ import json
 import logging
 import mpwt
 import os, os.path
-import pyasp
 import tempfile
 import time
 import sys
 import statistics
 from menetools import run_menescope
-from menetools.sbml import readSBMLspecies
+from menetools.sbml import readSBMLspecies_clyngor
 from metage2metabo import utils, sbml_management
 from miscoto import run_scopes, run_mincom, run_instance
 from shutil import copyfile
@@ -328,7 +327,7 @@ def analyze_indiv_scope(jsonfile, seeds):
     for elem in d:
         d_set[elem] = set(d[elem])
 
-    seed_metabolites = readSBMLspecies(seeds, "seeds")
+    seed_metabolites = readSBMLspecies_clyngor(seeds, "seeds")
     logger.info("%i metabolic models considered." %(len(d_set)))
     intersection_scope = set.intersection(*list(d_set.values()))
     logger.info(str(len(intersection_scope)) + " metabolites in core reachable by all organisms (intersection)")
