@@ -5,10 +5,9 @@ python:
   - "3.6"
 
 # Install packages
-install:
-  - pip install Metage2Metabo
-
-before_script: cd test
+before_script:
+- python setup.py develop
+- cd test
 
 script:
 - pytest test_m2m_addedvalue.py --disable-pytest-warnings
