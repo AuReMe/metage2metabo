@@ -1,0 +1,5 @@
+name: metage2metabo
+channels:
+- bioconda
+dependencies:
+- biopython
