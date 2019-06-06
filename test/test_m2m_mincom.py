@@ -88,7 +88,7 @@ NEWLYPROD_TARGETS = {
 }
 
 
-def test_m2m_addedvalue_call():
+def test_m2m_mincom_call():
     """
     Test m2m mincom when called in terminal.
     """
@@ -120,4 +120,4 @@ def test_m2m_addedvalue_call():
     shutil.rmtree(respath)
 
 if __name__ == "__main__":
-    test_m2m_addedvalue_call()
+    test_m2m_mincom_call()

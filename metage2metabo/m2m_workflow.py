@@ -21,13 +21,12 @@ import json
 import logging
 import mpwt
 import os, os.path
-import pyasp
 import tempfile
 import time
 import sys
 import statistics
 from menetools import run_menescope
-from menetools.sbml import readSBMLspecies
+from menetools.sbml import readSBMLspecies_clyngor
 from metage2metabo import utils, sbml_management
 from miscoto import run_scopes, run_mincom, run_instance
 from shutil import copyfile
@@ -179,16 +178,16 @@ def mincom(instance_w_targets, out_dir):
     # Compute community selection
     logger.info("Running minimal community selection")
     all_results = compute_mincom(instance_w_targets, out_dir)
+    for key in all_results:
+        all_results[key] = list(all_results[key])
     with open(miscoto_dir + "/mincom.json", 'w') as dumpfile:
         json.dump(all_results, dumpfile, default=lambda x: x.__dict__)
     logger.info("Community scopes for all metabolic networks available in " +
                 miscoto_dir + "/comm_scopes.json")
     # Give one solution
-    onesol = all_results['one_model']
     one_sol_bact = []
-    for a in onesol:
-        if a.pred() == 'chosen_bacteria':
-            one_sol_bact.append(a.arg(0).rstrip('"').lstrip('"'))
+    for bact in all_results['bacteria']:
+        one_sol_bact.append(bact)
     logger.info('######### One minimal community #########')
     logger.info("# One minimal community enabling to produce the target metabolites given as inputs")
     logger.info("Minimal number of bacteria in communities = " +
@@ -328,7 +327,7 @@ def analyze_indiv_scope(jsonfile, seeds):
     for elem in d:
         d_set[elem] = set(d[elem])
 
-    seed_metabolites = readSBMLspecies(seeds, "seeds")
+    seed_metabolites = readSBMLspecies_clyngor(seeds, "seeds")
     logger.info("%i metabolic models considered." %(len(d_set)))
     intersection_scope = set.intersection(*list(d_set.values()))
     logger.info(str(len(intersection_scope)) + " metabolites in core reachable by all organisms (intersection)")

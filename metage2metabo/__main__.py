@@ -2,13 +2,11 @@ import argparse
 import logging
 import os
 import pkg_resources
-import pyasp
 import re
 import sys
 import tarfile
 import time
-
-from shutil import copyfile
+from shutil import copyfile,which
 
 from metage2metabo.m2m_workflow import run_workflow, recon, iscope, cscope, addedvalue, mincom, instance_community
 from metage2metabo import sbml_management, utils
@@ -32,20 +30,11 @@ logging.basicConfig(
         format='%(message)s', level=logging.INFO)  #%(name)s:%(message)s
 logger = logging.getLogger(__name__)
 
-# Check pyasp binaries.
-if pyasp.__path__:
-    pyasp_bin_path = pyasp.__path__[0] + '/bin/'
-    bin_check = []
-    for asp_bin in ['clasp', 'gringo3', 'gringo4']:
-        bin_check.append(utils.is_valid_file(pyasp_bin_path + asp_bin))
-    if not all(bin_check):
-        logger.critical("Error with pyasp installation, retry to install it:")
-        logger.critical("pip install pyasp==1.4.3 --no-cache-dir --force-reinstall (add --user if you are not in a virtualenv)")
-        sys.exit(1)
-else:
-    logger.critical("Error with pyasp install, retry to install it:")
-    logger.critical("pip install pyasp==1.4.3 --no-cache-dir --force-reinstall (add --user if you are not in a virtualenv)")
-
+# Check ASP binaries.
+if not which('clingo'):
+    logger.critical('clingo is not in the Path, m2m can not work without it.')
+    logger.critical('You can install with: pip install clyngor-with-clingo') 
+    sys.exit(1)
 
 def main():
     """Run programm
