@@ -1,6 +1,10 @@
 os:
   - linux
   - osx
+      osx_image: xcode10
+      language: generic
+      env: PYTHON=36
+
 dist: trusty
 sudo: required
 language: python
