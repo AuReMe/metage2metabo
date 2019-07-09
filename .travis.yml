@@ -14,7 +14,7 @@ python:
 
 # Install packages
 before_script:
-- python setup.py develop
+- python3 setup.py develop
 - cd test
 
 script:
