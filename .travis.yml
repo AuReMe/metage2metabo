@@ -1,9 +1,10 @@
-os:
-  - linux
-  - osx
-      osx_image: xcode10
-      language: generic
-      env: PYTHON=36
+matrix:
+    include:
+        - os: linux
+        - os: osx
+            osx_image: xcode10
+            language: generic
+            env: PYTHON=36
 
 dist: trusty
 sudo: required
