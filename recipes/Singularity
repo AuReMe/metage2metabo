@@ -22,11 +22,11 @@ From: ubuntu:18.04
      apt-get clean; \
      apt-get purge; \
      mkdir programs;\
-     mkdir -p /external/folder/ptools;\
+     mkdir -p /external/folder;\
      chmod u+x /tmp/pathway-tools-23.0-linux-64-tier1-install;\
-     ./tmp/pathway-tools-23.0-linux-64-tier1-install --InstallDir /programs/pathway-tools --PTOOLS_LOCAL_PATH /external/folder/ptools --InstallDesktopShortcuts 0 --mode unattended;\
-     mkdir -p /opt/ptools;\
-     cp -r /external/folder/ptools  /opt/ptools;\
+     ./tmp/pathway-tools-23.0-linux-64-tier1-install --InstallDir /programs/pathway-tools --PTOOLS_LOCAL_PATH /external/folder --InstallDesktopShortcuts 0 --mode unattended;\
+     mkdir -p /opt;\
+     cp -r /external/folder/ptools-local /opt;\
      rm /tmp/pathway-tools-23.0-linux-64-tier1-install;\
      curl https://bootstrap.pypa.io/get-pip.py | python3;\
      pip install Metage2Metabo

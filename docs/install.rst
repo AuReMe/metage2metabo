@@ -142,7 +142,7 @@ Then move the ptools-local folder from the Singularity folder to the folder in y
 
 .. code:: sh
 
-    cp -r /opt/ptools /external/folder/ptools
+    cp -r /opt/ptools-local /external/folder
 
 This will move the ptools-local folder (with permissions) from Singularity container to the local machine.
 
