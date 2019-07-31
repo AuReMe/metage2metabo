@@ -429,7 +429,7 @@ Which uses the following mandatory inputs (run ``m2m test --help`` for optional 
 
 Optional arguments:
 
--q,              quiet mode
+-q               quiet mode
 -c int           cpu number for multi-processing
 
 .. code:: sh
