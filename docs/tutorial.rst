@@ -428,9 +428,9 @@ Which uses the following mandatory inputs (run ``m2m test --help`` for optional 
 -o directory           output directory path
 
 Optional arguments:
+
 -q,              quiet mode
 -c int           cpu number for multi-processing
-
 
 .. code:: sh
 
