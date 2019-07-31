@@ -253,7 +253,7 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
     genomes_pgdbs = [genome_dir.lower() + 'cyc' for genome_dir in os.listdir(genomes_dir)]
     already_here_pgdbs = mpwt.list_pgdb()
     if clean and set(genomes_pgdbs).issubset(set(already_here_pgdbs)):
-        mpwt.cleaning(cpu)
+        mpwt.cleaning(number_cpu=cpu, verbose=True)
 
     # Check whether PGDBs are already created. If yes and not --clean, pursue without running ptools again
     pgdb_dirs = [pgdb_dir.lower() + 'cyc' for pgdb_dir in os.listdir(pgdb_dir)]

@@ -22,55 +22,72 @@ Optional arguments:
 --noorphan       ignore the reactions without gene or 
                  protein association in final metabolic networks
 
-The inputs genomic data has to follow a strict strure, that can be observed in the `recon_data` directory of tests in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/test>`__. It is reproduced below:
+The inputs genomic data has to follow a strict structure:
 
 ::
 
-    recon_data
-        ├── organism_1          
+    input_folder
+        ├── organism_1
         │   └── organism_1.gbk
-        ├── organism_2          
+        ├── organism_2
         │   └── organism_2.gbk
-        ├── organism_3          
+        ├── organism_3
         │   └── organism_3.gbk
         ..
         └── organism_n         
             └── organism_n.gbk
 
+This structure can be observed in the `workflow_genomes.tar.gz` file in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/metage2metabo/workflow_data>`__.
+
+By extracting this file, you will find the
+
+::
+
+    workflow_genomes
+        ├── GCA_900315385
+        │   └── GCA_900315385.gbk
+        ├── GCA_900318805
+        │   └── GCA_900318805.gbk
+
 .. code:: sh
 
-    m2m recon -g test/recon_data -o output_directory -c cpu_number [--clean] [--orphan]
+    m2m recon -g workflow_genomes -o output_directory -c cpu_number [--clean] [--orphan]
 
 * standard output
     .. code:: 
 
         ######### Running metabolic network reconstruction with Pathway Tools #########
-        tca_cycle_ecolicyc (at xxxx/ptools-local/pgdbs/user/tca_cycle_ecolicyc) has been removed.
-        425hofleacyc (at xxxx/ptools-local/pgdbs/user/425hofleacyc) has been removed.
-        fatty_acid_beta_oxydation_icyc (at xxxx/ptools-local/pgdbs/user/fatty_acid_beta_oxydation_icyc) has been removed.
-        404rhizobiumcyc (at xxxx/ptools-local/pgdbs/user/404rhizobiumcyc) has been removed.
-        ~~~~~~~~~~Creation of input data from Genbank/GFF~~~~~~~~~~
-        Checking inputs for tca_cycle_ecoli: missing organism-params.dat; genetic-elements.dat; dat_creation.lisp. Inputs file created for tca_cycle_ecoli.
-        Checking inputs for fatty_acid_beta_oxydation_I: missing organism-params.dat; genetic-elements.dat; dat_creation.lisp. Inputs file created for fatty_acid_beta_oxydation_I.
+        PGDB-counter.dat has been removed.
+        gca_900315385cyc (at xxxx/ptools-local/pgdbs/user/gca_900315385cyc) has been removed.
+        gca_900318805cyc (at xxxx/ptools-local/pgdbs/user/gca_900318805cyc) has been removed.
+        ~~~~~~~~~~Creation of input data from Genbank/GFF/PF~~~~~~~~~~
+        Checking inputs for GCA_900318805: no missing files.
+        Checking inputs for GCA_900315385: no missing files.
+        ----------End of creation of input data from Genbank/GFF/PF: 0.01s----------
         ~~~~~~~~~~Inference on the data~~~~~~~~~~
-        pathway-tools -no-web-cel-overview -no-cel-overview -no-patch-download -disable-metadata-saving -nologfile -patho recon_data//tca_cycle_ecoli/
-        pathway-tools -no-web-cel-overview -no-cel-overview -no-patch-download -disable-metadata-saving -nologfile -patho recon_data//fatty_acid_beta_oxydation_I/
+        pathway-tools -no-web-cel-overview -no-cel-overview -no-patch-download -disable-metadata-saving -nologfile -patho workflow_genomes/GCA_900318805/
+        pathway-tools -no-web-cel-overview -no-cel-overview -no-patch-download -disable-metadata-saving -nologfile -patho workflow_genomes/GCA_900315385/
         ~~~~~~~~~~Check inference~~~~~~~~~~
 
         2 builds have passed!
 
+        ----------End of PathoLogic inference: 226.74s----------
         ~~~~~~~~~~Creation of the .dat files~~~~~~~~~~
-        pathway-tools -no-patch-download -disable-metadata-saving -nologfile -load recon_data//tca_cycle_ecoli//dat_creation.lisp
-        pathway-tools -no-patch-download -disable-metadata-saving -nologfile -load recon_data//fatty_acid_beta_oxydation_I//dat_creation.lisp
-        ~~~~~~~~~~Check .dat ~~~~~~~~~~
-        tca_cycle_ecolicyc: 23 on 23 dat files create.
-        fatty_acid_beta_oxydation_icyc: 23 on 23 dat files create.
-        ~~~~~~~~~~End of the Pathway-Tools Inference~~~~~~~~~~
+        pathway-tools -no-patch-download -disable-metadata-saving -nologfile -load workflow_genomes/GCA_900318805/dat_creation.lisp
+        pathway-tools -no-patch-download -disable-metadata-saving -nologfile -load workflow_genomes/GCA_900315385/dat_creation.lisp
+        ~~~~~~~~~~Check .dat~~~~~~~~~~
+        gca_900318805cyc: 23 out of 23 dat files create.
+        gca_900315385cyc: 23 out of 23 dat files create.
+        ----------End of dat files creation: 87.13s----------
+        ~~~~~~~~~~End of Pathway Tools~~~~~~~~~~
         ~~~~~~~~~~Moving result files~~~~~~~~~~
-        ~~~~~~~~~~The script have finished! Thank you for using it.
+        ----------End of moving fimes: 0.08s----------
+        ----------mpwt has finished in 314.03s! Thank you for using it.
         ######### Creating SBML files #########
-        PGDB created in output_directory//pgdb
-        SBML files created in output_directory//sbml
+        --- Recon runtime 316.96 seconds ---
+        PGDB created in output_directory/pgdb
+        SBML files created in output_directory/sbml
+        --- Total runtime 316.97 seconds ---
 
         Here the ``--clean`` option was used. The output shows that PGDB are created with Pathway Tools. Then the .dat files are extracted and used to build SBML files of the metabolic models. 
 * files outputs
@@ -80,7 +97,7 @@ The inputs genomic data has to follow a strict strure, that can be observed in t
 
         output_directory/
         ├── pgdb
-        │   ├── fatty_acid_beta_oxydation_I
+        │   ├── GCA_900315385
         │   │   ├── classes.dat
         │   │   ├── compound-links.dat
         │   │   ├── compounds.dat
@@ -104,7 +121,7 @@ The inputs genomic data has to follow a strict strure, that can be observed in t
         │   │   ├── species.dat
         │   │   ├── terminators.dat
         │   │   └── transunits.dat
-        │   └── tca_cycle_ecoli
+        │   └── GCA_900318805
         │       ├── classes.dat
         │       ├── compound-links.dat
         │       ├── compounds.dat
@@ -129,25 +146,25 @@ The inputs genomic data has to follow a strict strure, that can be observed in t
         │       ├── terminators.dat
         │       └── transunits.dat
         └── sbml
-            ├── fatty_acid_beta_oxydation_I.sbml
-            └── tca_cycle_ecoli.sbml
+            ├── GCA_900315385.sbml
+            └── GCA_900318805.sbml
 
         * Finally, in the input directory, some files are also generated automatically by Pathway Tools
         ::
             
             recon_data/
-            ├── fatty_acid_beta_oxydation_I
+            ├── GCA_900315385
             │   ├── dat_creation.lisp
-            │   ├── fatty_acid_beta_oxydation_I.gbk
+            │   ├── GCA_900315385.gbk
             │   ├── genetic-elements.dat
             │   ├── organism-params.dat
             │   └── pathologic.log
-            └── tca_cycle_ecoli
+            └── GCA_900318805
                 ├── dat_creation.lisp
+                └── GCA_900318805.gbk
                 ├── genetic-elements.dat
                 ├── organism-params.dat
                 ├── pathologic.log
-                └── tca_cycle_ecoli.gbk
 
 
 m2m iscope, cscope and addedvalue
@@ -405,6 +422,15 @@ You can run the workflow analysis with the two genbanks files available in the `
     m2m workflow -g workflow_genomes -s workflow_data/seeds_workflow.sbml -o output_directory/
 
 Or you can run the test argument (which use the same data):
+
+Which uses the following mandatory inputs (run ``m2m test --help`` for optional arguments):
+
+-o directory           output directory path
+
+Optional arguments:
+-q,              quiet mode
+-c int           cpu number for multi-processing
+
 
 .. code:: sh
 
