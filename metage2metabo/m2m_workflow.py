@@ -91,7 +91,7 @@ def recon(inp_dir, out_dir, noorphan_bool, sbml_level, nb_cpu, clean):
     sbml_dir = sbml_management.pgdb_to_sbml(pgdb_dir, out_dir, noorphan_bool,
                                             sbml_level, nb_cpu)
     logger.info(
-        "--- Recon runtime %.2f seconds ---" % (time.time() - starttime))
+        "--- Recon runtime %.2f seconds ---\n" % (time.time() - starttime))
     return pgdb_dir, sbml_dir
 
 
@@ -115,7 +115,7 @@ def iscope(sbmldir, seeds, out_dir):
         logger.info("Individual scopes for all metabolic networks available in " + scope_json)
         # Analyze the individual scopes results (json file)
         reachable_metabolites_union = analyze_indiv_scope(scope_json, seeds)
-        logger.info("--- Indiv scopes runtime %.2f seconds ---" %
+        logger.info("--- Indiv scopes runtime %.2f seconds ---\n" %
                     (time.time() - starttime))
         return reachable_metabolites_union
     else:
@@ -141,7 +141,7 @@ def cscope(sbmldir, seeds, outdir, host=None):
     # Run community scope
     logger.info("Running whole-community metabolic scopes")
     community_reachable_metabolites = comm_scope_run(instance_com, outdir)
-    logger.info("--- Community scope runtime %.2f seconds ---" %
+    logger.info("--- Community scope runtime %.2f seconds ---\n" %
                 (time.time() - starttime))
     return instance_com, community_reachable_metabolites
 
@@ -158,9 +158,9 @@ def addedvalue(iscope_rm, cscope_rm):
     """
     # Community targets = what can be produced only if cooperation occurs between species
     newtargets = cscope_rm - iscope_rm
-    logger.info("\n Added value of cooperation over individual metabolism: " +
+    logger.info("\nAdded value of cooperation over individual metabolism: " +
                 str(len(newtargets)) + " newly reachable metabolites: \n")
-    logger.info(', '.join(newtargets))
+    logger.info('\n'.join(newtargets))
     logger.info("\n")
     return newtargets
 
@@ -209,7 +209,7 @@ def mincom(instance_w_targets, out_dir):
                 str(len(intersection)))
     logger.info("\n".join(intersection))
     logger.info(
-        "--- Mincom runtime %.2f seconds ---" % (time.time() - starttime))
+        "--- Mincom runtime %.2f seconds ---\n" % (time.time() - starttime))
 
 
 def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
@@ -338,7 +338,7 @@ def analyze_indiv_scope(jsonfile, seeds):
     logger.info('\n' + str(len(union_scope)) + " metabolites reachable by individual organisms altogether (union), among which " + str(len(seed_metabolites)) + " seeds (growth medium) \n")
     logger.info("\n".join(union_scope))
     len_scope = [len(d[elem]) for elem in d]
-    logger.info("max metabolites in scope " + str(max(len_scope)))
+    logger.info("\nmax metabolites in scope " + str(max(len_scope)))
     logger.info("min metabolites in scope " + str(min(len_scope)))
     logger.info("average number of metabolites in scope %.2f (+/- %.2f)" %
                 (statistics.mean(len_scope), statistics.stdev(len_scope)))

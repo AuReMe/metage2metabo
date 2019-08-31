@@ -39,6 +39,7 @@ def create_species_sbml(metabolites, outputfile):
     document = libsbml.SBMLDocument(2, 1)
     model = document.createModel("metabolites")
     for compound in metabolites:
+        compound = compound.strip('"')
         name, stype, comp = convert_from_coded_id(compound)
         s = model.createSpecies()
         check(s, 'create species')

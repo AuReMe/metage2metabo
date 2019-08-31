@@ -310,7 +310,7 @@ def main_cscope(*allargs):
     """
     comscope = cscope(*allargs)[1]
     logger.info("\n" + str(len(comscope)) + " metabolites (excluding the seeds) reachable by the whole community/microbiota: \n")
-    logger.info(', '.join(comscope))
+    logger.info('\n'.join(comscope))
     return comscope
 
 
@@ -324,7 +324,7 @@ def main_added_value(sbmldir, seeds, outdir, host):
         host (str): SBML file for host
     """
     iscope_metabolites = main_iscope(sbmldir, seeds, outdir)
-    logger.info(", ".join(iscope_metabolites))
+    #logger.info(", ".join(iscope_metabolites))
     cscope_metabolites = main_cscope(sbmldir, seeds, outdir, host)
     newtargets = addedvalue(iscope_metabolites, cscope_metabolites)
     sbml_management.create_species_sbml(newtargets, outdir + "/community_analysis/targets.sbml")
