@@ -309,7 +309,7 @@ def main_cscope(*allargs):
     """Run cscope command
     """
     comscope = cscope(*allargs)[1]
-    logger.info(str(len(comscope)) + " metabolites reachable by the whole community/microbiota:")
+    logger.info("\n" + str(len(comscope)) + " metabolites (excluding the seeds) reachable by the whole community/microbiota: \n")
     logger.info(', '.join(comscope))
     return comscope
 

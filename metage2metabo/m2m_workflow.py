@@ -158,9 +158,10 @@ def addedvalue(iscope_rm, cscope_rm):
     """
     # Community targets = what can be produced only if cooperation occurs between species
     newtargets = cscope_rm - iscope_rm
-    logger.info("Added value of cooperation over individual metabolism: " +
-                str(len(newtargets)) + " newly reachable metabolites:")
+    logger.info("\n Added value of cooperation over individual metabolism: " +
+                str(len(newtargets)) + " newly reachable metabolites: \n")
     logger.info(', '.join(newtargets))
+    logger.info("\n")
     return newtargets
 
 def mincom(instance_w_targets, out_dir):
