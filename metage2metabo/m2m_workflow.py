@@ -330,10 +330,12 @@ def analyze_indiv_scope(jsonfile, seeds):
     seed_metabolites = readSBMLspecies_clyngor(seeds, "seeds")
     logger.info("%i metabolic models considered." %(len(d_set)))
     intersection_scope = set.intersection(*list(d_set.values()))
-    logger.info(str(len(intersection_scope)) + " metabolites in core reachable by all organisms (intersection)")
+    logger.info('\n' + str(len(intersection_scope)) + " metabolites in core reachable by all organisms (intersection) \n")
+    logger.info("\n".join(intersection_scope))
 
     union_scope = set.union(*list(d_set.values()))
-    logger.info(str(len(union_scope)) + " metabolites reachable by individual organisms altogether (union), among which " + str(len(seed_metabolites)) + " seeds (growth medium)")
+    logger.info('\n' + str(len(union_scope)) + " metabolites reachable by individual organisms altogether (union), among which " + str(len(seed_metabolites)) + " seeds (growth medium) \n")
+    logger.info("\n".join(union_scope))
     len_scope = [len(d[elem]) for elem in d]
     logger.info("max metabolites in scope " + str(max(len_scope)))
     logger.info("min metabolites in scope " + str(min(len_scope)))
