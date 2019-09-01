@@ -415,8 +415,9 @@ def add_targets_to_instance(instancefile, output_dir, target_set):
     copyfile(instancefile, new_instance_file)
 
     with open(new_instance_file, 'a') as f:
+        f.write('\n')
         for elem in target_set:
-            f.write('target("' + elem + '").')
+            f.write('target("' + elem + '").\n')
     return new_instance_file
 
 
