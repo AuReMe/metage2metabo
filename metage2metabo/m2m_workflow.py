@@ -37,7 +37,7 @@ logging.getLogger("menetools").setLevel(logging.CRITICAL)
 logging.getLogger("miscoto").setLevel(logging.CRITICAL)
 
 
-def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, host_mn):
+def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_bool, host_mn):
     """Run the whole m2m workflow
     
     Args:
@@ -47,10 +47,11 @@ def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, host_mn)
         clean (bool): clean PGDB and re-run them
         seeds (str): seeds file
         noorphan_bool (bool): ignores orphan reactions if True
+        padmet_bool (bool): creates padmet files if True
         host_mn (str): metabolic network file for host
     """
     # METABOLIC NETWORK RECONSTRUCTION
-    sbml_dir = recon(inp_dir, out_dir, noorphan_bool, 2, nb_cpu, clean)[1]
+    sbml_dir = recon(inp_dir, out_dir, noorphan_bool, padmet_bool, 2, nb_cpu, clean)[1]
     # INDIVIDUAL SCOPES
     union_targets_iscope = iscope(sbml_dir, seeds, out_dir)
     # COMMUNITY SCOPE
@@ -66,13 +67,14 @@ def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, host_mn)
     mincom(instance_w_targets, out_dir)
 
 
-def recon(inp_dir, out_dir, noorphan_bool, sbml_level, nb_cpu, clean):
+def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clean):
     """Run metabolic network reconstruction with Pathway Tools and get SBMLs
     
     Args:
         inp_dir (str): genomes directory
         out_dir (str): results directory
         noorphan_bool (bool): ignores orphan reactions if True
+        padmet_bool (bool): creates padmet files if True
         nb_cpu (int): number of CPU for multiprocessing
         clean (bool): re-run metabolic reconstructions that are already available if found
 
@@ -89,7 +91,7 @@ def recon(inp_dir, out_dir, noorphan_bool, sbml_level, nb_cpu, clean):
         sys.exit(1)
     # Create SBMLs from PGDBs
     sbml_dir = sbml_management.pgdb_to_sbml(pgdb_dir, out_dir, noorphan_bool,
-                                            sbml_level, nb_cpu)
+                                            padmet_bool, sbml_level, nb_cpu)
     logger.info(
         "--- Recon runtime %.2f seconds ---\n" % (time.time() - starttime))
     return pgdb_dir, sbml_dir

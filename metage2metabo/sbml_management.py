@@ -62,10 +62,15 @@ def run_pgdb_to_sbml(species_multiprocess_data):
     species_sbml_file = species_multiprocess_data[1]
     sbml_level = species_multiprocess_data[2]
     noorphan_bool = species_multiprocess_data[3]
+    padmet_file_dir = species_multiprocess_data[4]
+
     padmet = from_pgdb_to_padmet(
         pgdb_folder=species_pgdb_dir,
         extract_gene=True,
         no_orphan=noorphan_bool)
+
+    if padmet_file_dir:
+        padmet.generateFile(padmet_file_dir)
 
     padmet_to_sbml(padmet, species_sbml_file, sbml_lvl=sbml_level, verbose=False)
 
@@ -73,7 +78,7 @@ def run_pgdb_to_sbml(species_multiprocess_data):
     return sbml_check
 
 
-def pgdb_to_sbml(pgdb_dir, output_dir, noorphan_bool, sbml_level, cpu):
+def pgdb_to_sbml(pgdb_dir, output_dir, noorphan_bool, padmet_bool, sbml_level, cpu):
     """Turn Pathway Tools PGDBs into SBML2 files using Padmet
     
     Args:
@@ -89,6 +94,11 @@ def pgdb_to_sbml(pgdb_dir, output_dir, noorphan_bool, sbml_level, cpu):
 
     logger.info("######### Creating SBML files #########")
     sbml_dir = output_dir + "/sbml"
+    if padmet_bool:
+        padmet_dir = output_dir + "/padmet"
+        if not utils.is_valid_dir(padmet_dir):
+            logger.critical("Impossible to access/create output directory")
+            sys.exit(1)
     if not utils.is_valid_dir(sbml_dir):
         logger.critical("Impossible to access/create output directory")
         sys.exit(1)
@@ -97,10 +107,18 @@ def pgdb_to_sbml(pgdb_dir, output_dir, noorphan_bool, sbml_level, cpu):
 
     multiprocess_data = []
     for species in os.listdir(pgdb_dir):
-        multiprocess_data.append(
-            [pgdb_dir + '/' + species,
-            sbml_dir + '/' + species + '.sbml',
-            sbml_level, noorphan_bool])
+        if padmet_bool:
+            multiprocess_data.append(
+                [pgdb_dir + '/' + species,
+                sbml_dir + '/' + species + '.sbml',
+                sbml_level, noorphan_bool,
+                padmet_dir + '/' + species + '.padmet'])
+        else:
+            multiprocess_data.append(
+                [pgdb_dir + '/' + species,
+                sbml_dir + '/' + species + '.sbml',
+                sbml_level, noorphan_bool,
+                padmet_bool])
 
     sbml_checks = pgdb_to_sbml_pool.map(run_pgdb_to_sbml, multiprocess_data)
 

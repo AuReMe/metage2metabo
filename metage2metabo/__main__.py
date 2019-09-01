@@ -102,11 +102,13 @@ def main():
     parent_parser_g = argparse.ArgumentParser(add_help=False)
     parent_parser_g.add_argument(
         "-g", "--genomes", help="annotated genomes directory", required=True)
-    parent_parser_g.add_argument(
+    parent_parser_cl = argparse.ArgumentParser(add_help=False)
+    parent_parser_cl.add_argument(
         "--clean",
         help="clean PGDBs if already present",
         required=False,
-        action="store_true")
+        action="store_true",
+        default=None)
     parent_parser_m = argparse.ArgumentParser(add_help=False)
     parent_parser_m.add_argument(
         "-m",
@@ -123,6 +125,14 @@ def main():
         type = int,
         choices=[2,3],
         default=2)
+    parent_parser_p = argparse.ArgumentParser(add_help=False)
+    parent_parser_p.add_argument(
+        "-p",
+        "--padmet",
+        help="create padmet files",
+        required=False,
+        action="store_true",
+        default=None)
 
     # subparsers
     subparsers = parser.add_subparsers(
@@ -134,7 +144,7 @@ def main():
         help="metabolic network reconstruction",
         parents=[
             parent_parser_g, parent_parser_o, parent_parser_c, parent_parser_q,
-            parent_parser_l, parent_parser_no
+            parent_parser_l, parent_parser_no, parent_parser_p, parent_parser_cl
         ],
         description=
         "Run metabolic network reconstruction for each annotated genome of the input directory, using Pathway Tools"
@@ -199,7 +209,7 @@ def main():
         help="whole workflow",
         parents=[
             parent_parser_g, parent_parser_s, parent_parser_m, parent_parser_o,
-            parent_parser_c, parent_parser_q, parent_parser_no
+            parent_parser_c, parent_parser_q, parent_parser_no, parent_parser_p, parent_parser_cl
         ],
         description=
         "Run the whole workflow: metabolic network reconstruction, individual and community scope analysis and community selection"
@@ -246,7 +256,7 @@ def main():
     # deal with given subcommand
     if args.cmd == "workflow":
         main_workflow(args.genomes, args.out, args.cpu, args.clean, args.seeds,
-                      args.noorphan, new_arg_modelhost)
+                      args.noorphan, args.padmet, new_arg_modelhost)
     elif args.cmd in ["iscope", "cscope", "addedvalue", "mincom"]:
         if not os.path.isdir(args.networksdir):
             logger.critical(args.networksdir + " is not a correct directory path")
@@ -270,7 +280,7 @@ def main():
                 else:
                     main_mincom(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
     elif args.cmd == "recon":
-        main_recon(args.genomes, args.out, args.noorphan, args.level, args.cpu,
+        main_recon(args.genomes, args.out, args.noorphan, args.padmet, args.level, args.cpu,
                    args.clean)
     elif args.cmd == "seeds":
         if not utils.is_valid_file(args.metabolites):
