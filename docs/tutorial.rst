@@ -21,6 +21,7 @@ Optional arguments:
                  even if found in ptools-local
 --noorphan       ignore the reactions without gene or 
                  protein association in final metabolic networks
+-p               create padmet files from PGDB
 
 The inputs genomic data has to follow a strict structure:
 
@@ -414,6 +415,7 @@ Optional arguments:
                  even if found in ptools-local
 --noorphan       ignore the reactions without gene or 
                  protein association in final metabolic networks
+-p               create padmet files from PGDB
 
 You can run the workflow analysis with the two genbanks files available in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/metage2metabo>`__ (`workflow_data`). Two genomes are available in the compressed archive workflow_genomes.tar.gz. The archive has to be uncompressed before testing.
 
