@@ -400,8 +400,8 @@ def main_test(outdir, cpu):
 
     logger.info("Launching workflow on test data")
     input_genome = outdir + '/workflow_genomes'
-    main_workflow(inp_dir=input_genome, out_dir=outdir, nb_cpu=cpu, clean=None,
-                seeds=seeds_sbml_file, noorphan_bool=None, padmet_bool=None, host_mn=None)
+    main_workflow(input_genome, outdir, cpu, None,
+                seeds_sbml_file, None, None, None)
 
 
 def check_sbml(inpt, outdir, folder = True):
