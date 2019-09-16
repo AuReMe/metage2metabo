@@ -38,6 +38,7 @@ More information on usage and troubleshooting on Github: https://github.com/aure
     entry_points={
         'console_scripts': [
             'm2m = metage2metabo.__main__:main',
+            'm2m_analysis = metage2metabo.m2m_analysis:main_analysis',
         ]
     },
     install_requires=['miscoto', 'menetools', 'mpwt', 'padmet', 'padmet-utils'],
