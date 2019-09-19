@@ -29,4 +29,6 @@ From: ubuntu:18.04
      cp -r /external/folder/ptools-local /opt;\
      rm /tmp/pathway-tools-23.0-linux-64-tier1-install;\
      curl https://bootstrap.pypa.io/get-pip.py | python3;\
+     pip install graphviz ete3 networkx;\
+     pip install powergrasp;\
      pip install Metage2Metabo

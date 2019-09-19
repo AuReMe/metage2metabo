@@ -94,7 +94,6 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file):
 		tree_file.write(tree.get_ascii(attributes=["sci_name", "rank"]))
 
 
-
 def create_gml(sbml_folder, target_file, json_miscoto_file, miscoto_stat_output, gml_output, taxon_file):
 	len_min_sol = {}
 	len_union = {}
@@ -154,9 +153,10 @@ def create_gml(sbml_folder, target_file, json_miscoto_file, miscoto_stat_output,
 				else:
 					G.add_edge(species_1, species_2, weight=species_weight[combination_species])
 
-		with open(miscoto_stat_output,"w") as f:
-			f.write("categories\tnb_target\tsize_min_sol\tsize_union\tsize_intersection\tsize_enum\n")
-			f.write(categories + '\t' + str(len_target[categories]) + '\t' + str(len_min_sol[categories]) + '\t' + str(len_union[categories]) + '\t' + str(len_intersection[categories]) + '\t' + str(len_solution[categories]) + '\n')
+		with open(miscoto_stat_output,"w") as stats_output:
+			statswriter = csv.writer(stats_output, delimiter='\t')
+			statswriter.writerow(['categories', 'nb_target', 'size_min_sol', 'size_union', 'size_intersection', 'size_enum'])
+			statswriter.writerow([categories, str(len_target[categories]), str(len_min_sol[categories]), str(len_union[categories]), str(len_intersection[categories]), str(len_solution[categories])])
 
 		nx.write_gml(G, gml_output)
 
@@ -173,22 +173,11 @@ def main_analysis():
 	)
 
 	parser.add_argument(
-		"-q",
-		"--quiet",
-		dest="quiet",
-		help="quiet mode",
-		required=False,
-		action="store_true",
-		default=None,
-	)
-
-	parser.add_argument(
-		"-c",
-		"--cpu",
-		help="cpu number for multi-process",
-		required=False,
-		type=int,
-		default=1)
+		"-n",
+		"--networksdir",
+		metavar="NETWORKS_DIR",
+		help="metabolic networks directory",
+		required=True)
 
 	parser.add_argument(
 		"-o",
@@ -211,16 +200,10 @@ def main_analysis():
 		required=True)
 
 	parser.add_argument(
-		"-n",
-		"--networksdir",
-		metavar="NETWORKS_DIR",
-		help="metabolic networks directory",
+		"-j",
+		"--json",
+		help="json from miscoto",
 		required=True)
-
-	parser.add_argument(
-		"--taxon",
-		metavar="Taxon file path",
-		help="mpwt taxon file tsv", required=False)
 
 	parser.add_argument(
 		"-m",
@@ -228,6 +211,29 @@ def main_analysis():
 		help="host metabolic model for community analysis",
 		required=False,
 		default=None)
+
+	parser.add_argument(
+		"-q",
+		"--quiet",
+		dest="quiet",
+		help="quiet mode",
+		required=False,
+		action="store_true",
+		default=None,
+	)
+
+	parser.add_argument(
+		"-c",
+		"--cpu",
+		help="cpu number for multi-process",
+		required=False,
+		type=int,
+		default=1)
+
+	parser.add_argument(
+		"--taxon",
+		metavar="TAXON_FILE",
+		help="mpwt taxon file tsv", required=False)
 
     # If no argument print the help.
 	if len(sys.argv) == 1:

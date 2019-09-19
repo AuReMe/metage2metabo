@@ -48,9 +48,14 @@ In particular, m2m relies on:
 * [menetools](https://github.com/cfrioux/MeneTools) to analyze individual metabolic capabilities using logic programming
 * [miscoto](https://github.com/cfrioux/miscoto) to analyze collective metabolic capabilities and select communities within microbiota using logic programming
 
+Also, m2m_analysis (graph analysis part)) relies on other packages:
+* [networkx](https://github.com/networkx/networkx) to create graph from miscoto results
+* [ete3](https://github.com/etetoolkit/ete) to add taxonomy information on the graph if you used mpwt taxon file
+* [powergrasp](https://github.com/Aluriak/PowerGrASP) to compress networkx graph
+
 ## Requirements
 
-* [Pathway Tools](http://bioinformatics.ai.sri.com/ptools/) version 22.5 or higher (free for [academic users](https://biocyc.org/download-bundle.shtml)) is **required for m2m workflow and m2m recon**
+* [Pathway Tools](http://bioinformatics.ai.sri.com/ptools/) version 23.0 or higher (free for [academic users](https://biocyc.org/download-bundle.shtml)) is **required for m2m workflow and m2m recon**
     * Pathway Tools requirements
         * **Linux**: Gnome terminal and Libxm4
         ```sh
