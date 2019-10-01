@@ -107,7 +107,7 @@ def create_gml(sbml_folder, target_file, json_miscoto_file, miscoto_stat_output,
 		all_species.append(species)
 
 	species_categories = {}
-	species_categories['target'] = sbml_management.get_target(target_file)
+	species_categories['target'] = sbml_management.get_compounds(target_file)
 
 	if taxon_file:
 		phylum_species = {}

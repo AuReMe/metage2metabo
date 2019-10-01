@@ -29,7 +29,7 @@ def get_sbml_level(sbml_file):
     return document.getLevel()
 
 
-def get_target(sbml_file):
+def get_compounds(sbml_file):
     """Get target from sbml
 
     Args:

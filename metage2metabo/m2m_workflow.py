@@ -30,6 +30,11 @@ from menetools.sbml import readSBMLspecies_clyngor
 from metage2metabo import utils, sbml_management
 from miscoto import run_scopes, run_mincom, run_instance
 from shutil import copyfile
+from padmet.classes.padmetSpec import PadmetSpec
+import csv
+import xml.etree.ElementTree as etree
+from padmet.utils import sbmlPlugin
+from multiprocessing import Pool
 
 
 logger = logging.getLogger(__name__)
@@ -92,6 +97,10 @@ def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clea
     # Create SBMLs from PGDBs
     sbml_dir = sbml_management.pgdb_to_sbml(pgdb_dir, out_dir, noorphan_bool,
                                             padmet_bool, sbml_level, nb_cpu)
+
+    output_stat_file = out_dir + '/' + 'recon_stats.tsv'
+    analyze_recon(sbml_dir, out_dir, output_stat_file, padmet_bool, nb_cpu)
+
     logger.info(
         "--- Recon runtime %.2f seconds ---\n" % (time.time() - starttime))
     return pgdb_dir, sbml_dir
@@ -280,6 +289,166 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
     return (pgdb_dir)
 
 
+def create_padmet_stat(species_name, padmet_file):
+    """
+    Count reactions/pathways/compounds/genes in a padmet file.
+    Parameters
+    ----------
+    padmet_file: str
+        path to a padmet file
+    Returns
+    -------
+    list:
+        [path to padmet, number of pathways, number of reactions, number of genes, number of compounds]
+    """
+    padmetSpec = PadmetSpec(padmet_file)
+
+    total_pwy_id = set()
+    total_cpd_id = set()
+
+    all_rxns = [node for node in padmetSpec.dicOfNode.values() if node.type == "reaction"]
+    all_genes = [node.id for node in padmetSpec.dicOfNode.values() if node.type == "gene"]
+    gene_associated_rxns = []
+    rxns = []
+    for rxn_node in all_rxns:
+        total_cpd_id.update([rlt.id_out for rlt in padmetSpec.dicOfRelationIn[rxn_node.id] if rlt.type in ["consumes","produces"]])
+        pathways_ids = set([rlt.id_out for rlt in padmetSpec.dicOfRelationIn[rxn_node.id] if rlt.type == "is_in_pathway"])
+        rxns.append(rxn_node.id)
+        if any([rlt for rlt in padmetSpec.dicOfRelationIn[rxn_node.id] if rlt.type == "is_linked_to"]):
+            gene_associated_rxns.append(rxn_node.id)
+        total_pwy_id.update(pathways_ids)
+
+    all_pwys = [node_id for (node_id, node) in padmetSpec.dicOfNode.items() if node_id in total_pwy_id]
+    all_cpds = [node_id for (node_id, node) in padmetSpec.dicOfNode.items() if node_id in total_cpd_id]
+
+    return [species_name, all_genes, rxns, gene_associated_rxns, all_cpds, all_pwys]
+
+
+def create_sbml_stat(species_name, sbml_file):
+    tree = etree.parse(sbml_file)
+    sbml = tree.getroot()
+    genes = []
+    reactions = []
+    compounds = []
+    for e in sbml:
+        if e.tag[0] == "{":
+            uri, tag = e.tag[1:].split("}")
+        else:
+            tag = e.tag
+        if tag == "model":
+            model_element = e
+    for els in model_element:
+        if 'listOfSpecies' in els.tag:
+            for el in els:
+                compounds.append(sbmlPlugin.convert_from_coded_id(el.get('metaid'))[0])
+        if 'listOfReactions' in els.tag:
+            for el in els:
+                reactions.append(sbmlPlugin.convert_from_coded_id(el.get('id'))[0])
+                for subel in el.getchildren():
+                    if 'notes' in subel.tag:
+                        for subsubel in subel.getchildren():
+                            for subsubsubel in subsubel.getchildren():
+                                if 'GENE_ASSOCIATION' in subsubsubel.text:
+                                    for gene in sbmlPlugin.parseGeneAssoc(subsubsubel.text):
+                                        genes.append(gene.replace('GENE_ASSOCIATION:', ''))
+
+    return [species_name, genes, reactions, compounds]
+
+
+def mean_sd_data(datas):
+    mean_data = str(statistics.mean(datas))
+    sd_data = "(+/- {0:.2f})".format(statistics.stdev(datas))
+    return mean_data, sd_data
+
+def analyze_recon(sbml_folder, out_dir, output_stat_file, padmet_bool=None, nb_cpu=1):
+    analyze_pool = Pool(processes=nb_cpu)
+    if padmet_bool:
+        padmet_folder = out_dir + '/padmet/'
+        genes = {}
+        reactions = {}
+        gene_associated_reactions = {}
+        compounds = {}
+        pathways = {}
+
+        multiprocessing_data = []
+        for padmet in os.listdir(padmet_folder):
+            padmet_file = padmet_folder + '/' + padmet
+            species_name = padmet.replace('.padmet', '')
+            multiprocessing_data.append((species_name, padmet_file))
+        recon_stats = analyze_pool.starmap(create_padmet_stat, multiprocessing_data)
+
+        with open(output_stat_file, 'w') as micro_file:
+            csvwriter = csv.writer(micro_file, delimiter='\t')
+            csvwriter.writerow(['species', 'nb_reactions', 'nb_reactions_with_genes', 'nb_genes', 'nb_compounds', 'nb_pathways'])
+            for recon_stat in recon_stats:
+                species_name = recon_stat[0]
+                genes[species_name] = recon_stat[1]
+                reactions[species_name] = recon_stat[2]
+                gene_associated_reactions[species_name] = recon_stat[3]
+                compounds[species_name] = recon_stat[4]
+                pathways[species_name] = recon_stat[5]
+                csvwriter.writerow([species_name, len(reactions[species_name]), len(gene_associated_reactions[species_name]),
+                                    len(genes[species_name]), len(compounds[species_name]), len(pathways[species_name])])
+    else:
+        genes = {}
+        reactions = {}
+        compounds = {}
+        pathways = None
+        gene_associated_reactions = None
+
+        multiprocessing_data = []
+        for sbml in os.listdir(sbml_folder):
+            species_name = sbml.replace('.sbml','')
+            sbml_file = sbml_folder + '/' + sbml
+            multiprocessing_data.append((species_name, sbml_file))
+        sbml_stats = analyze_pool.starmap(create_sbml_stat, multiprocessing_data)
+
+        with open(output_stat_file, 'w') as micro_file:
+            csvwriter = csv.writer(micro_file, delimiter='\t')
+            csvwriter.writerow(['species', 'nb_reactions', 'nb_genes', 'nb_compounds'])
+            for sbml_stat in sbml_stats:
+                species_name = sbml_stat[0]
+                genes[species_name] = set(sbml_stat[1])
+                reactions[species_name] = set(sbml_stat[2])
+                compounds[species_name] = set(sbml_stat[3])
+                csvwriter.writerow([species_name, len(reactions[species_name]), len(genes[species_name]), len(compounds[species_name])])
+
+    analyze_pool.close()
+    analyze_pool.join()
+
+    logger.info("######### Stats GSMN reconstruction #########")
+
+    if len(genes) == len(reactions) and len(genes) == len(compounds) and len(reactions) == len(compounds):
+        logger.info("Number of genomes: " + str(len(genes)))
+
+    dataset_all_reactions = set([reaction for species_name in reactions for reaction in reactions[species_name]])
+    logger.info("Number of reactions in all GSMN: " + str(len(dataset_all_reactions)))
+
+    dataset_all_compounds = set([compound for species_name in compounds for compound in compounds[species_name]])
+    logger.info("Number of compounds in all GSMN: " + str(len(dataset_all_compounds)))
+
+    species_reactions = [len(reactions[species_name]) for species_name in reactions]
+    mean_species_reactions, sd_species_reactions = mean_sd_data(species_reactions)
+    logger.info("Average reactions per GSMN: " + mean_species_reactions + sd_species_reactions)
+
+    species_compounds = [len(compounds[species_name]) for species_name in compounds]
+    mean_species_compounds, sd_species_compounds = mean_sd_data(species_compounds)
+    logger.info("Average compounds per GSMN: " + mean_species_compounds + sd_species_compounds)
+
+    species_genes = [len(genes[species_name]) for species_name in genes]
+    mean_species_genes, sd_species_genes = mean_sd_data(species_genes)
+    logger.info("Average genes per GSMN: " + mean_species_genes + sd_species_genes)
+
+    if pathways:
+        species_pathways = [len(pathways[species_name]) for species_name in pathways]
+        mean_species_pathways, sd_species_pathways = mean_sd_data(species_pathways)
+        logger.info("Average pathways per GSMN: " + mean_species_pathways + sd_species_pathways)
+
+    if gene_associated_reactions:
+        dataset_gene_associated_reactions = len(set([reaction for species_name in gene_associated_reactions for reaction in gene_associated_reactions[species_name]]))
+        logger.info('Percentage of reactions associated with genes: ' + "{0:.2f}".format((dataset_gene_associated_reactions / len(dataset_all_reactions)) * 100))
+
+
 def indiv_scope_run(sbml_dir, seeds, output_dir):
     """Run Menetools and analyse individual metabolic capabilities
     
@@ -341,7 +510,9 @@ def analyze_indiv_scope(jsonfile, seeds):
     logger.info('\n' + str(len(union_scope)) + " metabolites reachable by individual organisms altogether (union), among which " + str(len(seed_metabolites)) + " seeds (growth medium) \n")
     logger.info("\n".join(union_scope))
     len_scope = [len(d[elem]) for elem in d]
-    logger.info("\nmax metabolites in scope " + str(max(len_scope)))
+    logger.info("\nintersection of scope " + str(len(intersection_scope)))
+    logger.info("union of scope " + str(len(union_scope)))
+    logger.info("max metabolites in scope " + str(max(len_scope)))
     logger.info("min metabolites in scope " + str(min(len_scope)))
     logger.info("average number of metabolites in scope %.2f (+/- %.2f)" %
                 (statistics.mean(len_scope), statistics.stdev(len_scope)))
