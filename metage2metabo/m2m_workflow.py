@@ -449,8 +449,11 @@ def analyze_recon(sbml_folder, out_dir, output_stat_file, padmet_bool=None, nb_c
         mean_species_pathways, sd_species_pathways = mean_sd_data(species_pathways)
         logger.info("Average pathways per GSMN: " + mean_species_pathways + sd_species_pathways)
 
-    dataset_gene_associated_reactions = len(set([reaction for species_name in gene_associated_reactions for reaction in gene_associated_reactions[species_name]]))
-    logger.info('Percentage of reactions associated with genes: ' + "{0:.2f}".format((dataset_gene_associated_reactions / len(dataset_all_reactions)) * 100))
+    gene_reactions_assoc_percentages = []
+    for species_name in reactions:
+        gene_reactions_assoc_percentages.append(((len(gene_associated_reactions[species_name]) / len(reactions[species_name]))*100))
+    mean_gene_reactions_assoc_percentages, sd_gene_reactions_assoc_percentages = mean_sd_data(gene_reactions_assoc_percentages)
+    logger.info('Percentage of reactions associated with genes: ' + mean_gene_reactions_assoc_percentages + sd_gene_reactions_assoc_percentages)
 
 
 def indiv_scope_run(sbml_dir, seeds, output_dir):
