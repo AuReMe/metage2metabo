@@ -329,6 +329,7 @@ def create_sbml_stat(species_name, sbml_file):
     sbml = tree.getroot()
     genes = []
     reactions = []
+    gene_associated_rxns = []
     compounds = []
     for e in sbml:
         if e.tag[0] == "{":
@@ -343,7 +344,8 @@ def create_sbml_stat(species_name, sbml_file):
                 compounds.append(sbmlPlugin.convert_from_coded_id(el.get('metaid'))[0])
         if 'listOfReactions' in els.tag:
             for el in els:
-                reactions.append(sbmlPlugin.convert_from_coded_id(el.get('id'))[0])
+                reaction_id = sbmlPlugin.convert_from_coded_id(el.get('id'))[0]
+                reactions.append(reaction_id)
                 for subel in el.getchildren():
                     if 'notes' in subel.tag:
                         for subsubel in subel.getchildren():
@@ -351,12 +353,14 @@ def create_sbml_stat(species_name, sbml_file):
                                 if 'GENE_ASSOCIATION' in subsubsubel.text:
                                     for gene in sbmlPlugin.parseGeneAssoc(subsubsubel.text):
                                         genes.append(gene.replace('GENE_ASSOCIATION:', ''))
+                                    if reaction_id not in gene_associated_rxns:
+                                        gene_associated_rxns.append(reaction_id)
 
-    return [species_name, genes, reactions, compounds]
+    return [species_name, genes, reactions, gene_associated_rxns, compounds]
 
 
 def mean_sd_data(datas):
-    mean_data = str(statistics.mean(datas))
+    mean_data = "{0:.2f}".format(statistics.mean(datas))
     sd_data = "(+/- {0:.2f})".format(statistics.stdev(datas))
     return mean_data, sd_data
 
@@ -394,7 +398,7 @@ def analyze_recon(sbml_folder, out_dir, output_stat_file, padmet_bool=None, nb_c
         reactions = {}
         compounds = {}
         pathways = None
-        gene_associated_reactions = None
+        gene_associated_reactions = {}
 
         multiprocessing_data = []
         for sbml in os.listdir(sbml_folder):
@@ -410,7 +414,8 @@ def analyze_recon(sbml_folder, out_dir, output_stat_file, padmet_bool=None, nb_c
                 species_name = sbml_stat[0]
                 genes[species_name] = set(sbml_stat[1])
                 reactions[species_name] = set(sbml_stat[2])
-                compounds[species_name] = set(sbml_stat[3])
+                gene_associated_reactions[species_name] = set(sbml_stat[3])
+                compounds[species_name] = set(sbml_stat[4])
                 csvwriter.writerow([species_name, len(reactions[species_name]), len(genes[species_name]), len(compounds[species_name])])
 
     analyze_pool.close()
@@ -444,9 +449,8 @@ def analyze_recon(sbml_folder, out_dir, output_stat_file, padmet_bool=None, nb_c
         mean_species_pathways, sd_species_pathways = mean_sd_data(species_pathways)
         logger.info("Average pathways per GSMN: " + mean_species_pathways + sd_species_pathways)
 
-    if gene_associated_reactions:
-        dataset_gene_associated_reactions = len(set([reaction for species_name in gene_associated_reactions for reaction in gene_associated_reactions[species_name]]))
-        logger.info('Percentage of reactions associated with genes: ' + "{0:.2f}".format((dataset_gene_associated_reactions / len(dataset_all_reactions)) * 100))
+    dataset_gene_associated_reactions = len(set([reaction for species_name in gene_associated_reactions for reaction in gene_associated_reactions[species_name]]))
+    logger.info('Percentage of reactions associated with genes: ' + "{0:.2f}".format((dataset_gene_associated_reactions / len(dataset_all_reactions)) * 100))
 
 
 def indiv_scope_run(sbml_dir, seeds, output_dir):
