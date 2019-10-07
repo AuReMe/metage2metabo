@@ -42,22 +42,23 @@ def run_analysis(m2m_results_folder, target_file, seed_file, output_dir, taxon_f
 	sbml_folder = m2m_results_folder + '/sbml'
 	miscoto_analysis = output_dir + '/miscoto_analysis/'
 
+	if not utils.is_valid_dir(miscoto_analysis):
+		logger.critical("Impossible to access/create output directory")
+		sys.exit(1)
+
 	results = miscoto.run_mincom(option='soup', bacteria_dir=sbml_folder,
 						targets_file=target_file, seeds_file=seed_file, host_file=None,
                 		intersection=True, enumeration=True, union=True, optsol=True)
 
 	miscoto_json = miscoto_analysis + 'mincom.json'
-	miscoto.utils.results_to_json(results, miscoto_json)
 
-	if not utils.is_valid_dir(miscoto_analysis):
-		logger.critical("Impossible to access/create output directory")
-		sys.exit(1)
+	miscoto.utils.results_to_json(results, miscoto_json)
 
 	miscoto_stat_output = miscoto_analysis + 'miscoto_stats.txt'
 	gml_output = miscoto_analysis + 'graph.gml'
 	bbl_output = miscoto_analysis + 'graph.bbl'
 
-	create_gml(sbml_folder, target_file, miscoto_json, miscoto_stat_output, gml_output, taxon_file)
+	create_gml(sbml_folder, target_file, miscoto_json, miscoto_analysis, taxon_file)
 	compression(gml_output, bbl_output, recipes)
 
 
@@ -69,7 +70,7 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file):
 	phylum_count = {}
 	with open(taxon_output_file, 'w') as phylum_file:
 		csvwriter = csv.writer(phylum_file, delimiter='\t')
-		csvwriter.writerow(['species', 'taxid', 'ink_name', 'kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species'])
+		csvwriter.writerow(['species', 'taxid', 'phylum_number', 'phylum', 'class', 'order', 'family', 'genus', 'species'])
 		with open(mpwt_taxon_file, 'r') as taxon_file:
 			csvfile = csv.reader(taxon_file, delimiter='\t')
 			for line in csvfile:
@@ -79,10 +80,15 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file):
 					lineage2ranks = ncbi.get_rank(lineage)
 					names = ncbi.get_taxid_translator(lineage)
 					ranks2lineage = dict((rank, names[taxid]) for (taxid, rank) in lineage2ranks.items())
-					ranks = [ranks2lineage.get(rank, '<not present>') for rank in ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species']]
-					phylum = ranks[1][:4]
+					ranks = [ranks2lineage.get(rank, 'no_information') for rank in ['phylum', 'class', 'order', 'family', 'genus', 'species']]
+					if ranks[1] != 'no_information':
+						phylum = ranks[1][:4]
+					else:
+						phylum = 'no_information'
 					if phylum not in phylum_count :
 						phylum_count[phylum] = 1
+					elif phylum == 'no_information':
+						phylum_count[phylum] = ''
 					else:
 						phylum_count[phylum] += 1
 					row = [line[0], line[1]] + [phylum + str(phylum_count[phylum])] + ranks
@@ -94,7 +100,75 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file):
 		tree_file.write(tree.get_ascii(attributes=["sci_name", "rank"]))
 
 
-def create_gml(sbml_folder, target_file, json_miscoto_file, miscoto_stat_output, gml_output, taxon_file):
+def detect_phylum_key_species(phylums, all_phylums):
+	count_phylumns = {}
+	for phylum in phylums:
+		if phylum[:4] not in count_phylumns:
+			count_phylumns[phylum[:4]] = [phylums[phylum]]
+		else:
+			count_phylumns[phylum[:4]].append(phylums[phylum])
+
+	for phylum in all_phylums:
+		if phylum not in count_phylumns:
+			count_phylumns[phylum[:4]] = []
+
+	return count_phylumns
+
+
+
+def detect_key_species(json_elements, all_phylums, phylum_species=None):
+	if phylum_species:
+		unions = {phylum_species[species_union]: species_union for species_union in json_elements["union_bacteria"]}
+		intersections = {phylum_species[species_intersection]: species_intersection for species_intersection in json_elements["inter_bacteria"]}
+	else:
+		unions = json_elements["union_bacteria"]
+		intersections = json_elements["inter_bacteria"]
+
+	if phylum_species:
+		key_stone_species = detect_phylum_key_species(unions, all_phylums)
+		essential_symbionts = detect_phylum_key_species(intersections, all_phylums)
+		alternative_symbionts = {}
+		for phylum in key_stone_species:
+			alternative_symbionts[phylum] = list(set(key_stone_species[phylum]) - set(essential_symbionts[phylum]))
+		for phylum in all_phylums:
+			if phylum not in alternative_symbionts:
+				alternative_symbionts[phylum] = []
+	else:
+		key_stone_species = {}
+		essential_symbionts = {}
+		alternative_symbionts = {}
+		key_stone_species['data'] = unions
+		essential_symbionts['data'] = intersections
+		alternative_symbionts['data'] = list(set(unions) - set(intersections))
+
+	return key_stone_species, essential_symbionts, alternative_symbionts
+
+
+def create_stat_species(target_categories, json_elements, phylum_species, all_phylums, statwriter, supdatawriter):
+
+	key_stone_species, essential_symbionts, alternative_symbionts = detect_key_species(json_elements, all_phylums, phylum_species)
+
+	key_stone_counts = [len(key_stone_species[phylum]) for phylum in sorted(list(key_stone_species.keys()))]
+	statwriter.writerow([target_categories, 'key_stone_species'] + key_stone_counts + [sum(key_stone_counts)])
+
+	essential_symbiont_counts = [len(essential_symbionts[phylum]) for phylum in sorted(list(essential_symbionts.keys()))]
+	statwriter.writerow([target_categories, 'essential_symbionts'] + essential_symbiont_counts + [sum(essential_symbiont_counts)])
+
+	alternative_symbiont_counts = [len(alternative_symbionts[phylum]) for phylum in sorted(list(alternative_symbionts.keys()))]
+	statwriter.writerow([target_categories, 'alternative_symbionts'] + alternative_symbiont_counts + [sum(alternative_symbiont_counts)])
+
+	for phylum in sorted(all_phylums):
+		supdatawriter.writerow([target_categories, 'key_stone_species', phylum] + key_stone_species[phylum])
+		supdatawriter.writerow([target_categories, 'essential_symbionts', phylum] + essential_symbionts[phylum])
+		supdatawriter.writerow([target_categories, 'alternative_symbionts', phylum] + alternative_symbionts[phylum])
+
+
+def create_gml(sbml_folder, target_file, json_miscoto_file, miscoto_analysis, taxon_file=None):
+	miscoto_stat_output = miscoto_analysis + '/' + 'miscoto_stats.txt'
+	key_species_stats_output = miscoto_analysis + '/' + 'key_species_stats.tsv'
+	key_species_supdata_output = miscoto_analysis + '/' + 'key_species_supdata.tsv'
+	gml_output = miscoto_analysis + '/' + 'graph.gml'
+
 	len_min_sol = {}
 	len_union = {}
 	len_intersection = {}
@@ -111,14 +185,27 @@ def create_gml(sbml_folder, target_file, json_miscoto_file, miscoto_stat_output,
 
 	if taxon_file:
 		phylum_species = {}
+		all_phylums = []
 		with open(taxon_file, 'r') as phylum_file:
 			phylum_reader = csv.reader(phylum_file, delimiter='\t', quotechar='|')
 			for row in phylum_reader:
 				phylum_species[row[0]] = row[2]
+				if row[2][:4] not in all_phylums:
+					if 'no_information' not in row[2] and 'phylum_number' not in row[2]:
+						all_phylums.append(row[2][:4])
 
-	for categories in  species_categories:
+	for categories in species_categories:
 		with open(json_miscoto_file) as json_data:
 			dicti = json.load(json_data)
+		with open(key_species_stats_output,"w") as key_stats_file:
+			key_stats_writer = csv.writer(key_stats_file, delimiter='\t')
+			if taxon_file:
+				key_stats_writer.writerow(['target_categories', 'key_stones_group', *sorted(all_phylums), 'Sum'])
+			else:
+				key_stats_writer.writerow(['target_categories', 'key_stones_group', 'data', 'Sum'])
+			with open(key_species_supdata_output,"w") as key_sup_file:
+				key_sup_writer = csv.writer(key_sup_file, delimiter='\t')
+				create_stat_species(categories, dicti, phylum_species, all_phylums, key_stats_writer, key_sup_writer)
 		G = nx.Graph()
 		added_node = []
 		species_weight = {}
