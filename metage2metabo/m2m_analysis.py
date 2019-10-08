@@ -27,6 +27,7 @@ import padmet
 import powergrasp
 import sys
 import time
+import subprocess
 
 recipes = '''{
 	"clingo multithreading": 4
@@ -38,29 +39,62 @@ from itertools import combinations
 from metage2metabo import utils, sbml_management
 
 
-def run_analysis(m2m_results_folder, target_file, seed_file, output_dir, taxon_file):
-	sbml_folder = m2m_results_folder + '/sbml'
+def run_analysis_workflow(sbml_folder, target_folder_file, seed_file, output_dir, taxon_file, oog_jar, host_file=None):
+	if os.path.isfile(target_folder_file):
+		miscoto_json = enumeration_analysis(seed_file, sbml_folder, target_folder_file, output_dir, host_file)
+	elif os.path.isdir(target_folder_file):
+		for target_file in os.listdir(target_folder_file):
+			enumeration_analysis(seed_file, sbml_folder, target_folder_file + '/' + target_file, output_dir, host_file)
 	miscoto_analysis = output_dir + '/miscoto_analysis/'
 
 	if not utils.is_valid_dir(miscoto_analysis):
 		logger.critical("Impossible to access/create output directory")
 		sys.exit(1)
 
-	results = miscoto.run_mincom(option='soup', bacteria_dir=sbml_folder,
-						targets_file=target_file, seeds_file=seed_file, host_file=None,
-                		intersection=True, enumeration=True, union=True, optsol=True)
-
-	miscoto_json = miscoto_analysis + 'mincom.json'
-
-	miscoto.utils.results_to_json(results, miscoto_json)
+	miscoto_json = enumeration_analysis(seed_file, sbml_folder, target_file, output_dir, host_file)
 
 	miscoto_stat_output = miscoto_analysis + 'miscoto_stats.txt'
 	gml_output = miscoto_analysis + 'graph.gml'
 	bbl_output = miscoto_analysis + 'graph.bbl'
+	svg_output = miscoto_analysis + 'graph.svg'
 
-	create_gml(sbml_folder, target_file, miscoto_json, miscoto_analysis, taxon_file)
-	compression(gml_output, bbl_output, recipes)
+	create_gml(target_file, miscoto_json, miscoto_analysis, taxon_file)
+	powergraph_analysis(gml_output, output_dir, oog_jar)
 
+
+def enumeration_analysis(seed_file, sbml_folder, target_file, output_dir, host_file):
+	results = miscoto.run_mincom(option='soup', bacteria_dir=sbml_folder,
+						targets_file=target_file, seeds_file=seed_file, host_file=host_file,
+                		intersection=True, enumeration=True, union=True, optsol=True)
+
+	miscoto_json = miscoto_analysis + '/miscoto_analysis/mincom_enumeration.json'
+
+	miscoto.utils.results_to_json(results, miscoto_json)
+
+	return miscoto_json
+
+
+def stat_analysis(json_file, output_folder, taxon_file=None):
+	if taxon_file:
+		phylum_output_file = output_folder + '/taxon_phylum.tsv'
+		tree_output_file = output_folder + '/taxon_tree.txt'
+		extract_taxa(taxon_file, phylum_output_file, tree_output_file)
+		all_phylums, phylum_species = get_phylum(phylum_output_file)
+
+	with open(json_file) as json_data:
+		json_elements = json.load(json_data)
+		if taxon_file:
+			create_stat_species(json_elements, all_phylums, phylum_species)
+
+
+def graph_analysis(json):
+	create_gml(target_file, miscoto_json, miscoto_analysis, taxon_file)
+
+def powergraph_analysis(graph_input, output_folder, oog_jar):
+	bbl_output = output_folder + '/test.bbl'
+	svg_output = output_folder + '/test.svg'
+	compression(graph_input, bbl_output)
+	bbl_to_svg(oog_jar, bbl_output, svg_output)
 
 def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file):
 	ncbi = NCBITaxa()
@@ -115,7 +149,6 @@ def detect_phylum_key_species(phylums, all_phylums):
 	return count_phylumns
 
 
-
 def detect_key_species(json_elements, all_phylums, phylum_species=None):
 	if phylum_species:
 		unions = {phylum_species[species_union]: species_union for species_union in json_elements["union_bacteria"]}
@@ -163,7 +196,20 @@ def create_stat_species(target_categories, json_elements, phylum_species, all_ph
 		supdatawriter.writerow([target_categories, 'alternative_symbionts', phylum] + alternative_symbionts[phylum])
 
 
-def create_gml(sbml_folder, target_file, json_miscoto_file, miscoto_analysis, taxon_file=None):
+def get_phylum(phylum_file):
+	phylum_species = {}
+	all_phylums = []
+	with open(phylum_file, 'r') as phylum_file:
+		phylum_reader = csv.reader(phylum_file, delimiter='\t', quotechar='|')
+		for row in phylum_reader:
+			phylum_species[row[0]] = row[2]
+			if row[2][:4] not in all_phylums:
+				if 'no_information' not in row[2] and 'phylum_number' not in row[2]:
+					all_phylums.append(row[2][:4])
+
+	return phylum_species, all_phylums
+
+def create_gml(target_file, json_miscoto_file, miscoto_analysis, taxon_file=None):
 	miscoto_stat_output = miscoto_analysis + '/' + 'miscoto_stats.txt'
 	key_species_stats_output = miscoto_analysis + '/' + 'key_species_stats.tsv'
 	key_species_supdata_output = miscoto_analysis + '/' + 'key_species_supdata.tsv'
@@ -175,24 +221,11 @@ def create_gml(sbml_folder, target_file, json_miscoto_file, miscoto_analysis, ta
 	len_solution = {}
 	len_target = {}
 
-	all_species = []
-	for species in os.listdir(sbml_folder):
-		species = species.replace('.sbml', '')
-		all_species.append(species)
-
 	species_categories = {}
 	species_categories['target'] = sbml_management.get_compounds(target_file)
 
 	if taxon_file:
-		phylum_species = {}
-		all_phylums = []
-		with open(taxon_file, 'r') as phylum_file:
-			phylum_reader = csv.reader(phylum_file, delimiter='\t', quotechar='|')
-			for row in phylum_reader:
-				phylum_species[row[0]] = row[2]
-				if row[2][:4] not in all_phylums:
-					if 'no_information' not in row[2] and 'phylum_number' not in row[2]:
-						all_phylums.append(row[2][:4])
+		phylum_species, all_phylums = get_phylum(taxon_file)
 
 	for categories in species_categories:
 		with open(json_miscoto_file) as json_data:
@@ -247,86 +280,9 @@ def create_gml(sbml_folder, target_file, json_miscoto_file, miscoto_analysis, ta
 
 		nx.write_gml(G, gml_output)
 
-def compression(gml_input, bbl_output, recipes):
+def compression(gml_input, bbl_output):
     powergrasp.compress_by_cc(gml_input, bbl_output)
 
-def main_analysis():
-	"""Run programm
-	"""
-	start_time = time.time()
-	parser = argparse.ArgumentParser(
-		"m2m_analysis",
-		description=" Run graph creation and compression on enumeration of miscoto solution."
-	)
 
-	parser.add_argument(
-		"-n",
-		"--networksdir",
-		metavar="NETWORKS_DIR",
-		help="metabolic networks directory",
-		required=True)
-
-	parser.add_argument(
-		"-o",
-		"--out",
-		dest="out",
-		required=True,
-		help="output directory path",
-		metavar="OUPUT_DIR")
-
-	parser.add_argument(
-		"-s",
-		"--seeds",
-		help="seeds (growth medium) for metabolic analysis",
-		required=True)
-
-	parser.add_argument(
-		"-t",
-		"--targets",
-		help="targets for metabolic analysis",
-		required=True)
-
-	parser.add_argument(
-		"-j",
-		"--json",
-		help="json from miscoto",
-		required=True)
-
-	parser.add_argument(
-		"-m",
-		"--modelhost",
-		help="host metabolic model for community analysis",
-		required=False,
-		default=None)
-
-	parser.add_argument(
-		"-q",
-		"--quiet",
-		dest="quiet",
-		help="quiet mode",
-		required=False,
-		action="store_true",
-		default=None,
-	)
-
-	parser.add_argument(
-		"-c",
-		"--cpu",
-		help="cpu number for multi-process",
-		required=False,
-		type=int,
-		default=1)
-
-	parser.add_argument(
-		"--taxon",
-		metavar="TAXON_FILE",
-		help="mpwt taxon file tsv", required=False)
-
-    # If no argument print the help.
-	if len(sys.argv) == 1:
-		parser.print_help()
-		sys.exit(1)
-
-	args = parser.parse_args()
-
-	run_analysis(args.networksdir, args.targets, args.seeds, args.out, args.taxon)
+def bbl_to_svg(oog_jar, bbl_input, svg_output):
+    subprocess.call(['java', '-jar', oog_jar, '-inputfiles', bbl_input, '-img', '-f', svg_output])
