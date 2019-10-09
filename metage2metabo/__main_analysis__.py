@@ -96,8 +96,8 @@ def main():
     parent_parser_t.add_argument(
 		"-t",
 		"--targets",
-        metavar="TARGETS_DIR",
-		help="Folder containg sbml targets for metabolic analysis",
+        metavar="TARGETS_DIR_OR_FILE",
+		help="Folder containg sbml targets or single sbml file for metabolic analysis",
 		required=True)
     parent_parser_m = argparse.ArgumentParser(add_help=False)
     parent_parser_m.add_argument(
@@ -116,14 +116,16 @@ def main():
     parent_parser_j.add_argument(
         "-j",
         "--json",
-        help="JSON file containing miscoto enumeration results",
+        metavar="JSON_DIR_OR_FILE",
+        help="Folder containing JSON file of single JSON file containing miscoto enumeration results",
         required=False,
         type = str)
     parent_parser_g = argparse.ArgumentParser(add_help=False)
     parent_parser_g.add_argument(
         "-g",
         "--graph",
-        help="Graph GML file",
+        metavar="GML_DIR_OR_FILE",
+        help="Folder containing Graph GML file or single GML file",
         required=True)
     parent_parser_jar = argparse.ArgumentParser(add_help=False)
     parent_parser_jar.add_argument(

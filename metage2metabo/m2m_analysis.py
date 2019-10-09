@@ -28,73 +28,106 @@ import powergrasp
 import sys
 import time
 import subprocess
+import logging
+
+from ete3 import NCBITaxa
+from itertools import combinations
+from metage2metabo import utils, sbml_management
 
 recipes = '''{
 	"clingo multithreading": 4
 }'''
 powergrasp.recipe.Recipe.from_lines(recipes)
 
-from ete3 import NCBITaxa
-from itertools import combinations
-from metage2metabo import utils, sbml_management
+logger = logging.getLogger(__name__)
+logging.getLogger("miscoto").setLevel(logging.CRITICAL)
 
+def file_or_folder(variable_folder_file):
+	file_folder_paths = {}
+
+	if os.path.isfile(variable_folder_file):
+		filename = os.path.splitext(os.path.basename(variable_folder_file))[0]
+		file_folder_paths[filename] = variable_folder_file
+
+	elif os.path.isdir(variable_folder_file):
+		for file_from_folder in os.listdir(variable_folder_file):
+			file_folder_paths[file_from_folder] = variable_folder_file + '/' + file_from_folder
+
+	return file_folder_paths
 
 def run_analysis_workflow(sbml_folder, target_folder_file, seed_file, output_dir, taxon_file, oog_jar, host_file=None):
-	if os.path.isfile(target_folder_file):
-		miscoto_json = enumeration_analysis(seed_file, sbml_folder, target_folder_file, output_dir, host_file)
-	elif os.path.isdir(target_folder_file):
-		for target_file in os.listdir(target_folder_file):
-			enumeration_analysis(seed_file, sbml_folder, target_folder_file + '/' + target_file, output_dir, host_file)
-	miscoto_analysis = output_dir + '/miscoto_analysis/'
+	enumeration_analysis(seed_file, sbml_folder, target_folder_file, output_dir, host_file)
 
-	if not utils.is_valid_dir(miscoto_analysis):
-		logger.critical("Impossible to access/create output directory")
-		sys.exit(1)
+	for miscoto_json in miscoto_jsons:
+		miscoto_analysis = miscoto_json[1]
+		miscoto_stat_output = miscoto_analysis + '/' + 'miscoto_stats.txt'
+		gml_output = miscoto_analysis + '/' + 'graph.gml'
+		bbl_output = miscoto_analysis + '/' + 'graph.bbl'
+		svg_output = miscoto_analysis + '/' + 'graph.svg'
 
-	miscoto_json = enumeration_analysis(seed_file, sbml_folder, target_file, output_dir, host_file)
+		create_gml(target_file, miscoto_json[0], miscoto_analysis, taxon_file)
 
-	miscoto_stat_output = miscoto_analysis + 'miscoto_stats.txt'
-	gml_output = miscoto_analysis + 'graph.gml'
-	bbl_output = miscoto_analysis + 'graph.bbl'
-	svg_output = miscoto_analysis + 'graph.svg'
-
-	create_gml(target_file, miscoto_json, miscoto_analysis, taxon_file)
-	powergraph_analysis(gml_output, output_dir, oog_jar)
+	powergraph_analysis(output_dir + '/gml', output_dir, oog_jar)
 
 
-def enumeration_analysis(seed_file, sbml_folder, target_file, output_dir, host_file):
+def enumeration(seed_file, sbml_folder, target_file, output_json, host_file):
 	results = miscoto.run_mincom(option='soup', bacteria_dir=sbml_folder,
 						targets_file=target_file, seeds_file=seed_file, host_file=host_file,
                 		intersection=True, enumeration=True, union=True, optsol=True)
 
-	miscoto_json = miscoto_analysis + '/miscoto_analysis/mincom_enumeration.json'
+	miscoto.utils.results_to_json(results, output_json)
 
-	miscoto.utils.results_to_json(results, miscoto_json)
-
-	return miscoto_json
+	return output_json
 
 
-def stat_analysis(json_file, output_folder, taxon_file=None):
+def enumeration_analysis(seed_file, sbml_folder, target_file, output_dir, host_file):
+	target_paths = file_or_folder(target_file)
+
+	miscoto_jsons = {}
+	for target_path in target_paths:
+		target_pathname = target_path[target_path]
+		output_json = output_dir + '/' + 'json' + '/' + target_path + '.json'
+		if not utils.is_valid_dir(output_json):
+			logger.critical("Impossible to access/create output directory")
+			sys.exit(1)
+		miscoto_json = enumeration(seed_file, sbml_folder, target_pathname, output_json, host_file)
+		miscoto_jsons[target_path] = miscoto_json
+
+	return miscoto_jsons
+
+
+def stat_analysis(json_file_folder, output_dir, taxon_file=None):
+	miscoto_stat_output = output_dir + '/' + 'miscoto_stats.txt'
+	key_species_stats_output = output_dir + '/' + 'key_species_stats.tsv'
+	key_species_supdata_output = output_dir + '/' + 'key_species_supdata.tsv'
+	json_paths = file_or_folder(json_file_folder)
+
 	if taxon_file:
-		phylum_output_file = output_folder + '/taxon_phylum.tsv'
-		tree_output_file = output_folder + '/taxon_tree.txt'
+		phylum_output_file = output_dir + '/taxon_phylum.tsv'
+		tree_output_file = output_dir + '/taxon_tree.txt'
 		extract_taxa(taxon_file, phylum_output_file, tree_output_file)
 		all_phylums, phylum_species = get_phylum(phylum_output_file)
 
-	with open(json_file) as json_data:
-		json_elements = json.load(json_data)
-		if taxon_file:
-			create_stat_species(json_elements, all_phylums, phylum_species)
+	for json_path in json_paths:
+		with open(json_paths[json_path]) as json_data:
+			json_elements = json.load(json_data)
+		create_stat_species(json_path, json_elements, key_species_stats_output, key_species_supdata_output, phylum_species, all_phylums)
 
 
-def graph_analysis(json):
-	create_gml(target_file, miscoto_json, miscoto_analysis, taxon_file)
+def graph_analysis(json_file_folder, output_folder, target_file, taxon_file):
+	json_paths = file_or_folder(json_file_folder)
+
+	create_gml(target_file, json_paths, output_folder, taxon_file)
 
 def powergraph_analysis(graph_input, output_folder, oog_jar):
-	bbl_output = output_folder + '/test.bbl'
-	svg_output = output_folder + '/test.svg'
-	compression(graph_input, bbl_output)
-	bbl_to_svg(oog_jar, bbl_output, svg_output)
+	gml_paths = file_or_folder(graph_input)
+
+	for gml_path in gml_paths:
+		bbl_output = output_folder + '/' + 'bbl' + '/' + gml_path + '.bbl'
+		svg_output = output_folder + '/' + 'svg' + '/' + gml_path + '.svg'
+		graph_input = gml_paths[gml_path]
+		compression(graph_input, bbl_output)
+		bbl_to_svg(oog_jar, bbl_output, svg_output)
 
 def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file):
 	ncbi = NCBITaxa()
@@ -177,24 +210,36 @@ def detect_key_species(json_elements, all_phylums, phylum_species=None):
 	return key_stone_species, essential_symbionts, alternative_symbionts
 
 
-def create_stat_species(target_categories, json_elements, phylum_species, all_phylums, statwriter, supdatawriter):
+def create_stat_species(target_categories, json_elements, key_species_stats_output, key_species_supdata_output, phylum_species=None, all_phylums=None):
+	with open(key_species_stats_output, "w") as key_stats_file:
+		key_stats_writer = csv.writer(key_stats_file, delimiter='\t')
+		if all_phylums:
+			key_stats_writer.writerow(['target_categories', 'key_stones_group', *sorted(all_phylums), 'Sum'])
+		else:
+			key_stats_writer.writerow(['target_categories', 'key_stones_group', 'data', 'Sum'])
+		with open(key_species_supdata_output,"w") as key_sup_file:
+			key_sup_writer = csv.writer(key_sup_file, delimiter='\t')
 
-	key_stone_species, essential_symbionts, alternative_symbionts = detect_key_species(json_elements, all_phylums, phylum_species)
+			key_stone_species, essential_symbionts, alternative_symbionts = detect_key_species(json_elements, all_phylums, phylum_species)
 
-	key_stone_counts = [len(key_stone_species[phylum]) for phylum in sorted(list(key_stone_species.keys()))]
-	statwriter.writerow([target_categories, 'key_stone_species'] + key_stone_counts + [sum(key_stone_counts)])
+			key_stone_counts = [len(key_stone_species[phylum]) for phylum in sorted(list(key_stone_species.keys()))]
+			key_stats_writer.writerow([target_categories, 'key_stone_species'] + key_stone_counts + [sum(key_stone_counts)])
 
-	essential_symbiont_counts = [len(essential_symbionts[phylum]) for phylum in sorted(list(essential_symbionts.keys()))]
-	statwriter.writerow([target_categories, 'essential_symbionts'] + essential_symbiont_counts + [sum(essential_symbiont_counts)])
+			essential_symbiont_counts = [len(essential_symbionts[phylum]) for phylum in sorted(list(essential_symbionts.keys()))]
+			key_stats_writer.writerow([target_categories, 'essential_symbionts'] + essential_symbiont_counts + [sum(essential_symbiont_counts)])
 
-	alternative_symbiont_counts = [len(alternative_symbionts[phylum]) for phylum in sorted(list(alternative_symbionts.keys()))]
-	statwriter.writerow([target_categories, 'alternative_symbionts'] + alternative_symbiont_counts + [sum(alternative_symbiont_counts)])
+			alternative_symbiont_counts = [len(alternative_symbionts[phylum]) for phylum in sorted(list(alternative_symbionts.keys()))]
+			key_stats_writer.writerow([target_categories, 'alternative_symbionts'] + alternative_symbiont_counts + [sum(alternative_symbiont_counts)])
 
-	for phylum in sorted(all_phylums):
-		supdatawriter.writerow([target_categories, 'key_stone_species', phylum] + key_stone_species[phylum])
-		supdatawriter.writerow([target_categories, 'essential_symbionts', phylum] + essential_symbionts[phylum])
-		supdatawriter.writerow([target_categories, 'alternative_symbionts', phylum] + alternative_symbionts[phylum])
-
+			if all_phylums:
+				for phylum in sorted(all_phylums):
+						key_sup_writer.writerow([target_categories, 'key_stone_species', phylum] + key_stone_species[phylum])
+						key_sup_writer.writerow([target_categories, 'essential_symbionts', phylum] + essential_symbionts[phylum])
+						key_sup_writer.writerow([target_categories, 'alternative_symbionts', phylum] + alternative_symbionts[phylum])
+			else:
+				key_sup_writer.writerow([target_categories, 'key_stone_species', 'data'] + key_stone_species[phylum])
+				key_sup_writer.writerow([target_categories, 'essential_symbionts', 'data'] + essential_symbionts[phylum])
+				key_sup_writer.writerow([target_categories, 'alternative_symbionts', 'data'] + alternative_symbionts[phylum])
 
 def get_phylum(phylum_file):
 	phylum_species = {}
@@ -209,11 +254,12 @@ def get_phylum(phylum_file):
 
 	return phylum_species, all_phylums
 
-def create_gml(target_file, json_miscoto_file, miscoto_analysis, taxon_file=None):
-	miscoto_stat_output = miscoto_analysis + '/' + 'miscoto_stats.txt'
-	key_species_stats_output = miscoto_analysis + '/' + 'key_species_stats.tsv'
-	key_species_supdata_output = miscoto_analysis + '/' + 'key_species_supdata.tsv'
-	gml_output = miscoto_analysis + '/' + 'graph.gml'
+def create_gml(targets, jsons, output_dir, taxon_file=None):
+	miscoto_stat_output = output_dir + '/' + 'miscoto_stats.txt'
+	key_species_stats_output = output_dir + '/' + 'key_species_stats.tsv'
+	key_species_supdata_output = output_dir + '/' + 'key_species_supdata.tsv'
+
+	gml_output = output_dir + '/' + 'gml' + '/'
 
 	len_min_sol = {}
 	len_union = {}
@@ -221,34 +267,27 @@ def create_gml(target_file, json_miscoto_file, miscoto_analysis, taxon_file=None
 	len_solution = {}
 	len_target = {}
 
-	species_categories = {}
-	species_categories['target'] = sbml_management.get_compounds(target_file)
+	target_categories = {}
+	for target in targets:
+		target_categories[target] = sbml_management.get_compounds(targets[target])
 
 	if taxon_file:
 		phylum_species, all_phylums = get_phylum(taxon_file)
 
-	for categories in species_categories:
-		with open(json_miscoto_file) as json_data:
+	for target_categorie in target_categories:
+		with open(jsons[target_categorie]) as json_data:
 			dicti = json.load(json_data)
-		with open(key_species_stats_output,"w") as key_stats_file:
-			key_stats_writer = csv.writer(key_stats_file, delimiter='\t')
-			if taxon_file:
-				key_stats_writer.writerow(['target_categories', 'key_stones_group', *sorted(all_phylums), 'Sum'])
-			else:
-				key_stats_writer.writerow(['target_categories', 'key_stones_group', 'data', 'Sum'])
-			with open(key_species_supdata_output,"w") as key_sup_file:
-				key_sup_writer = csv.writer(key_sup_file, delimiter='\t')
-				create_stat_species(categories, dicti, phylum_species, all_phylums, key_stats_writer, key_sup_writer)
+		create_stat_species(target_categories, dicti, key_species_stats_output, key_species_supdata_output, phylum_species, all_phylums)
 		G = nx.Graph()
 		added_node = []
 		species_weight = {}
 		if dicti["still_unprod"] != []:
 			print("ERROR ", dicti["still_unprod"], " is unproducible")
-		len_target[categories] = len(dicti["newly_prod"]) + len(dicti["still_unprod"])
-		len_min_sol[categories] = len(dicti["bacteria"])
-		len_union[categories] = len(dicti["union_bacteria"])
-		len_intersection[categories] = len(dicti["inter_bacteria"])
-		len_solution[categories] = len(dicti["enum_bacteria"])
+		len_target[target_categorie] = len(dicti["newly_prod"]) + len(dicti["still_unprod"])
+		len_min_sol[target_categorie] = len(dicti["bacteria"])
+		len_union[target_categorie] = len(dicti["union_bacteria"])
+		len_intersection[target_categorie] = len(dicti["inter_bacteria"])
+		len_solution[target_categorie] = len(dicti["enum_bacteria"])
 		for sol in dicti["enum_bacteria"]:
 			for species_1, species_2 in combinations(dicti["enum_bacteria"][sol], 2):
 				if species_1 not in added_node:
@@ -276,7 +315,8 @@ def create_gml(target_file, json_miscoto_file, miscoto_analysis, taxon_file=None
 		with open(miscoto_stat_output,"w") as stats_output:
 			statswriter = csv.writer(stats_output, delimiter='\t')
 			statswriter.writerow(['categories', 'nb_target', 'size_min_sol', 'size_union', 'size_intersection', 'size_enum'])
-			statswriter.writerow([categories, str(len_target[categories]), str(len_min_sol[categories]), str(len_union[categories]), str(len_intersection[categories]), str(len_solution[categories])])
+			statswriter.writerow([target_categorie, str(len_target[target_categorie]), str(len_min_sol[target_categorie]),
+								str(len_union[target_categorie]), str(len_intersection[target_categorie]), str(len_solution[target_categorie])])
 
 		nx.write_gml(G, gml_output)
 
