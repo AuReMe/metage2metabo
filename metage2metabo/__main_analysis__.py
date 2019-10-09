@@ -208,15 +208,16 @@ def main():
         sys.exit()
 
     #if modelhost is given as an arg: check the SBML level and turn it into 2 if needed
-    if args.cmd in ["workflow", "enumeration"]:
+    if args.cmd in ["workflow", "enum"]:
         if not os.path.isdir(args.networksdir):
             logger.critical(args.networksdir + " is not a correct directory path")
             sys.exit(1)
         network_dir = check_sbml(args.networksdir, args.out)
+
         if not utils.is_valid_file(args.seeds):
             logger.critical(args.seeds + " is not a correct filepath")
             sys.exit(1)
-        if not utils.is_valid_file(args.targets):
+        if not utils.is_valid_file(args.targets) and not utils.is_valid_dir(args.targets):
             logger.critical(args.targets + " is not a correct filepath")
             sys.exit(1)
         if args.modelhost:
@@ -229,8 +230,8 @@ def main():
     if args.cmd == "workflow":
         main_analysis_workflow(args.network_dir, args.targets, args.seeds, args.out, args.oog,
                       new_arg_modelhost, args.taxon)
-    elif args.cmd == "enumeration":
-        main_enumeration(args.seeds, network_dir, args.out, args.targets, new_arg_modelhost)
+    elif args.cmd == "enum":
+        main_enumeration(args.seeds, network_dir, args.targets, args.out, new_arg_modelhost)
     elif args.cmd == "stat":
         main_stat(args.json, args.out, args.taxon)
     elif args.cmd == "graph":
