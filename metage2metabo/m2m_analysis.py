@@ -51,7 +51,8 @@ def file_or_folder(variable_folder_file):
 
 	elif os.path.isdir(variable_folder_file):
 		for file_from_folder in os.listdir(variable_folder_file):
-			file_folder_paths[file_from_folder] = variable_folder_file + '/' + file_from_folder
+			filename = os.path.splitext(os.path.basename(file_from_folder))[0]
+			file_folder_paths[filename] = variable_folder_file + '/' + file_from_folder
 
 	return file_folder_paths
 
@@ -106,13 +107,27 @@ def stat_analysis(json_file_folder, output_dir, taxon_file=None):
 		phylum_output_file = output_dir + '/taxon_phylum.tsv'
 		tree_output_file = output_dir + '/taxon_tree.txt'
 		extract_taxa(taxon_file, phylum_output_file, tree_output_file)
-		all_phylums, phylum_species = get_phylum(phylum_output_file)
+		phylum_species, all_phylums = get_phylum(phylum_output_file)
 
-	for json_path in json_paths:
-		with open(json_paths[json_path]) as json_data:
-			json_elements = json.load(json_data)
-		create_stat_species(json_path, json_elements, key_species_stats_output, key_species_supdata_output, phylum_species, all_phylums)
+	with open(key_species_stats_output, "w") as key_stats_file:
+		key_stats_writer = csv.writer(key_stats_file, delimiter='\t')
+		if all_phylums:
+			key_stats_writer.writerow(['target_categories', 'key_stones_group', *sorted(all_phylums), 'Sum'])
+		else:
+			key_stats_writer.writerow(['target_categories', 'key_stones_group', 'data', 'Sum'])
+		with open(key_species_supdata_output,"w") as key_sup_file:
+			key_sup_writer = csv.writer(key_sup_file, delimiter='\t')
 
+			for json_path in json_paths:
+				with open(json_paths[json_path]) as json_data:
+					json_elements = json.load(json_data)
+				create_stat_species(json_path, json_elements, key_stats_writer, key_sup_writer, phylum_species, all_phylums)
+
+				with open(miscoto_stat_output,"w") as stats_output:
+					statswriter = csv.writer(stats_output, delimiter='\t')
+					statswriter.writerow(['categories', 'nb_target', 'size_min_sol', 'size_union', 'size_intersection', 'size_enum'])
+					statswriter.writerow([json_path, str(len(json_elements["newly_prod"]) + len(json_elements["still_unprod"])), str(len(json_elements["bacteria"])),
+										str(len(json_elements["union_bacteria"])), str(len(json_elements["inter_bacteria"])), str(len(json_elements["enum_bacteria"]))])
 
 def graph_analysis(json_file_folder, output_folder, target_file, taxon_file):
 	json_paths = file_or_folder(json_file_folder)
@@ -210,36 +225,27 @@ def detect_key_species(json_elements, all_phylums, phylum_species=None):
 	return key_stone_species, essential_symbionts, alternative_symbionts
 
 
-def create_stat_species(target_categories, json_elements, key_species_stats_output, key_species_supdata_output, phylum_species=None, all_phylums=None):
-	with open(key_species_stats_output, "w") as key_stats_file:
-		key_stats_writer = csv.writer(key_stats_file, delimiter='\t')
-		if all_phylums:
-			key_stats_writer.writerow(['target_categories', 'key_stones_group', *sorted(all_phylums), 'Sum'])
-		else:
-			key_stats_writer.writerow(['target_categories', 'key_stones_group', 'data', 'Sum'])
-		with open(key_species_supdata_output,"w") as key_sup_file:
-			key_sup_writer = csv.writer(key_sup_file, delimiter='\t')
+def create_stat_species(target_categories, json_elements, key_stats_writer, key_sup_writer, phylum_species=None, all_phylums=None):
+	key_stone_species, essential_symbionts, alternative_symbionts = detect_key_species(json_elements, all_phylums, phylum_species)
 
-			key_stone_species, essential_symbionts, alternative_symbionts = detect_key_species(json_elements, all_phylums, phylum_species)
+	key_stone_counts = [len(key_stone_species[phylum]) for phylum in sorted(list(key_stone_species.keys()))]
+	key_stats_writer.writerow([target_categories, 'key_stone_species'] + key_stone_counts + [sum(key_stone_counts)])
 
-			key_stone_counts = [len(key_stone_species[phylum]) for phylum in sorted(list(key_stone_species.keys()))]
-			key_stats_writer.writerow([target_categories, 'key_stone_species'] + key_stone_counts + [sum(key_stone_counts)])
+	essential_symbiont_counts = [len(essential_symbionts[phylum]) for phylum in sorted(list(essential_symbionts.keys()))]
+	key_stats_writer.writerow([target_categories, 'essential_symbionts'] + essential_symbiont_counts + [sum(essential_symbiont_counts)])
 
-			essential_symbiont_counts = [len(essential_symbionts[phylum]) for phylum in sorted(list(essential_symbionts.keys()))]
-			key_stats_writer.writerow([target_categories, 'essential_symbionts'] + essential_symbiont_counts + [sum(essential_symbiont_counts)])
+	alternative_symbiont_counts = [len(alternative_symbionts[phylum]) for phylum in sorted(list(alternative_symbionts.keys()))]
+	key_stats_writer.writerow([target_categories, 'alternative_symbionts'] + alternative_symbiont_counts + [sum(alternative_symbiont_counts)])
 
-			alternative_symbiont_counts = [len(alternative_symbionts[phylum]) for phylum in sorted(list(alternative_symbionts.keys()))]
-			key_stats_writer.writerow([target_categories, 'alternative_symbionts'] + alternative_symbiont_counts + [sum(alternative_symbiont_counts)])
-
-			if all_phylums:
-				for phylum in sorted(all_phylums):
-						key_sup_writer.writerow([target_categories, 'key_stone_species', phylum] + key_stone_species[phylum])
-						key_sup_writer.writerow([target_categories, 'essential_symbionts', phylum] + essential_symbionts[phylum])
-						key_sup_writer.writerow([target_categories, 'alternative_symbionts', phylum] + alternative_symbionts[phylum])
-			else:
-				key_sup_writer.writerow([target_categories, 'key_stone_species', 'data'] + key_stone_species[phylum])
-				key_sup_writer.writerow([target_categories, 'essential_symbionts', 'data'] + essential_symbionts[phylum])
-				key_sup_writer.writerow([target_categories, 'alternative_symbionts', 'data'] + alternative_symbionts[phylum])
+	if all_phylums:
+		for phylum in sorted(all_phylums):
+				key_sup_writer.writerow([target_categories, 'key_stone_species', phylum] + key_stone_species[phylum])
+				key_sup_writer.writerow([target_categories, 'essential_symbionts', phylum] + essential_symbionts[phylum])
+				key_sup_writer.writerow([target_categories, 'alternative_symbionts', phylum] + alternative_symbionts[phylum])
+	else:
+		key_sup_writer.writerow([target_categories, 'key_stone_species', 'data'] + key_stone_species[phylum])
+		key_sup_writer.writerow([target_categories, 'essential_symbionts', 'data'] + essential_symbionts[phylum])
+		key_sup_writer.writerow([target_categories, 'alternative_symbionts', 'data'] + alternative_symbionts[phylum])
 
 def get_phylum(phylum_file):
 	phylum_species = {}

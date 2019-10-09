@@ -143,7 +143,7 @@ def main():
         "enum",
         help="enumeration using miscoto",
         parents=[
-            parent_parser_s, parent_parser_n, parent_parser_t, parent_parser_m, parent_parser_o
+            parent_parser_s, parent_parser_n, parent_parser_t, parent_parser_m, parent_parser_o, parent_parser_q
         ],
         description=
         "Run miscoto enumeration on sbml species with seeds and targets"
@@ -152,7 +152,7 @@ def main():
         "stat",
         help="statistics on key species",
         parents=[
-            parent_parser_j, parent_parser_o, parent_parser_taxon
+            parent_parser_j, parent_parser_o, parent_parser_taxon, parent_parser_q
         ],
         description=
         "Compute statistics on key species in the community"
@@ -161,14 +161,14 @@ def main():
         "graph",
         help="graph creation with enumeration solution",
         parents=[
-            parent_parser_j, parent_parser_o, parent_parser_t, parent_parser_taxon
+            parent_parser_j, parent_parser_o, parent_parser_t, parent_parser_taxon, parent_parser_q
         ],
         description="Create the solution graph using the JSON from miscoto enumeration")
     powergraph_parser = subparsers.add_parser(
         "powergraph",
         help="powergraph creation and visualization",
         parents=[
-            parent_parser_g, parent_parser_o, parent_parser_jar
+            parent_parser_g, parent_parser_o, parent_parser_jar, parent_parser_q
         ],
         description=
         "Compress the GMl graph of solution and create a powergraph (bbl) and a svg of the graph"
@@ -178,7 +178,7 @@ def main():
         help="whole workflow",
         parents=[
             parent_parser_s, parent_parser_n, parent_parser_t, parent_parser_m, parent_parser_o, parent_parser_jar,
-            parent_parser_taxon
+            parent_parser_taxon, parent_parser_q
         ],
         description=
         "Run the whole workflow: miscoto enumeration, statistics on key species, graph on solution and powergraph creation"
