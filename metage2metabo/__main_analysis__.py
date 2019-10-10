@@ -6,7 +6,7 @@ import re
 import sys
 import tarfile
 import time
-from shutil import copyfile,which
+from shutil import copyfile, which
 
 from metage2metabo.m2m_analysis import run_analysis_workflow, enumeration_analysis, stat_analysis, graph_analysis, powergraph_analysis
 from metage2metabo.__main__ import check_sbml
@@ -22,7 +22,7 @@ MESSAGE = """
 Detection of key species among communities.
 """
 REQUIRES = """
-Oog jar file for powergraph visualization.
+Oog jar file (http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-command-line-tool.html) for powergraph visualization.
 """
 
 root_logger = logging.getLogger()
