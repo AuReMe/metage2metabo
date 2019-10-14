@@ -54,7 +54,7 @@ def file_or_folder(variable_folder_file):
 
 
 def run_analysis_workflow(sbml_folder, target_folder_file, seed_file, output_dir, taxon_file, oog_jar, host_file=None):
-    json_file_folder = enumeration_analysis( seed_file, sbml_folder, target_folder_file, output_dir, host_file)
+    json_file_folder = enumeration_analysis(seed_file, sbml_folder, target_folder_file, output_dir, host_file)
 
     gml_output = graph_analysis(json_file_folder, output_dir, target_folder_file, taxon_file)
 

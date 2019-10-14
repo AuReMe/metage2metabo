@@ -190,7 +190,7 @@ def mincom(instance_w_targets, out_dir):
     # Compute community selection
     logger.info("Running minimal community selection")
     all_results = compute_mincom(instance_w_targets, out_dir)
-    all_results = next(all_results)
+
     for key in all_results:
         all_results[key] = list(all_results[key])
     with open(miscoto_dir + "/mincom.json", 'w') as dumpfile:
