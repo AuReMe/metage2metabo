@@ -68,7 +68,7 @@ def enumeration(seed_file, sbml_folder, target_file, output_json, host_file):
         enumeration=True, union=True,
         optsol=True)
 
-    miscoto.utils.results_to_json(results, output_json)
+    miscoto.utils.to_json(results, output_json)
 
     return output_json
 
