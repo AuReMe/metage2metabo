@@ -316,4 +316,4 @@ Arnaud Belcour, Clémence Frioux, Meziane Aite, Anthony Bretaudeau, Anne Siegel 
 [Clémence Frioux](https://cfrioux.github.io/) and [Arnaud Belcour](https://arnaudbelcour.github.io/blog/), Univ Rennes, Inria, CNRS, IRISA, Rennes, France.
 
 ## Acknowledgement
-People of Pathway Tools (SRI International) for their help integrating Pathway Tools with command line and multi process in the [mpwt](https://github.com/AuReMe/mpwt) package, used in M2M.
+People of Pathway Tools (SRI International) for their help integrating Pathway Tools with command line and multiprocessing in the [mpwt](https://github.com/AuReMe/mpwt) package, used in M2M.

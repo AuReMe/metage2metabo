@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 # Check ASP binaries.
 if not which('clingo'):
-    logger.critical('clingo is not in the Path, m2m can not work without it.')
+    logger.critical('clingo is not in the Path, m2m_analysis can not work without it.')
     logger.critical('You can install with: pip install clyngor-with-clingo') 
     sys.exit(1)
 
@@ -43,7 +43,7 @@ def main():
     start_time = time.time()
     parser = argparse.ArgumentParser(
         "m2m_analysis",
-        description=MESSAGE + " For specific help on each subcommand use: m2m {cmd} --help",
+        description=MESSAGE + " For specific help on each subcommand use: m2m_analysis {cmd} --help",
         epilog=REQUIRES
     )
     parser.add_argument(
@@ -231,11 +231,11 @@ def main():
         main_analysis_workflow(args.network_dir, args.targets, args.seeds, args.out, args.oog,
                       new_arg_modelhost, args.taxon)
     elif args.cmd == "enum":
-        main_enumeration(args.seeds, network_dir, args.targets, args.out, new_arg_modelhost)
+        main_enumeration(network_dir, args.targets, args.seeds, args.out, new_arg_modelhost)
     elif args.cmd == "stat":
         main_stat(args.json, args.out, args.taxon)
     elif args.cmd == "graph":
-        main_graph(args.json, args.out, args.targets, args.taxon)
+        main_graph(args.json, args.targets, args.out, args.taxon)
     elif args.cmd == "powergraph":
         main_powergraph(args.graph, args.out, args.oog)
 
@@ -249,24 +249,25 @@ def main_analysis_workflow(*allargs):
 
 
 def main_enumeration(*allargs):
-    """Run recon command
+    """Run enumeration command
     """
     enumeration_analysis(*allargs)
 
 
 def main_stat(*allargs):
-    """Run iscope command
+    """Run stat command
     """
     stat_analysis(*allargs)
 
 
 def main_graph(*allargs):
-    """Run cscope command
+    """Run graph command
     """
     graph_analysis(*allargs)
 
+
 def main_powergraph(*allargs):
-    """Run cscope command
+    """Run powergraph command
     """
     powergraph_analysis(*allargs)
 
