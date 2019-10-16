@@ -24,6 +24,7 @@ m2m can be used as a whole workflow ( ``` m2m workflow ``` ) or steps can be per
     - [m2m workflow](#m2m-workflow)
     - [m2m seeds](#m2m-seeds)
   - [Additional features](#additional-features)
+  - [Citation](#citation)
   - [Authors](#authors)
   - [Acknowledgement](#acknowledgement)
 
@@ -307,6 +308,9 @@ M2M relies on packages that can also be used independantly with more features:
 * [mpwt](https://github.com/AuReMe/mpwt): command-line and multi-process solutions to run Pathway Tools. Suitable to multiple reconstruction, for example genomes of a microbiota
 * [menetools](https://github.com/cfrioux/MeneTools): individual metabolic capabilities analysis using graph-based producibility criteria
 * [miscoto](https://github.com/cfrioux/miscoto): community selection and metabolic screening in large-scal microbiotas, with or without taking a host into account
+
+## Citation
+Arnaud Belcour, Clémence Frioux, Meziane Aite, Anthony Bretaudeau, Anne Siegel (2019) Metage2Metabo: metabolic complementarity applied to genomes of large-scale microbiotas for the identification of keystone species. bioRxiv 803056; doi: [https://doi.org/10.1101/803056](https://doi.org/10.1101/803056)
 
 ## Authors
 [Clémence Frioux](https://cfrioux.github.io/) and [Arnaud Belcour](https://arnaudbelcour.github.io/blog/), Univ Rennes, Inria, CNRS, IRISA, Rennes, France.

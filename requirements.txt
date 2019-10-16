@@ -20,7 +20,7 @@ mpwt==0.5
 numpy==1.16.4
 optlang==1.4.4
 packaging==19.0
-padmet==3.2.1
+padmet>=3.2.2
 padmet-utils==0.0.8
 pandas==0.24.2
 pipdeptree==0.13.2
@@ -31,7 +31,7 @@ pyparsing==2.4.0
 pyPEG2==2.15.2
 pytest==4.6.1
 python-dateutil==2.8.0
-python-libsbml==5.16.0
+python-libsbml>=5.18.0
 pytz==2019.1
 ruamel.yaml==0.15.96
 simplejson==3.16.0
