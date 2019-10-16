@@ -20,7 +20,7 @@
 import json
 import logging
 import mpwt
-import os, os.path
+import os
 import tempfile
 import time
 import sys
@@ -70,6 +70,9 @@ def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_b
         newtargets)
     # MINCOM
     mincom(instance_w_targets, out_dir)
+    # remove intermediate files
+    os.unlink(instance_com)
+    os.unlink(instance_w_targets)
 
 
 def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clean):

@@ -17,13 +17,11 @@
 # along with metage2metabo.  If not, see <http://www.gnu.org/licenses/>.
 # -*- coding: utf-8 -*-
 
-import argparse
 import csv
 import json
 import miscoto
 import networkx as nx
 import os
-import padmet
 import powergrasp
 import sys
 import time
@@ -98,9 +96,7 @@ def enumeration(sbml_folder, target_file, seed_file, output_json, host_file):
         targets_file=target_file, seeds_file=seed_file,
         host_file=host_file, intersection=True,
         enumeration=True, union=True,
-        optsol=True)
-
-    miscoto.utils.to_json(results, output_json)
+        optsol=True, output_json=output_json)
 
     return output_json
 
@@ -258,8 +254,8 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file):
                     names = ncbi.get_taxid_translator(lineage)
                     ranks2lineage = dict((rank, names[taxid]) for (taxid, rank) in lineage2ranks.items())
                     ranks = [ranks2lineage.get(rank, "no_information") for rank in ["phylum", "class", "order", "family", "genus", "species"]]
-                    if ranks[1] != "no_information":
-                        phylum = ranks[1][:4]
+                    if ranks[0] != "no_information":
+                        phylum = ranks[0][:4]
                     else:
                         phylum = "no_information"
                     if phylum not in phylum_count:
@@ -427,9 +423,7 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
     if taxon_file:
         phylum_named_species, all_phylums = get_phylum(taxon_file)
 
-    with open(key_species_stats_output, "w") as key_stats_file, open(
-        key_species_supdata_output, "w"
-    ) as key_sup_file, open(miscoto_stat_output, "w") as stats_output:
+    with open(key_species_stats_output, "w") as key_stats_file, open(key_species_supdata_output, "w") as key_sup_file, open(miscoto_stat_output, "w") as stats_output:
         keystone_stats_writer = csv.writer(key_stats_file, delimiter="\t")
         if all_phylums:
             keystone_stats_writer.writerow(["target_categories", "key_stones_group", *sorted(all_phylums), "Sum"])

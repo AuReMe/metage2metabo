@@ -49,7 +49,7 @@ In particular, m2m relies on:
 * [menetools](https://github.com/cfrioux/MeneTools) to analyze individual metabolic capabilities using logic programming
 * [miscoto](https://github.com/cfrioux/miscoto) to analyze collective metabolic capabilities and select communities within microbiota using logic programming
 
-Also, m2m_analysis (graph analysis part)) relies on other packages:
+Also, m2m_analysis relies on other packages:
 * [networkx](https://github.com/networkx/networkx) to create graph from miscoto results
 * [ete3](https://github.com/etetoolkit/ete) to add taxonomy information on the graph if you used mpwt taxon file
 * [powergrasp](https://github.com/Aluriak/PowerGrASP) to compress networkx graph
@@ -90,6 +90,8 @@ Also, m2m_analysis (graph analysis part)) relies on other packages:
         ````sh
         echo 'export PATH="$PATH:your/install/directory/pathway-tools:"' >> ~/.bashrc
         ````
+
+* [Oog Power Graph Command line tool](http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-command-line-tool.html) to create a svg file from the compressed graph at the end of m2m_analysis. This tool is a jar file, Java is needed to use it.
 
 ## Installation
 

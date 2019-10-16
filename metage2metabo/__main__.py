@@ -14,7 +14,7 @@ from metage2metabo import sbml_management, utils
 VERSION = pkg_resources.get_distribution("metage2metabo").version
 LICENSE = """Copyright (C) Dyliss
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-m2m is free software: you are free to change and redistribute it.
+metage2metabo is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.\n
 """
 MESSAGE = """
@@ -318,9 +318,11 @@ def main_iscope(*allargs):
 def main_cscope(*allargs):
     """Run cscope command
     """
-    comscope = cscope(*allargs)[1]
+    instance_com, comscope = cscope(*allargs)
     logger.info("\n" + str(len(comscope)) + " metabolites (excluding the seeds) reachable by the whole community/microbiota: \n")
     logger.info('\n'.join(comscope))
+    #delete intermediate file
+    os.unlink(instance_com)
     return comscope
 
 
@@ -356,6 +358,8 @@ def main_mincom(sbmldir, seedsfiles, outdir, targets, host):
     instance = instance_community(sbmldir, seedsfiles, outdir, targets, host)
     #run mincom
     mincom(instance, outdir)
+    #delete intermediate file
+    os.unlink(instance)
 
 
 def main_seeds(metabolites_file, outdir):

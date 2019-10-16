@@ -15,7 +15,7 @@ from metage2metabo import sbml_management, utils
 VERSION = pkg_resources.get_distribution("metage2metabo").version
 LICENSE = """Copyright (C) Dyliss
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-m2m is free software: you are free to change and redistribute it.
+metage2metabo is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.\n
 """
 MESSAGE = """
