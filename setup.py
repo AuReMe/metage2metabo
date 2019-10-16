@@ -21,7 +21,7 @@ from setuptools import setup
 
 setup(
     name='Metage2Metabo',
-    version='1.0.1',
+    version='1.1.0',
     url='https://github.com/aureme/metage2metabo',
     license='GPLv3+',
     description=
@@ -38,6 +38,7 @@ More information on usage and troubleshooting on Github: https://github.com/aure
     entry_points={
         'console_scripts': [
             'm2m = metage2metabo.__main__:main',
+            'm2m_analysis = metage2metabo.__main_analysis__:main',
         ]
     },
     install_requires=['miscoto', 'menetools', 'mpwt', 'padmet', 'padmet-utils'],

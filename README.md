@@ -24,6 +24,7 @@ m2m can be used as a whole workflow ( ``` m2m workflow ``` ) or steps can be per
     - [m2m workflow](#m2m-workflow)
     - [m2m seeds](#m2m-seeds)
   - [Additional features](#additional-features)
+  - [Citation](#citation)
   - [Authors](#authors)
   - [Acknowledgement](#acknowledgement)
 
@@ -48,9 +49,14 @@ In particular, m2m relies on:
 * [menetools](https://github.com/cfrioux/MeneTools) to analyze individual metabolic capabilities using logic programming
 * [miscoto](https://github.com/cfrioux/miscoto) to analyze collective metabolic capabilities and select communities within microbiota using logic programming
 
+Also, m2m_analysis relies on other packages:
+* [networkx](https://github.com/networkx/networkx) to create graph from miscoto results
+* [ete3](https://github.com/etetoolkit/ete) to add taxonomy information on the graph if you used mpwt taxon file
+* [powergrasp](https://github.com/Aluriak/PowerGrASP) to compress networkx graph
+
 ## Requirements
 
-* [Pathway Tools](http://bioinformatics.ai.sri.com/ptools/) version 22.5 or higher (free for [academic users](https://biocyc.org/download-bundle.shtml)) is **required for m2m workflow and m2m recon**
+* [Pathway Tools](http://bioinformatics.ai.sri.com/ptools/) version 23.0 or higher (free for [academic users](https://biocyc.org/download-bundle.shtml)) is **required for m2m workflow and m2m recon**
     * Pathway Tools requirements
         * **Linux**: Gnome terminal and Libxm4
         ```sh
@@ -84,6 +90,8 @@ In particular, m2m relies on:
         ````sh
         echo 'export PATH="$PATH:your/install/directory/pathway-tools:"' >> ~/.bashrc
         ````
+
+* [Oog Power Graph Command line tool](http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-command-line-tool.html) to create a svg file from the compressed graph at the end of m2m_analysis. This tool is a jar file, Java is needed to use it.
 
 ## Installation
 
@@ -303,8 +311,11 @@ M2M relies on packages that can also be used independantly with more features:
 * [menetools](https://github.com/cfrioux/MeneTools): individual metabolic capabilities analysis using graph-based producibility criteria
 * [miscoto](https://github.com/cfrioux/miscoto): community selection and metabolic screening in large-scal microbiotas, with or without taking a host into account
 
+## Citation
+Arnaud Belcour, Clémence Frioux, Meziane Aite, Anthony Bretaudeau, Anne Siegel (2019) Metage2Metabo: metabolic complementarity applied to genomes of large-scale microbiotas for the identification of keystone species. bioRxiv 803056; doi: [https://doi.org/10.1101/803056](https://doi.org/10.1101/803056)
+
 ## Authors
 [Clémence Frioux](https://cfrioux.github.io/) and [Arnaud Belcour](https://arnaudbelcour.github.io/blog/), Univ Rennes, Inria, CNRS, IRISA, Rennes, France.
 
 ## Acknowledgement
-People of Pathway Tools (SRI International) for their help integrating Pathway Tools with command line and multi process in the [mpwt](https://github.com/AuReMe/mpwt) package, used in M2M.
+People of Pathway Tools (SRI International) for their help integrating Pathway Tools with command line and multiprocessing in the [mpwt](https://github.com/AuReMe/mpwt) package, used in M2M.

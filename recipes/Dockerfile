@@ -3,7 +3,7 @@
 FROM ubuntu:18.04
 MAINTAINER "Belcour A."
 LABEL Version="0.1"
-LABEL Description="m2min Docker container"
+LABEL Description="m2m Docker container"
 
 # Update repositories & install packages.
 # Create file needed by Pathway-Tools to find Blast binaries.
@@ -35,4 +35,6 @@ RUN mkdir programs;\
 
 # Install m2m and its dependencies.
 RUN curl https://bootstrap.pypa.io/get-pip.py | python3;\
+    pip install graphviz ete3 networkx;\
+    pip install powergrasp;\
     pip install Metage2Metabo

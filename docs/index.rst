@@ -22,6 +22,7 @@ m2m's documentation
     tutorial
     suppinformation
     api
+    m2m_analysis
 
 
 Additional features

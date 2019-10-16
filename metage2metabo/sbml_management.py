@@ -17,16 +17,32 @@ logger = logging.getLogger(__name__)
 
 def get_sbml_level(sbml_file):
     """Get SBML Level of a file
-    
+
     Args:
         sbml_file (str): SBML file
-    
+
     Returns:
         int: SBML Level
     """
     reader = SBMLReader()
     document = reader.readSBML(sbml_file)
     return document.getLevel()
+
+
+def get_compounds(sbml_file):
+    """Get target from sbml
+
+    Args:
+        sbml_file (str): SBML file
+
+    Returns:
+        list: target
+    """
+    reader = SBMLReader()
+    document = reader.readSBML(sbml_file)
+    model = document.getModel()
+    targets = [target.id for target in model.getListOfSpecies()]
+    return targets
 
 
 def create_species_sbml(metabolites, outputfile):
