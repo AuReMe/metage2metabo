@@ -149,7 +149,7 @@ def main():
         "Run miscoto enumeration on sbml species with seeds and targets"
     )
     stat_parser = subparsers.add_parser(
-        "stat",
+        "stats",
         help="statistics on key species",
         parents=[
             parent_parser_j, parent_parser_o, parent_parser_taxon, parent_parser_q
@@ -228,11 +228,11 @@ def main():
 
     # deal with given subcommand
     if args.cmd == "workflow":
-        main_analysis_workflow(args.network_dir, args.targets, args.seeds, args.out, args.oog,
-                      new_arg_modelhost, args.taxon)
+        main_analysis_workflow(network_dir, args.targets, args.seeds, args.out, args.taxon,
+                                args.oog, new_arg_modelhost)
     elif args.cmd == "enum":
         main_enumeration(network_dir, args.targets, args.seeds, args.out, new_arg_modelhost)
-    elif args.cmd == "stat":
+    elif args.cmd == "stats":
         main_stat(args.json, args.out, args.taxon)
     elif args.cmd == "graph":
         main_graph(args.json, args.targets, args.out, args.taxon)

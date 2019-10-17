@@ -16,7 +16,7 @@ m2m_analysis needs:
     * `ete3 <https://github.com/etetoolkit/ete>`__: to add taxonomy information on the graph if you used mpwt taxon file
     * `powergrasp <https://github.com/Aluriak/PowerGrASP>`__: to compress networkx graph (which required graphviz)
 
-Requirements
+Presentation
 ------------
 
 m2m_analysis goes deeper in the analysis compare to m2m. In m2m_analysis, the enumeration of all solution is computed, this step is far more time consuming than the others (union or intersection).
@@ -27,8 +27,15 @@ In a second step (``m2m_analysis graph``), the optimal solutions from the enumer
 
 The last step (``m2m_analysis powergraph``) compresses the graph into a power graph (in bbl format). Then it creates a svg picture of this power graph.
 
+
+m2m Tutorial
+------------
+
+Test data is avaible in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/test>`__.
+It contains enough data to run the different subcommands.
+
 m2m_analysis enum
------------------
++++++++++++++++++
 ``m2m_analysis enum`` runs miscoto with enumeration on a set of target.
 
 It uses the following mandatory inputs (run ``m2m_analysis enum --help`` for optional arguments):
@@ -36,33 +43,193 @@ It uses the following mandatory inputs (run ``m2m_analysis enum --help`` for opt
 -n directory           directory of metabolic networks, 
                         in SBML format
 -s file                seeds SBML file
--t file/directory      targets SBML file or folder containing multiple targets SBML files
+-t directory           targets SBML file or folder containing multiple targets SBML files
 -o directory           output directory for results
 -m file                host metabolic network in SBML
 
+.. code:: sh
+
+    m2m_analysis enum -n toy_bact -s metabolic_data/seeds_toy.sbml -t metabolic_data/targets_toy.sbml -o output_directory
+
+* standard output
+    .. code::
+
+        ######### Enumeration of solution for: targets_toy #########
+        ######### Keystone species: Union of minimal communities #########
+        # Bacteria occurring in at least one minimal community enabling the producibility of the target metabolites given as inputs
+        Keystone species = 17
+        GCA_003437885
+        GCA_003437665
+        GCA_003437945
+        GCA_003437595
+        GCA_003437195
+        GCA_003437345
+        GCA_003437815
+        GCA_003438055
+        GCA_003437715
+        GCA_003437325
+        GCA_003437905
+        GCA_003437375
+        GCA_003437175
+        GCA_003437785
+        GCA_003437055
+        GCA_003437255
+        GCA_003437295
+        ######### Essential symbionts: Intersection of minimal communities #########
+        # Bacteria occurring in ALL minimal community enabling the producibility of the target metabolites given as inputs
+        Essential symbionts = 12
+        GCA_003437885
+        GCA_003437665
+        GCA_003437595
+        GCA_003437905
+        GCA_003437195
+        GCA_003437375
+        GCA_003437055
+        GCA_003437815
+        GCA_003438055
+        GCA_003437715
+        GCA_003437255
+        GCA_003437295
+        ######### Alternative symbionts: Difference between Union and Intersection #########
+        # Bacteria occurring in at least one minimal community but not all minimal community enabling the producibility of the target metabolites given as inputs
+        Alternative symbionts = 5
+        GCA_003437945
+        GCA_003437325
+        GCA_003437175
+        GCA_003437785
+        GCA_003437345
+
+* files output
+    ::
+
+        output_directory
+        ├── json
+        │   ├── targets_toy.json
+
 m2m_analysis graph
-------------------
+++++++++++++++++++
 ``m2m_analysis graph`` creates the graph containing the solutions.
 
 It uses the following mandatory inputs (run ``m2m_analysis graph --help`` for optional arguments):
 
--j file/directory      directory of miscoto output JSONs
--t file/directory      targets SBML file or folder containing multiple targets SBML files
+-j directory           directory of miscoto output JSONs or single JSON
+-t directory           targets SBML file or folder containing multiple targets SBML files
 -o directory           output directory for results
 --taxon file           mpwt taxon file
 
+You can use the `taxon file from gut experience <https://github.com/AuReMe/metage2metabo/blob/master/article_data/gut_microbiota/taxon_id.tsv>`__.
+
+.. code:: sh
+
+    m2m_analysis graph -j output_directory/json -t metabolic_data/targets_toy.sbml -o output_directory --taxon taxon_id.tsv
+
+* standard output
+    .. code::
+
+        ######### Graph of targets_toy #########
+        Number of nodes: 17
+        Number of edges: 126
+
+* files output
+    ::
+
+        output_directory
+        ├── gml
+        │   ├── targets_toy.gml
+        ├── key_species_stats.tsv
+        ├── key_species_supdata.tsv
+        ├── miscoto_stats.txt
+
 m2m_analysis powergraph
------------------------
++++++++++++++++++++++++
 ``m2m_analysis powergraph`` compresses the graph and create a svg picture.
 
 It uses the following mandatory inputs (run ``m2m_analysis powergraph --help`` for optional arguments):
 
 --oog file             Oog jar file
--g file/directory      directory of GML files or a GML file
+-g file                directory of GML files or a GML file
 -o directory           output directory for results
 
+.. code:: sh
+
+    m2m_analysis graph --oog Oog.jar -g output_directory/gml -o output_directory
+
+* standard output
+    .. code::
+
+        ######### Graph compression: targets_toy #########
+        ERROR input config do not have any section.
+        INFO no config file
+        INFO searchers: clique, non-star-biclique, star
+        INFO recipe: None
+        SOLVE clingo --opt-mode=optN -c k=1 -c lowerbound=16 -c upperbound=16 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-star.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpqi0wb63l
+        SOLVE clingo --opt-mode=optN -c k=1 -c lowerbound=66 -c upperbound=120 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-clique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpdlj4u0aa
+        SOLVE clingo --opt-mode=optN -c k=1 -c lowerbound=79 -c upperbound=126 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-biclique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmp7z46p13h
+        COMPRESS…
+        INFO 5 clique motif of score 78 compressed
+        TIMER since start: 1.07s		since last motif: 1.07s
+        SOLVE clingo --opt-mode=optN -c k=2 -c lowerbound=2 -c upperbound=16 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-star.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpda54fewe
+        SOLVE clingo --opt-mode=optN -c k=2 -c lowerbound=13 -c upperbound=78 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-clique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpe4zkksn9
+        SOLVE clingo --opt-mode=optN -c k=2 -c lowerbound=13 -c upperbound=126 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-biclique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpf83t3v5i
+        COMPRESS…
+        INFO 1 non-star-biclique motif of score 48 compressed
+        TIMER since start: 2.06s		since last motif: 1.0s
+        SOLVE clingo --opt-mode=optN -c k=3 -c lowerbound=2 -c upperbound=12 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-star.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpimc4_94j
+        SOLVE clingo --opt-mode=optN -c k=3 -c lowerbound=3 -c upperbound=78 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-clique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpo3js7kjf
+        SOLVE clingo --opt-mode=optN -c k=3 -c lowerbound=4 -c upperbound=48 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-biclique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpwmldtyt6
+        TIMER since start: 2.98s		output generation: 0.0s
+        Number of powernodes: 3
+        Number of poweredges: 2
+        ********************************************************************************
+        *  Oog - PowerGraph Library (Matthias Reimann, c 2006-2012)                    *
+        *  PowerGraph Analysis through the command line interface of Oog               *
+        *                                                                              *
+        *  Please cite us: Royer L, Reimann M, Andreopoulos B, Schroeder M             *
+        *  (2008) Unraveling Protein Networks with Power Graph Analysis.               *
+        *  PLoS Comput Biol 4(7): e1000108                                             *
+        *                                                                              *
+        *  Contact: reimann@biotec.tu-dresden.de                                       *
+        ********************************************************************************
+        <II> Current time: 2019/10/17 13:09:56
+        <II> Oog build: Oog_build_2012.04.17_14.16.48
+
+        <II> Working directory: . (/shared/metage2metabo/test/metabolic_data/)
+        <II> Graph file directories: [.]
+        <II> Output directory: test_out/svg
+        <II> Loading graph (targets_toy.bbl) ... 27ms
+        <II> Arrange Graph ... Exception in thread "PowerGraphArranger" java.lang.IndexOutOfBoundsException: Index 20 out of bounds for length 20
+            at java.base/jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:64)
+            at java.base/jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:70)
+            at java.base/jdk.internal.util.Preconditions.checkIndex(Preconditions.java:248)
+            at java.base/java.util.Objects.checkIndex(Objects.java:372)
+            at java.base/java.util.ArrayList.get(ArrayList.java:458)
+            at org.mattlab.eaglevista.graph.OogGraph.getID_(OogGraph.java:2703)
+            at org.mattlab.eaglevista.graph.OogPGArranger.arrangeRec(OogPGArranger.java:361)
+            at org.mattlab.eaglevista.graph.OogPGArranger.arrange(OogPGArranger.java:327)
+            at org.mattlab.eaglevista.graph.OogPGArranger.run(OogPGArranger.java:271)
+            at java.base/java.lang.Thread.run(Thread.java:834)
+        4001ms (15ms)
+        <II> Create SVG ... 469ms
+        <II> Image written (test_out/svg/targets_toy.bbl.svg)
+
+* files output
+    ::
+
+        output_directory
+        ├── bbl
+        │   ├── targets_toy.bbl
+        ├── svg
+        │   ├── targets_toy.bbl.svg
+
+The ERROR and INFO are not real errors, it is jsut powergrasp saying that it does not find config file so it will use default option.
+
+This command creates the following svg:
+
+.. image:: images/targets_toy.bbl.svg
+   :width: 500pt
+
 m2m_analysis workflow
----------------------
++++++++++++++++++++++
 ``m2m_analysis workflow`` runs the all m2m_analysis workflow.
 
 It uses the following mandatory inputs (run ``m2m_analysis workflow --help`` for optional arguments):
@@ -70,8 +237,142 @@ It uses the following mandatory inputs (run ``m2m_analysis workflow --help`` for
 -n directory           directory of metabolic networks, 
                         in SBML format
 -s file                seeds SBML file
--t file/directory      targets SBML file or folder containing multiple targets SBML files
+-t directory           targets SBML file or folder containing multiple targets SBML files
 -o directory           output directory for results
 -m file                host metabolic network in SBML
 --oog file             Oog jar file
 --taxon file           mpwt taxon file
+
+.. code:: sh
+
+    m2m_analysis enum -n toy_bact -s metabolic_data/seeds_toy.sbml -t metabolic_data/targets_toy.sbml -o output_directory --oog Oog.jar --taxon taxon_id.tsv
+
+* standard output
+    .. code::
+
+        ######### Enumeration of solution for: targets_toy #########
+        ######### Keystone species: Union of minimal communities #########
+        # Bacteria occurring in at least one minimal community enabling the producibility of the target metabolites given as inputs
+        Keystone species = 17
+        GCA_003437885
+        GCA_003437665
+        GCA_003437945
+        GCA_003437595
+        GCA_003437195
+        GCA_003437345
+        GCA_003437815
+        GCA_003438055
+        GCA_003437715
+        GCA_003437325
+        GCA_003437905
+        GCA_003437375
+        GCA_003437175
+        GCA_003437785
+        GCA_003437055
+        GCA_003437255
+        GCA_003437295
+        ######### Essential symbionts: Intersection of minimal communities #########
+        # Bacteria occurring in ALL minimal community enabling the producibility of the target metabolites given as inputs
+        Essential symbionts = 12
+        GCA_003437885
+        GCA_003437665
+        GCA_003437595
+        GCA_003437905
+        GCA_003437195
+        GCA_003437375
+        GCA_003437055
+        GCA_003437815
+        GCA_003438055
+        GCA_003437715
+        GCA_003437255
+        GCA_003437295
+        ######### Alternative symbionts: Difference between Union and Intersection #########
+        # Bacteria occurring in at least one minimal community but not all minimal community enabling the producibility of the target metabolites given as inputs
+        Alternative symbionts = 5
+        GCA_003437945
+        GCA_003437325
+        GCA_003437175
+        GCA_003437785
+        GCA_003437345
+        --- Enumeration runtime 6.74 seconds ---
+
+        ######### Graph of targets_toy #########
+        Number of nodes: 17
+        Number of edges: 126
+        --- Graph runtime 0.02 seconds ---
+
+        ######### Graph compression: targets_toy #########
+        ERROR input config do not have any section.
+        INFO no config file
+        INFO searchers: clique, non-star-biclique, star
+        INFO recipe: None
+        SOLVE clingo --opt-mode=optN -c k=1 -c lowerbound=16 -c upperbound=16 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-star.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpqi0wb63l
+        SOLVE clingo --opt-mode=optN -c k=1 -c lowerbound=66 -c upperbound=120 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-clique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpdlj4u0aa
+        SOLVE clingo --opt-mode=optN -c k=1 -c lowerbound=79 -c upperbound=126 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-biclique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmp7z46p13h
+        COMPRESS…
+        INFO 5 clique motif of score 78 compressed
+        TIMER since start: 1.07s		since last motif: 1.07s
+        SOLVE clingo --opt-mode=optN -c k=2 -c lowerbound=2 -c upperbound=16 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-star.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpda54fewe
+        SOLVE clingo --opt-mode=optN -c k=2 -c lowerbound=13 -c upperbound=78 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-clique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpe4zkksn9
+        SOLVE clingo --opt-mode=optN -c k=2 -c lowerbound=13 -c upperbound=126 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-biclique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpf83t3v5i
+        COMPRESS…
+        INFO 1 non-star-biclique motif of score 48 compressed
+        TIMER since start: 2.06s		since last motif: 1.0s
+        SOLVE clingo --opt-mode=optN -c k=3 -c lowerbound=2 -c upperbound=12 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-star.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpimc4_94j
+        SOLVE clingo --opt-mode=optN -c k=3 -c lowerbound=3 -c upperbound=78 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-clique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpo3js7kjf
+        SOLVE clingo --opt-mode=optN -c k=3 -c lowerbound=4 -c upperbound=48 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-biclique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpwmldtyt6
+        TIMER since start: 2.98s		output generation: 0.0s
+        Number of powernodes: 3
+        Number of poweredges: 2
+        ********************************************************************************
+        *  Oog - PowerGraph Library (Matthias Reimann, c 2006-2012)                    *
+        *  PowerGraph Analysis through the command line interface of Oog               *
+        *                                                                              *
+        *  Please cite us: Royer L, Reimann M, Andreopoulos B, Schroeder M             *
+        *  (2008) Unraveling Protein Networks with Power Graph Analysis.               *
+        *  PLoS Comput Biol 4(7): e1000108                                             *
+        *                                                                              *
+        *  Contact: reimann@biotec.tu-dresden.de                                       *
+        ********************************************************************************
+        <II> Current time: 2019/10/17 13:09:56
+        <II> Oog build: Oog_build_2012.04.17_14.16.48
+
+        <II> Working directory: . (/shared/metage2metabo/test/metabolic_data/)
+        <II> Graph file directories: [.]
+        <II> Output directory: test_out/svg
+        <II> Loading graph (targets_toy.bbl) ... 27ms
+        <II> Arrange Graph ... Exception in thread "PowerGraphArranger" java.lang.IndexOutOfBoundsException: Index 20 out of bounds for length 20
+            at java.base/jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:64)
+            at java.base/jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:70)
+            at java.base/jdk.internal.util.Preconditions.checkIndex(Preconditions.java:248)
+            at java.base/java.util.Objects.checkIndex(Objects.java:372)
+            at java.base/java.util.ArrayList.get(ArrayList.java:458)
+            at org.mattlab.eaglevista.graph.OogGraph.getID_(OogGraph.java:2703)
+            at org.mattlab.eaglevista.graph.OogPGArranger.arrangeRec(OogPGArranger.java:361)
+            at org.mattlab.eaglevista.graph.OogPGArranger.arrange(OogPGArranger.java:327)
+            at org.mattlab.eaglevista.graph.OogPGArranger.run(OogPGArranger.java:271)
+            at java.base/java.lang.Thread.run(Thread.java:834)
+        4001ms (15ms)
+        <II> Create SVG ... 469ms
+        <II> Image written (test_out/svg/targets_toy.bbl.svg)
+        --- Powergraph runtime 7.80 seconds ---
+
+        --- m2m_analysis runtime 14.56 seconds ---
+
+        --- Total runtime 21.06 seconds ---
+
+* files output
+    ::
+
+        output_directory
+        ├── json
+        │   ├── targets_toy.json
+        ├── gml
+        │   ├── targets_toy.gml
+        ├── bbl
+        │   ├── targets_toy.bbl
+        ├── svg
+        │   ├── targets_toy.bbl.svg
+        ├── key_species_stats.tsv
+        ├── key_species_supdata.tsv
+        ├── miscoto_stats.txt

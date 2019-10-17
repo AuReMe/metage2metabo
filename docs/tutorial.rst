@@ -343,58 +343,67 @@ It uses the following mandatory inputs (run ``m2m mincom --help`` for optional a
         Running minimal community selection
         Community scopes for all metabolic networks available in output_directory/community_analysis/comm_scopes.json
         ######### One minimal community #########
-        # One minimal community enabling to produce the target metabolites given as inputs
+        # One minimal community enabling the producibility of the target metabolites given as inputs
         Minimal number of bacteria in communities = 13
-        GCA_003437905
-        GCA_003437255
-        GCA_003437055
-        GCA_003437885
+        GCA_003437375
+        GCA_003437945
+        GCA_003437195
+        GCA_003437295
         GCA_003437815
         GCA_003437595
-        GCA_003437375
-        GCA_003438055
-        GCA_003437665
-        GCA_003437945
-        GCA_003437295
-        GCA_003437195
-        GCA_003437715
-        ######### Union of minimal communities #########
-        # Bacteria occurring in at least one minimal community enabling to produce the target metabolites given as inputs
-        Union of bacteria in minimal communities = 17
-        GCA_003437345
+        GCA_003437885
         GCA_003437905
+        GCA_003437715
         GCA_003437255
         GCA_003437055
+        GCA_003437665
+        GCA_003438055
+        ######### Keystone species: Union of minimal communities #########
+        # Bacteria occurring in at least one minimal community enabling the producibility of the target metabolites given as inputs
+        Keystone species = 17
+        GCA_003437195
         GCA_003437175
+        GCA_003437945
+        GCA_003437785
+        GCA_003437295
         GCA_003437885
+        GCA_003437715
+        GCA_003437345
+        GCA_003437255
+        GCA_003437375
         GCA_003437325
         GCA_003437815
         GCA_003437595
-        GCA_003437375
-        GCA_003438055
-        GCA_003437665
-        GCA_003437945
-        GCA_003437295
-        GCA_003437195
-        GCA_003437715
-        GCA_003437785
-        ######### Intersection of minimal communities #########
-        # Bacteria occurring in ALL minimal community enabling to produce the target metabolites given as inputs
-        Intersection of bacteria in minimal communities = 12
         GCA_003437905
-        GCA_003437255
         GCA_003437055
-        GCA_003437885
+        GCA_003437665
+        GCA_003438055
+        ######### Essential symbionts: Intersection of minimal communities #########
+        # Bacteria occurring in ALL minimal community enabling the producibility of the target metabolites given as inputs
+        Essential symbionts = 12
+        GCA_003437375
+        GCA_003437195
+        GCA_003437295
         GCA_003437815
         GCA_003437595
-        GCA_003437375
-        GCA_003438055
-        GCA_003437665
-        GCA_003437295
-        GCA_003437195
+        GCA_003437885
+        GCA_003437905
         GCA_003437715
+        GCA_003437255
+        GCA_003437055
+        GCA_003437665
+        GCA_003438055
+        ######### Alternative symbionts: Difference between Union and Intersection #########
+        # Bacteria occurring in at least one minimal community but not all minimal community enabling the producibility of the target metabolites given as inputs
+        Alternative symbionts = 5
+        GCA_003437325
+        GCA_003437345
+        GCA_003437175
+        GCA_003437945
+        GCA_003437785
 
-    This output gives the result of minimal community selection. It means that for producing the 119 metabolic targets, a minimum of 13 bacteria out of the 17 is required. One example of such minimal community is given. In addition, the whole space of solution is studied. All bacteria (17) occur in at least one minimal community. Finally, the intersection gives the following information: a set of 12 bacteria occurs in each minimal communtity. This means that these 12 bacteria are needed in any case, and that any of the remaining 5 bacteria can complete the missing function(s).
+
+    This output gives the result of minimal community selection. It means that for producing the 119 metabolic targets, a minimum of 13 bacteria out of the 17 is required. One example of such minimal community is given. In addition, the whole space of solution is studied. All bacteria (17) occur in at least one minimal community (keystone species). Finally, the intersection gives the following information: a set of 12 bacteria occurs in each minimal communtity. This means that these 12 bacteria are needed in any case (essential symbionts), and that any of the remaining 5 bacteria (alternative symbionts) can complete the missing function(s).
 * files outputs
     * As for other commands, a json file with the results is produced in ``output_directory/community_analysis/comm_scopes.json``
 
@@ -481,20 +490,23 @@ Optional arguments:
         Running minimal community selection
         Community scopes for all metabolic networks available in output_directory//community_analysis/comm_scopes.json
         ######### One minimal community #########
-        # One minimal community enabling to produce the target metabolites given as inputs
+        # One minimal community enabling the producibility of the target metabolites given as inputs
         Minimal number of bacteria in communities = 2
-        GCA_900318805
         GCA_900315385
-        ######### Union of minimal communities #########
-        # Bacteria occurring in at least one minimal community enabling to produce the target metabolites given as inputs
-        Union of bacteria in minimal communities = 2
         GCA_900318805
+        ######### Keystone species: Union of minimal communities #########
+        # Bacteria occurring in at least one minimal community enabling the producibility of the target metabolites given as inputs
+        Keystone species = 2
         GCA_900315385
-        ######### Intersection of minimal communities #########
-        # Bacteria occurring in ALL minimal community enabling to produce the target metabolites given as inputs
-        Intersection of bacteria in minimal communities = 2
         GCA_900318805
+        ######### Essential symbionts: Intersection of minimal communities #########
+        # Bacteria occurring in ALL minimal community enabling the producibility of the target metabolites given as inputs
+        Essential symbionts = 2
         GCA_900315385
+        GCA_900318805
+        ######### Alternative symbionts: Difference between Union and Intersection #########
+        # Bacteria occurring in at least one minimal community but not all minimal community enabling the producibility of the target metabolites given as inputs
+        Alternative symbionts = 0
 
 * files outputs
     * Numerous files are created in the output_directory

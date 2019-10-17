@@ -23,7 +23,7 @@ Therefore, the scope is computed following these two conditions:
 
 The computation of the scope in m2m is performed with logic programming: `Answer Set Programming <https://potassco.org/>`_.
 
-.. image:: scope.gif
+.. image:: images/scope.gif
    :width: 350pt
 
 In the example above, a small metabolic network consists of 5 reactions (squares) and 8 metabolites (circles).

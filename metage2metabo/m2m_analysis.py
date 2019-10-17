@@ -22,7 +22,6 @@ import json
 import miscoto
 import networkx as nx
 import os
-import powergrasp
 import sys
 import time
 import subprocess
@@ -72,12 +71,16 @@ def run_analysis_workflow(sbml_folder, target_folder_file, seed_file, output_dir
         oog_jar (str): path to OOG jar file
         host_file (str): metabolic network file for host
     """
-    json_file_folder = enumeration_analysis(seed_file, sbml_folder, target_folder_file, output_dir, host_file)
+    starttime = time.time()
 
-    gml_output = graph_analysis(json_file_folder, output_dir, target_folder_file, taxon_file)
+    json_file_folder = enumeration_analysis(sbml_folder, target_folder_file, seed_file, output_dir, host_file)
+
+    gml_output = graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file)
 
     powergraph_analysis(gml_output, output_dir, oog_jar)
 
+    logger.info(
+        "--- m2m_analysis runtime %.2f seconds ---\n" % (time.time() - starttime))
 
 def enumeration(sbml_folder, target_file, seed_file, output_json, host_file):
     """Run miscoto enumeration on one target file
@@ -98,6 +101,28 @@ def enumeration(sbml_folder, target_file, seed_file, output_json, host_file):
         enumeration=True, union=True,
         optsol=True, output_json=output_json)
 
+    # Give union of solutions
+    union = results['union_bacteria']
+    logger.info('######### Keystone species: Union of minimal communities #########')
+    logger.info("# Bacteria occurring in at least one minimal community enabling the producibility of the target metabolites given as inputs")
+    logger.info("Keystone species = " +
+                str(len(union)))
+    logger.info("\n".join(union))
+    # Give intersection of solutions
+    intersection = results['inter_bacteria']
+    logger.info('######### Essential symbionts: Intersection of minimal communities #########')
+    logger.info("# Bacteria occurring in ALL minimal community enabling the producibility of the target metabolites given as inputs")
+    logger.info("Essential symbionts = " +
+                str(len(intersection)))
+    logger.info("\n".join(intersection))
+    # Give keystones, essential and alternative symbionts
+    alternative_symbionts = list(set(union) - set(intersection))
+    logger.info('######### Alternative symbionts: Difference between Union and Intersection #########')
+    logger.info("# Bacteria occurring in at least one minimal community but not all minimal community enabling the producibility of the target metabolites given as inputs")
+    logger.info("Alternative symbionts = " +
+                str(len(alternative_symbionts)))
+    logger.info("\n".join(alternative_symbionts))
+
     return output_json
 
 
@@ -114,6 +139,8 @@ def enumeration_analysis(sbml_folder, target_folder_file, seed_file, output_dir,
     Returns:
         dict: {target_filename_without_extension: json_output_path}
     """
+    starttime = time.time()
+
     target_paths = file_or_folder(target_folder_file)
 
     output_jsons = output_dir + "/" + "json" + "/"
@@ -123,10 +150,14 @@ def enumeration_analysis(sbml_folder, target_folder_file, seed_file, output_dir,
 
     miscoto_jsons = {}
     for target_path in target_paths:
+        logger.info('######### Enumeration of solution for: '+ target_path + ' #########')
         target_pathname = target_paths[target_path]
         output_json = output_jsons + target_path + ".json"
         miscoto_json = enumeration(sbml_folder, target_pathname, seed_file, output_json, host_file)
         miscoto_jsons[target_path] = miscoto_json
+
+    logger.info(
+        "--- Enumeration runtime %.2f seconds ---\n" % (time.time() - starttime))
 
     return output_jsons
 
@@ -139,6 +170,8 @@ def stat_analysis(json_file_folder, output_dir, taxon_file=None):
         output_dir (str): results directory
         taxon_file (str): mpwt taxon file for species in sbml folder
     """
+    starttime = time.time()
+
     miscoto_stat_output = output_dir + "/" + "miscoto_stats.txt"
     key_species_stats_output = output_dir + "/" + "key_species_stats.tsv"
     key_species_supdata_output = output_dir + "/" + "key_species_supdata.tsv"
@@ -149,6 +182,9 @@ def stat_analysis(json_file_folder, output_dir, taxon_file=None):
         tree_output_file = output_dir + "/taxon_tree.txt"
         extract_taxa(taxon_file, phylum_output_file, tree_output_file)
         phylum_species, all_phylums = get_phylum(phylum_output_file)
+    else:
+        phylum_species = None
+        all_phylums = None
 
     with open(key_species_stats_output, "w") as key_stats_file, open(
         key_species_supdata_output, "w"
@@ -169,6 +205,9 @@ def stat_analysis(json_file_folder, output_dir, taxon_file=None):
 									str(len(json_elements["bacteria"])), str(len(json_elements["union_bacteria"])),
                     				str(len(json_elements["inter_bacteria"])), str(len(json_elements["enum_bacteria"]))])
 
+    logger.info(
+        "--- Stats runtime %.2f seconds ---\n" % (time.time() - starttime))
+
 
 def graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file):
     """Run the graph creation on miscoto output
@@ -182,6 +221,8 @@ def graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file)
     Returns:
         str: path to folder containing gml results
     """
+    starttime = time.time()
+
     target_paths = file_or_folder(target_folder_file)
     json_paths = file_or_folder(json_file_folder)
 
@@ -192,8 +233,13 @@ def graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file)
         tree_output_file = output_dir + "/taxon_tree.txt"
         if not os.path.exists(phylum_output_file):
             extract_taxa(taxon_file, phylum_output_file, tree_output_file)
+    else:
+        phylum_output_file = None
 
     create_gml(json_paths, target_paths, output_dir, phylum_output_file)
+
+    logger.info(
+        "--- Graph runtime %.2f seconds ---\n" % (time.time() - starttime))
 
     return gml_output
 
@@ -206,6 +252,8 @@ def powergraph_analysis(gml_file_folder, output_dir, oog_jar):
         output_dir (str): results directory
         oog_jar (str): path to OOG jar file
     """
+    starttime = time.time()
+
     gml_paths = file_or_folder(gml_file_folder)
 
     bbl_path = output_dir + "/" + "bbl" + "/"
@@ -223,8 +271,12 @@ def powergraph_analysis(gml_file_folder, output_dir, oog_jar):
         bbl_output = bbl_path + gml_path + ".bbl"
         svg_output = svg_path + gml_path + ".svg"
         gml_input = gml_paths[gml_path]
+        logger.info('######### Graph compression: ' + gml_path + ' #########')
         compression(gml_input, bbl_output)
         bbl_to_svg(oog_jar, bbl_output, svg_path)
+
+    logger.info(
+        "--- Powergraph runtime %.2f seconds ---\n" % (time.time() - starttime))
 
 
 def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file):
@@ -367,9 +419,9 @@ def create_stat_species(target_category, json_elements, keystone_stats_writer, k
             keystone_sup_writer.writerow([target_category, "essential_symbionts", phylum] + essential_symbionts[phylum])
             keystone_sup_writer.writerow([target_category, "alternative_symbionts", phylum] + alternative_symbionts[phylum])
     else:
-        keystone_sup_writer.writerow([target_category, "key_stone_species", "data"] + key_stone_species[phylum])
-        keystone_sup_writer.writerow([target_category, "essential_symbionts", "data"] + essential_symbionts[phylum])
-        keystone_sup_writer.writerow([target_category, "alternative_symbionts", "data"] + alternative_symbionts[phylum])
+        keystone_sup_writer.writerow([target_category, "key_stone_species", "data"] + key_stone_species["data"])
+        keystone_sup_writer.writerow([target_category, "essential_symbionts", "data"] + essential_symbionts["data"])
+        keystone_sup_writer.writerow([target_category, "alternative_symbionts", "data"] + alternative_symbionts["data"])
 
 
 def get_phylum(phylum_file):
@@ -422,6 +474,9 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
 
     if taxon_file:
         phylum_named_species, all_phylums = get_phylum(taxon_file)
+    else:
+        phylum_named_species = None
+        all_phylums = None
 
     with open(key_species_stats_output, "w") as key_stats_file, open(key_species_supdata_output, "w") as key_sup_file, open(miscoto_stat_output, "w") as stats_output:
         keystone_stats_writer = csv.writer(key_stats_file, delimiter="\t")
@@ -477,7 +532,9 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
             statswriter.writerow([target_category, str(len_target[target_category]), str(len_min_sol[target_category]),
                                     str(len_union[target_category]), str(len_intersection[target_category]),
                                     str(len_solution[target_category])])
-
+            logger.info('######### Graph of ' + target_category + ' #########')
+            logger.info('Number of nodes: ' + str(G.number_of_nodes()))
+            logger.info('Number of edges: ' + str(G.number_of_edges()))
             nx.write_gml(G, gml_output + "/" + target_category + ".gml")
 
 
@@ -488,9 +545,18 @@ def compression(gml_input, bbl_output):
         gml_input (str): gml file
         bbl_output (str): bbl output file
     """
+    import powergrasp
+    from bubbletools import BubbleTree
+
+    powernodes = 0
+    poweredges = 0
     with open(bbl_output, "w") as fd:
         for line in powergrasp.compress_by_cc(gml_input):
             fd.write(line + "\n")
+
+    tree = BubbleTree.from_bubble_file(bbl_output)
+    logger.info('Number of powernodes: ' + str(len([powernode for powernode in tree.powernodes()])))
+    logger.info('Number of poweredges: ' + str(tree.edge_number()))
 
 
 def bbl_to_svg(oog_jar, bbl_input, svg_output):

@@ -102,7 +102,8 @@ def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clea
                                             padmet_bool, sbml_level, nb_cpu)
 
     output_stat_file = out_dir + '/' + 'recon_stats.tsv'
-    analyze_recon(sbml_dir, out_dir, output_stat_file, padmet_bool, nb_cpu)
+    padmet_folder = out_dir + '/padmet/'
+    analyze_recon(sbml_dir, output_stat_file, padmet_folder, padmet_bool, nb_cpu)
 
     logger.info(
         "--- Recon runtime %.2f seconds ---\n" % (time.time() - starttime))
@@ -205,24 +206,31 @@ def mincom(instance_w_targets, out_dir):
     for bact in all_results['bacteria']:
         one_sol_bact.append(bact)
     logger.info('######### One minimal community #########')
-    logger.info("# One minimal community enabling to produce the target metabolites given as inputs")
+    logger.info("# One minimal community enabling the producibility of the target metabolites given as inputs")
     logger.info("Minimal number of bacteria in communities = " +
                 str(len(one_sol_bact)))
     logger.info("\n".join(one_sol_bact))
     # Give union of solutions
     union = all_results['union_bacteria']
-    logger.info('######### Union of minimal communities #########')
-    logger.info("# Bacteria occurring in at least one minimal community enabling to produce the target metabolites given as inputs")
-    logger.info("Union of bacteria in minimal communities = " +
+    logger.info('######### Keystone species: Union of minimal communities #########')
+    logger.info("# Bacteria occurring in at least one minimal community enabling the producibility of the target metabolites given as inputs")
+    logger.info("Keystone species = " +
                 str(len(union)))
     logger.info("\n".join(union))
     # Give intersection of solutions
     intersection = all_results['inter_bacteria']
-    logger.info('######### Intersection of minimal communities #########')
-    logger.info("# Bacteria occurring in ALL minimal community enabling to produce the target metabolites given as inputs")
-    logger.info("Intersection of bacteria in minimal communities = " +
+    logger.info('######### Essential symbionts: Intersection of minimal communities #########')
+    logger.info("# Bacteria occurring in ALL minimal community enabling the producibility of the target metabolites given as inputs")
+    logger.info("Essential symbionts = " +
                 str(len(intersection)))
     logger.info("\n".join(intersection))
+    # Give keystones, essential and alternative symbionts
+    alternative_symbionts = list(set(union) - set(intersection))
+    logger.info('######### Alternative symbionts: Difference between Union and Intersection #########')
+    logger.info("# Bacteria occurring in at least one minimal community but not all minimal community enabling the producibility of the target metabolites given as inputs")
+    logger.info("Alternative symbionts = " +
+                str(len(alternative_symbionts)))
+    logger.info("\n".join(alternative_symbionts))
     logger.info(
         "--- Mincom runtime %.2f seconds ---\n" % (time.time() - starttime))
 
@@ -293,16 +301,14 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
 
 
 def create_padmet_stat(species_name, padmet_file):
-    """
-    Count reactions/pathways/compounds/genes in a padmet file.
-    Parameters
-    ----------
-    padmet_file: str
-        path to a padmet file
+    """Extract reactions/pathways/compounds/genes from a padmet file.
+
+    Args:
+        species_name (str): species names
+        padmet_file (str): path to a padmet file
+
     Returns
-    -------
-    list:
-        [path to padmet, number of pathways, number of reactions, number of genes, number of compounds]
+        list: [species name, list of genes, list of reactions, list of reactions associated with genes, list of compounds, list of pathways]
     """
     padmetSpec = PadmetSpec(padmet_file)
 
@@ -328,6 +334,15 @@ def create_padmet_stat(species_name, padmet_file):
 
 
 def create_sbml_stat(species_name, sbml_file):
+    """Extract reactions/pathways/compounds/genes from a sbml file.
+
+    Args:
+        species_name (str): species names
+        sbml_file (str): path to a sbml file
+
+    Returns
+        list: [species name, list of genes, list of reactions, list of reactions associated with genes, list of compounds]
+    """
     tree = etree.parse(sbml_file)
     sbml = tree.getroot()
     genes = []
@@ -363,14 +378,33 @@ def create_sbml_stat(species_name, sbml_file):
 
 
 def mean_sd_data(datas):
+    """Compute the mean and standard deviation from a list.
+
+    Args:
+        datas (list): list of integer/float
+
+    Returns
+        mean_data (float): mean of the list
+        sd_data (flaot): standard deviation of the lsit
+    """
     mean_data = "{0:.2f}".format(statistics.mean(datas))
     sd_data = "(+/- {0:.2f})".format(statistics.stdev(datas))
+
     return mean_data, sd_data
 
-def analyze_recon(sbml_folder, out_dir, output_stat_file, padmet_bool=None, nb_cpu=1):
+def analyze_recon(sbml_folder, output_stat_file, padmet_folder, padmet_bool=None, nb_cpu=1):
+    """Analyze the sbml and/or the padmet files after metabolic network reconstruction.
+    And write the result in a file.
+
+    Args:
+        sbml_folder (str): directory of SBML files
+        output_stat_file (str): path to output stat file
+        padmet_folder (str): directory of PADMET files
+        padmet_bool (bool): use or not the padmet files
+        nb_cpu (int): number of CPU to use
+    """
     analyze_pool = Pool(processes=nb_cpu)
     if padmet_bool:
-        padmet_folder = out_dir + '/padmet/'
         genes = {}
         reactions = {}
         gene_associated_reactions = {}
