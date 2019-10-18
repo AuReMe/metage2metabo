@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbml xmlns="http://www.sbml.org/sbml/level2" level="2" version="1">
+  <model>
+    <listOfSpecies>
+      <species id="M_NAD_c" name="NAD" compartment="c" boundaryCondition="false"/>
+      <species id="M_NADP_c" name="NADP" compartment="c" boundaryCondition="false"/>
+      <species id="M_ADP_c" name="ADP" compartment="c" boundaryCondition="false"/>
+      <species id="M_ETOH_c" name="ETOH" compartment="c"/>
+      <species id="M_WATER_c" name="WATER" compartment="c"/>
+      <species id="M_CPD1F__45__129_c" name="CPD1F-129" compartment="c"/>
+      <species id="M_Retinols_c" name="Retinols" compartment="c"/>
+      <species id="M_THIAMINE_c" name="THIAMINE" compartment="c"/>
+      <species id="M_ADENOSYLCOBALAMIN_c" name="ADENOSYLCOBALAMIN" compartment="c"/>
+      <species id="M_RIBOFLAVIN_c" name="RIBOFLAVIN" compartment="c"/>
+      <species id="M_NIACINE_c" name="NIACINE" compartment="c"/>
+      <species id="M_NIACINAMIDE_c" name="NIACINAMIDE" compartment="c"/>
+      <species id="M_PYRIDOXAMINE_c" name="PYRIDOXAMINE" compartment="c"/>
+      <species id="M_PYRIDOXINE_c" name="PYRIDOXINE" compartment="c"/>
+      <species id="M_PYRIDOXAL_c" name="PYRIDOXAL" compartment="c"/>
+      <species id="M_BIOTIN_c" name="BIOTIN" compartment="c"/>
+      <species id="M_10__45__FORMYL__45__THF_c" name="10-FORMYL-THF" compartment="c"/>
+      <species id="M_5__45__METHYL__45__THF_c" name="5-METHYL-THF" compartment="c"/>
+      <species id="M_THF_c" name="THF" compartment="c"/>
+      <species id="M_VITAMIN_D3_c" name="VITAMIN_D3" compartment="c"/>
+      <species id="M_ALPHA__45__TOCOPHEROL_c" name="ALPHA-TOCOPHEROL" compartment="c"/>
+      <species id="M_2__45__METHYL__45__3__45__PHYTYL__45__14__45__NAPHTHOQUINONE_c" name="2-METHYL-3-PHYTYL-14-NAPHTHOQUINONE" compartment="c"/>
+      <species id="M_CA__43__2_c" name="CA+2" compartment="c"/>
+      <species id="M_K__43___c" name="K+" compartment="c"/>
+      <species id="M_MG__43__2_c" name="MG+2" compartment="c"/>
+      <species id="M_NA__43___c" name="NA+" compartment="c"/>
+      <species id="M_Pi_c" name="Pi" compartment="c"/>
+      <species id="M_CU__43__2_c" name="CU+2" compartment="c"/>
+      <species id="M_FE__43__2_c" name="FE+2" compartment="c"/>
+      <species id="M_FE__43__3_c" name="FE+3" compartment="c"/>
+      <species id="M_MN__43__2_c" name="MN+2" compartment="c"/>
+      <species id="M_ZN__43__2_c" name="ZN+2" compartment="c"/>
+      <species id="M_MANNITOL_c" name="MANNITOL" compartment="c"/>
+      <species id="M_XYLITOL_c" name="XYLITOL" compartment="c"/>
+      <species id="M_CPD__45__15972_c" name="CPD-15972" compartment="c"/>
+      <species id="M_MALTOSE_c" name="MALTOSE" compartment="c"/>
+      <species id="M_SUCROSE_c" name="SUCROSE" compartment="c"/>
+      <species id="M_D__45__galactopyranose_c" name="D-galactopyranose" compartment="c"/>
+      <species id="M_L__45__ALPHA__45__ALANINE_c" name="L-ALPHA-ALANINE" compartment="c"/>
+      <species id="M_ARG_c" name="ARG" compartment="c"/>
+      <species id="M_L__45__ASPARTATE_c" name="L-ASPARTATE" compartment="c"/>
+      <species id="M_CYS_c" name="CYS" compartment="c"/>
+      <species id="M_GLT_c" name="GLT" compartment="c"/>
+      <species id="M_GLY_c" name="GLY" compartment="c"/>
+      <species id="M_URATE_c" name="URATE" compartment="c"/>
+      <species id="M_HIS_c" name="HIS" compartment="c"/>
+      <species id="M_ILE_c" name="ILE" compartment="c"/>
+      <species id="M_LEU_c" name="LEU" compartment="c"/>
+      <species id="M_LYS_c" name="LYS" compartment="c"/>
+      <species id="M_MET_c" name="MET" compartment="c"/>
+      <species id="M_PHE_c" name="PHE" compartment="c"/>
+      <species id="M_PRO_c" name="PRO" compartment="c"/>
+      <species id="M_SER_c" name="SER" compartment="c"/>
+      <species id="M_THR_c" name="THR" compartment="c"/>
+      <species id="M_TRP_c" name="TRP" compartment="c"/>
+      <species id="M_TYR_c" name="TYR" compartment="c"/>
+      <species id="M_VAL_c" name="VAL" compartment="c"/>
+      <species id="M_CPD__45__3617_c" name="CPD-3617" compartment="c"/>
+      <species id="M_DODECANOATE_c" name="DODECANOATE" compartment="c"/>
+      <species id="M_CPD__45__7836_c" name="CPD-7836" compartment="c"/>
+      <species id="M_CPD__45__8462_c" name="CPD-8462" compartment="c"/>
+      <species id="M_PALMITATE_c" name="PALMITATE" compartment="c"/>
+      <species id="M_CPD__45__7830_c" name="CPD-7830" compartment="c"/>
+      <species id="M_STEARIC_ACID_c" name="STEARIC_ACID" compartment="c"/>
+      <species id="M_OLEATE__45__CPD_c" name="OLEATE-CPD" compartment="c"/>
+      <species id="M_ARACHIDIC_ACID_c" name="ARACHIDIC_ACID" compartment="c"/>
+      <species id="M_ARACHIDONIC_ACID_c" name="ARACHIDONIC_ACID" compartment="c"/>
+      <species id="M_CPD__45__17322_c" name="CPD-17322" compartment="c"/>
+      <species id="M_BUTYRIC_ACID_c" name="BUTYRIC_ACID" compartment="c"/>
+      <species id="M_CPD__45__195_c" name="CPD-195" compartment="c"/>
+      <species id="M_CHOLESTEROL_c" name="CHOLESTEROL" compartment="c"/>
+      <species id="M_CPD__45__9245_c" name="CPD-9245" compartment="c"/>
+      <species id="M_TETRACOSANOATE_c" name="TETRACOSANOATE" compartment="c"/>
+      <species id="M_CPD__45__12826_c" name="CPD-12826" compartment="c"/>
+      <species id="M_CPD__45__387_c" name="CPD-387" compartment="c"/>
+      <species id="M_CELLULOSE_c" name="CELLULOSE" compartment="c"/>
+      <species id="M_CPD__45__17188_c" name="CPD-17188" compartment="c"/>
+      <species id="M_LINOLEIC_ACID_c" name="LINOLEIC_ACID" compartment="c"/>
+      <species id="M_CPD__45__13792_c" name="CPD-13792" compartment="c"/>
+      <species id="M_Starch_c" name="Starch" compartment="c"/>
+      <species id="M_ASCORBATE_c" name="ASCORBATE" compartment="c"/>
+      <species id="M_CPD__45__12189_c" name="CPD-12189" compartment="c"/>
+      <species id="M_CPD__45__12653_c" name="CPD-12653" compartment="c"/>
+      <species id="M_BETA__45__D__45__FRUCTOSE_c" name="BETA-D-FRUCTOSE" compartment="c"/>
+      <species id="M_PANTOTHENATE_c" name="PANTOTHENATE" compartment="c"/>
+      <species id="M_DOCOSANOATE_c" name="DOCOSANOATE" compartment="c"/>
+      <species id="M_CPD__45__14292_c" name="CPD-14292" compartment="c"/>
+      <species id="M_LINOLENIC_ACID_c" name="LINOLENIC_ACID" compartment="c"/>
+      <species id="M_CL__45___c" name="CL-" compartment="c"/>
+      <species id="M_SORBITOL_c" name="SORBITOL" compartment="c"/>
+      <species id="M_CPD0__45__2208_c" name="CPD0-2208" compartment="c"/>
+      <species id="M_GLC_c" name="GLC" compartment="c"/>
+      <species id="M_CPD__45__10244_c" name="CPD-10244" compartment="c"/>
+    </listOfSpecies>
+  </model>
+</sbml>
