@@ -387,8 +387,13 @@ def mean_sd_data(datas):
         mean_data (float): mean of the list
         sd_data (flaot): standard deviation of the lsit
     """
-    mean_data = "{0:.2f}".format(statistics.mean(datas))
-    sd_data = "(+/- {0:.2f})".format(statistics.stdev(datas))
+    if len(datas) >1:
+        mean_data = "{0:.2f}".format(statistics.mean(datas))
+        sd_data = "(+/- {0:.2f})".format(statistics.stdev(datas))
+    else:
+        logger.info("No mean and standard deviation on one sample.")
+        mean_data = None
+        sd_data = None
 
     return mean_data, sd_data
 
@@ -470,27 +475,47 @@ def analyze_recon(sbml_folder, output_stat_file, padmet_folder, padmet_bool=None
     logger.info("Number of compounds in all GSMN: " + str(len(dataset_all_compounds)))
 
     species_reactions = [len(reactions[species_name]) for species_name in reactions]
-    mean_species_reactions, sd_species_reactions = mean_sd_data(species_reactions)
-    logger.info("Average reactions per GSMN: " + mean_species_reactions + sd_species_reactions)
+    if len(species_reactions) > 1:
+        mean_species_reactions, sd_species_reactions = mean_sd_data(species_reactions)
+        if mean_species_reactions and sd_species_reactions:
+            logger.info("Average reactions per GSMN: " + mean_species_reactions + sd_species_reactions)
+    else:
+        logger.info("Number of reactions in GSMN: " + str(species_reactions[0]))
 
     species_compounds = [len(compounds[species_name]) for species_name in compounds]
-    mean_species_compounds, sd_species_compounds = mean_sd_data(species_compounds)
-    logger.info("Average compounds per GSMN: " + mean_species_compounds + sd_species_compounds)
+    if len(species_compounds) > 1:
+        mean_species_compounds, sd_species_compounds = mean_sd_data(species_compounds)
+        if mean_species_compounds and sd_species_compounds:
+            logger.info("Average compounds per GSMN: " + mean_species_compounds + sd_species_compounds)
+    else:
+        logger.info("Number of compounds in GSMN: " + str(species_compounds[0]))
 
     species_genes = [len(genes[species_name]) for species_name in genes]
-    mean_species_genes, sd_species_genes = mean_sd_data(species_genes)
-    logger.info("Average genes per GSMN: " + mean_species_genes + sd_species_genes)
+    if len(species_genes) > 1:
+        mean_species_genes, sd_species_genes = mean_sd_data(species_genes)
+        if mean_species_genes and sd_species_genes:
+            logger.info("Average genes per GSMN: " + mean_species_genes + sd_species_genes)
+    else:
+        logger.info("Number of genes in GSMN: " + str(species_genes[0]))
 
     if pathways:
         species_pathways = [len(pathways[species_name]) for species_name in pathways]
-        mean_species_pathways, sd_species_pathways = mean_sd_data(species_pathways)
-        logger.info("Average pathways per GSMN: " + mean_species_pathways + sd_species_pathways)
+        if len(species_pathways) > 1:
+            mean_species_pathways, sd_species_pathways = mean_sd_data(species_pathways)
+            if mean_species_pathways and sd_species_pathways:
+                logger.info("Average pathways per GSMN: " + mean_species_pathways + sd_species_pathways)
+        else:
+            logger.info("Number of pathways in GSMN: " + str(species_pathways[0]))
 
     gene_reactions_assoc_percentages = []
     for species_name in reactions:
         gene_reactions_assoc_percentages.append(((len(gene_associated_reactions[species_name]) / len(reactions[species_name]))*100))
-    mean_gene_reactions_assoc_percentages, sd_gene_reactions_assoc_percentages = mean_sd_data(gene_reactions_assoc_percentages)
-    logger.info('Percentage of reactions associated with genes: ' + mean_gene_reactions_assoc_percentages + sd_gene_reactions_assoc_percentages)
+    if len(gene_reactions_assoc_percentages) > 1:
+        mean_gene_reactions_assoc_percentages, sd_gene_reactions_assoc_percentages = mean_sd_data(gene_reactions_assoc_percentages)
+        if mean_gene_reactions_assoc_percentages and sd_gene_reactions_assoc_percentages:
+            logger.info('Percentage of reactions associated with genes: ' + mean_gene_reactions_assoc_percentages + sd_gene_reactions_assoc_percentages)
+    else:
+        logger.info('Percentage of reactions associated with genes: ' + str(gene_reactions_assoc_percentages[0]))
 
 
 def indiv_scope_run(sbml_dir, seeds, output_dir):
