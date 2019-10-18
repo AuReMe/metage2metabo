@@ -11,7 +11,7 @@ python:
 # Install packages
 before_script:
 - python3 setup.py develop
-- pip install networkx
+- pip install networkx ete3
 - cd test
 
 script:
