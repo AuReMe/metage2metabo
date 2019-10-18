@@ -16,6 +16,7 @@ RUN apt-get -y update && \
     libxm4 \
     python3.6-dev \
     python3.6-distutils \
+    default-jre \
     iputils-ping \
     gnome-terminal;\
     apt-get clean;\
@@ -24,12 +25,16 @@ RUN apt-get -y update && \
 
 # Copy the Pathway-Tools installer into the docker.
 COPY pathway-tools-23.0-linux-64-tier1-install /tmp/
+COPY Oog.jar /tmp
 
 # Install silently Pathway-Tools in /programs/pathway-tools and clean folder.
 RUN mkdir programs;\
     chmod u+x /tmp/pathway-tools-23.0-linux-64-tier1-install;\
     ./tmp/pathway-tools-23.0-linux-64-tier1-install --InstallDir /programs/pathway-tools --PTOOLS_LOCAL_PATH /root --InstallDesktopShortcuts 0 --mode unattended;\
     echo 'export PATH="$PATH:/programs/pathway-tools:"' >> ~/.bashrc;\
+    mv /tmp/Oog.jar /programs;\
+    echo 'export PATH="$PATH:/programs/Oog.jar:"' >> ~/.bashrc;\
+    echo 'export PYTHONIOENCODING=utf8' >> ~/.bashrc;\
     rm /tmp/pathway-tools-23.0-linux-64-tier1-install;\
     rm -rf /tmp/* /var/tmp/*
 

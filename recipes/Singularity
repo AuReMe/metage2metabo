@@ -3,9 +3,12 @@ From: ubuntu:18.04
 
 %files
      pathway-tools-23.0-linux-64-tier1-install /tmp
+     Oog.jar /tmp
 
 %environment
      export PATH="$PATH:/programs/pathway-tools:"
+     export PATH="$PATH:/programs/Oog.jar:"
+     export PYTHONIOENCODING=utf8
 
 %post
      apt-get -y update && \
@@ -17,11 +20,13 @@ From: ubuntu:18.04
      libxm4 \
      python3.6-dev \
      python3.6-distutils \
+     default-jre \
      iputils-ping \
      gnome-terminal;\
      apt-get clean; \
      apt-get purge; \
-     mkdir programs;\
+     mkdir /programs;\
+     mv /tmp/Oog.jar /programs;\
      mkdir -p /external/folder;\
      chmod u+x /tmp/pathway-tools-23.0-linux-64-tier1-install;\
      ./tmp/pathway-tools-23.0-linux-64-tier1-install --InstallDir /programs/pathway-tools --PTOOLS_LOCAL_PATH /external/folder --InstallDesktopShortcuts 0 --mode unattended;\

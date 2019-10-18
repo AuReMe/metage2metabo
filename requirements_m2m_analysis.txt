@@ -15,11 +15,11 @@ future==0.17.1
 gffutils==0.9
 graphviz==0.13
 importlib-metadata==0.17
-MeneTools==2.0.1
-Miscoto==2.0.5
+MeneTools>=2.0.2
+Miscoto>=2.0.5
 more-itertools==7.0.0
 mpmath==1.1.0
-mpwt==0.5.1
+mpwt>=0.5.2
 networkx==2.3
 numpy==1.16.4
 optlang==1.4.4
