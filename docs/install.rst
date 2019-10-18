@@ -78,7 +78,7 @@ Installation with pip
 Installation with Docker
 ========================
 
-To create the m2m image, use the Dockerfile found in `Recipes <https://github.com/AuReMe/metage2metabo/tree/master/recipes>`__ of the Github repository. Note that the Pathway-Tools installer needs to be placed in the same folder than the Dockerfile.
+To create the m2m image, use the Dockerfile found in `Recipes <https://github.com/AuReMe/metage2metabo/tree/master/recipes>`__ of the Github repository. Note that the **Pathway-Tools installer** and the **Oog.jar file** need to be placed in the same folder than the Dockerfile.
 The name of the installer file is currently hardcoded in the Dockerfile. Hence it must be changed if you use a different version of Pathway-Tools. Please note that the following commands (especially due to the use of root privileges) apply to Linux OS.
 
 .. code:: sh
@@ -111,7 +111,7 @@ The Singularity image has to be created from the recipe. You might need to do it
 To use the image on a cluster, the path to Pathway Tools ptools folder should be indicated in the recipe. Therefore, you have to replace '/external/folder/ptools' with the path where you want to put the ptools-local folder (which will contain the PGDB created by Pathway-Tools).
 
 Like for the Dockerfile, Pathway-Tools installer is hardcoded in the recipe so if you use another version, you have to modify the recipe.
-And the installer must be stored in the same folder than the Singularity recipe.
+And the **Pathway Tools installer** and **Oog.jar file** must be stored in the same folder than the Singularity recipe.
 
 To create the image named m2m.sif:
 
