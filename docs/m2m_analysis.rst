@@ -136,8 +136,8 @@ You can use the `taxon file from gut experience <https://github.com/AuReMe/metag
         output_directory
         ├── gml
         │   ├── targets_toy.gml
-        ├── key_species_stats.tsv
-        ├── key_species_supdata.tsv
+        ├── keystone_species_stats.tsv
+        ├── keystone_species_supdata.tsv
         ├── miscoto_stats.txt
 
 m2m_analysis powergraph
@@ -373,6 +373,6 @@ It uses the following mandatory inputs (run ``m2m_analysis workflow --help`` for
         │   ├── targets_toy.bbl
         ├── svg
         │   ├── targets_toy.bbl.svg
-        ├── key_species_stats.tsv
-        ├── key_species_supdata.tsv
+        ├── keystone_species_stats.tsv
+        ├── keystone_species_supdata.tsv
         ├── miscoto_stats.txt

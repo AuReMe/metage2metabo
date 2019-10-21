@@ -19,10 +19,10 @@ metage2metabo is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.\n
 """
 MESSAGE = """
-Detection of key species among communities.
+Detection of keystone species among communities.
 """
 REQUIRES = """
-Oog jar file (http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-command-line-tool.html) for powergraph visualization.
+Requires: Oog jar file (http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-command-line-tool.html) for powergraph visualization.
 """
 
 root_logger = logging.getLogger()
@@ -44,7 +44,7 @@ def main():
     parser = argparse.ArgumentParser(
         "m2m_analysis",
         description=MESSAGE + " For specific help on each subcommand use: m2m_analysis {cmd} --help",
-        epilog=REQUIRES
+        epilog=REQUIRES, formatter_class=argparse.RawTextHelpFormatter
     )
     parser.add_argument(
         "-v",
@@ -150,12 +150,12 @@ def main():
     )
     stat_parser = subparsers.add_parser(
         "stats",
-        help="statistics on key species",
+        help="statistics on keystone species",
         parents=[
             parent_parser_j, parent_parser_o, parent_parser_taxon, parent_parser_q
         ],
         description=
-        "Compute statistics on key species in the community"
+        "Compute statistics on keystone species in the community"
     )
     graph_parser = subparsers.add_parser(
         "graph",
@@ -181,7 +181,7 @@ def main():
             parent_parser_taxon, parent_parser_q
         ],
         description=
-        "Run the whole workflow: miscoto enumeration, statistics on key species, graph on solution and powergraph creation"
+        "Run the whole workflow: miscoto enumeration, statistics on keystone species, graph on solution and powergraph creation"
     )
 
     args = parser.parse_args()

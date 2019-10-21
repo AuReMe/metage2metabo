@@ -21,7 +21,7 @@ MESSAGE = """
 From metabolic network reconstruction with annotated genomes to metabolic capabilities screening to identify organisms of interest in a large microbiota.
 """
 REQUIRES = """
-Pathway Tools installed and in $PATH, and NCBI Blast
+Requires: Pathway Tools installed and in $PATH, and NCBI Blast
 """
 
 root_logger = logging.getLogger()

@@ -23,6 +23,8 @@ m2m can be used as a whole workflow ( ``` m2m workflow ``` ) or steps can be per
     - [m2m mincom](#m2m-mincom)
     - [m2m workflow](#m2m-workflow)
     - [m2m seeds](#m2m-seeds)
+    - [m2m test](#m2m-test)
+  - [Analysis of the minimal solutions](#analysis-of-the-minimal-solutions)
   - [Additional features](#additional-features)
   - [Citation](#citation)
   - [Authors](#authors)
@@ -123,7 +125,7 @@ There is NO WARRANTY, to the extent permitted by law.
 
 
 usage: m2m [-h] [-v]
-           {recon,iscope,cscope,addedvalue,mincom,seeds,workflow} ...
+           {recon,iscope,cscope,addedvalue,mincom,seeds,workflow,test} ...
 
 From metabolic network reconstruction with annotated genomes to metabolic
 capabilities screening to identify organisms of interest in a large
@@ -136,7 +138,7 @@ optional arguments:
 subcommands:
   valid subcommands:
 
-  {recon,iscope,cscope,addedvalue,mincom,seeds,workflow}
+  {recon,iscope,cscope,addedvalue,mincom,seeds,workflow,test}
     recon               metabolic network reconstruction
     iscope              individual scope computation
     cscope              community scope computation
@@ -145,33 +147,34 @@ subcommands:
     mincom              minimal communtity selection
     seeds               creation of seeds SBML file
     workflow            whole workflow
+    test                test on sample data from rumen experiments
 
-Requirements here Pathway Tools installed and in $PATH, and NCBI Blast
+Requires: Pathway Tools installed and in $PATH, and NCBI Blast
 ````
 
 ### m2m recon
 
 ````
-usage: m2m recon [-h] -g GENOMES [--clean] -o OUPUT_DIR [-c CPU] [-q]
-              [-l {2,3}] [--noorphan]
+usage: m2m recon [-h] -g GENOMES -o OUPUT_DIR [-c CPU] [-q] [-l {2,3}]
+                 [--noorphan] [-p] [--clean]
 
 Run metabolic network reconstruction for each annotated genome of the input
 directory, using Pathway Tools
 
-  optional arguments:
+optional arguments:
   -h, --help            show this help message and exit
   -g GENOMES, --genomes GENOMES
-                          annotated genomes directory
-  --clean               clean PGDBs if already present
+                        annotated genomes directory
   -o OUPUT_DIR, --out OUPUT_DIR
-                          output directory path
+                        output directory path
   -c CPU, --cpu CPU     cpu number for multi-process
   -q, --quiet           quiet mode
   -l {2,3}, --level {2,3}
-                          Level for SBML creation, 2 or 3
+                        Level for SBML creation, 2 or 3
   --noorphan            use this option to ignore reactions without gene or
-                          protein association
-
+                        protein association
+  -p, --padmet          create padmet files
+  --clean               clean PGDBs if already present
 ````
 
 ### m2m iscope
@@ -219,6 +222,9 @@ optional arguments:
 ### m2m addedvalue
 
 ````
+usage: m2m addedvalue [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR
+                      [-m MODELHOST] [-c CPU] [-q]
+
 Compute metabolites that are reachable by the community/microbiota and not by
 individual organisms
 
@@ -263,8 +269,8 @@ optional arguments:
 ### m2m workflow
 
 ````
-usage: m2m workflow [-h] -g GENOMES [--clean] -s SEEDS [-m MODELHOST] -o
-                    OUPUT_DIR [-c CPU] [-q] [--noorphan]
+usage: m2m workflow [-h] -g GENOMES -s SEEDS [-m MODELHOST] -o OUPUT_DIR
+                    [-c CPU] [-q] [--noorphan] [-p] [--clean]
 
 Run the whole workflow: metabolic network reconstruction, individual and
 community scope analysis and community selection
@@ -273,7 +279,6 @@ optional arguments:
   -h, --help            show this help message and exit
   -g GENOMES, --genomes GENOMES
                         annotated genomes directory
-  --clean               clean PGDBs if already present
   -s SEEDS, --seeds SEEDS
                         seeds (growth medium) for metabolic analysis
   -m MODELHOST, --modelhost MODELHOST
@@ -284,6 +289,8 @@ optional arguments:
   -q, --quiet           quiet mode
   --noorphan            use this option to ignore reactions without gene or
                         protein association
+  -p, --padmet          create padmet files
+  --clean               clean PGDBs if already present
 ````
 
 ### m2m seeds
@@ -302,6 +309,50 @@ optional arguments:
   --metabolites METABOLITES
                         metabolites file: one per line, encoded (XXX as in
                         <species id="XXXX" .../> of SBML files)
+````
+
+### m2m test
+
+````
+usage: m2m test [-h] [-q] [-c CPU] -o OUPUT_DIR
+
+Test the whole workflow on a data sample
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -q, --quiet           quiet mode
+  -c CPU, --cpu CPU     cpu number for multi-process
+  -o OUPUT_DIR, --out OUPUT_DIR
+                        output directory path
+````
+
+## Analysis of the minimal solutions
+
+M2M performs a community minimization to find the union and intersection of the minimal communities. But it is possible to analyze all the minimal communities.
+M2M has a second command-line, named m2m_analysis that performs this analysis. This method is slower than m2m as all sollutions are enumerated.
+Then it creates a solutions graph and compresses it in a powergraph.
+
+````
+usage: m2m_analysis [-h] [-v] {enum,stats,graph,powergraph,workflow} ...
+
+Detection of keystone species among communities.
+ For specific help on each subcommand use: m2m_analysis {cmd} --help
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --version         show program's version number and exit
+
+subcommands:
+  valid subcommands:
+
+  {enum,stats,graph,powergraph,workflow}
+    enum                enumeration using miscoto
+    stats               statistics on keystone species
+    graph               graph creation with enumeration solution
+    powergraph          powergraph creation and visualization
+    workflow            whole workflow
+
+Requires: Oog jar file (http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-command-line-tool.html) for powergraph visualization.
 ````
 
 ## Additional features

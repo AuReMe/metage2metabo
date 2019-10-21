@@ -42,7 +42,7 @@ def file_or_folder(variable_folder_file):
         variable_folder_file (str): path to a file or a folder
 
     Returns:
-        dict: key: {name of input file: path to input file}
+        dict: {name of input file: path to input file}
     """
     file_folder_paths = {}
 
@@ -173,8 +173,8 @@ def stat_analysis(json_file_folder, output_dir, taxon_file=None):
     starttime = time.time()
 
     miscoto_stat_output = output_dir + "/" + "miscoto_stats.txt"
-    key_species_stats_output = output_dir + "/" + "key_species_stats.tsv"
-    key_species_supdata_output = output_dir + "/" + "key_species_supdata.tsv"
+    key_species_stats_output = output_dir + "/" + "keystone_species_stats.tsv"
+    key_species_supdata_output = output_dir + "/" + "keystone_species_supdata.tsv"
     json_paths = file_or_folder(json_file_folder)
 
     if taxon_file:
@@ -191,9 +191,9 @@ def stat_analysis(json_file_folder, output_dir, taxon_file=None):
     ) as key_sup_file, open(miscoto_stat_output, "w") as stats_output:
         key_stats_writer = csv.writer(key_stats_file, delimiter="\t")
         if all_phylums:
-            key_stats_writer.writerow(["target_categories", "key_stones_group", *sorted(all_phylums), "Sum"])
+            key_stats_writer.writerow(["target_categories", "keystones_group", *sorted(all_phylums), "Sum"])
         else:
-            key_stats_writer.writerow(["target_categories", "key_stones_group", "data", "Sum"])
+            key_stats_writer.writerow(["target_categories", "keystones_group", "data", "Sum"])
         key_sup_writer = csv.writer(key_sup_file, delimiter="\t")
         statswriter = csv.writer(stats_output, delimiter="\t")
         statswriter.writerow(["categories", "nb_target", "size_min_sol", "size_union", "size_intersection", "size_enum"])
@@ -453,8 +453,8 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
         taxon_file (str): mpwt taxon file for species in sbml folder
     """
     miscoto_stat_output = output_dir + "/" + "miscoto_stats.txt"
-    key_species_stats_output = output_dir + "/" + "key_species_stats.tsv"
-    key_species_supdata_output = output_dir + "/" + "key_species_supdata.tsv"
+    key_species_stats_output = output_dir + "/" + "keystone_species_stats.tsv"
+    key_species_supdata_output = output_dir + "/" + "keystone_species_supdata.tsv"
 
     gml_output = output_dir + "/" + "gml" + "/"
 
@@ -481,12 +481,10 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
     with open(key_species_stats_output, "w") as key_stats_file, open(key_species_supdata_output, "w") as key_sup_file, open(miscoto_stat_output, "w") as stats_output:
         keystone_stats_writer = csv.writer(key_stats_file, delimiter="\t")
         if all_phylums:
-            keystone_stats_writer.writerow(["target_categories", "key_stones_group", *sorted(all_phylums), "Sum"])
+            keystone_stats_writer.writerow(["target_categories", "keystones_group", *sorted(all_phylums), "Sum"])
         else:
-            keystone_stats_writer.writerow(["target_categories", "key_stones_group", "data", "Sum"])
+            keystone_stats_writer.writerow(["target_categories", "keystones_group", "data", "Sum"])
         keystone_sup_writer = csv.writer(key_sup_file, delimiter="\t")
-        statswriter = csv.writer(stats_output, delimiter="\t")
-        statswriter.writerow(["categories", "nb_target", "size_min_sol", "size_union", "size_intersection", "size_enum"])
         for target_category in target_categories:
             with open(json_paths[target_category]) as json_data:
                 dicti = json.load(json_data)
