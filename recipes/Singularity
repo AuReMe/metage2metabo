@@ -1,6 +1,11 @@
 Bootstrap: docker
 From: ubuntu:18.04
 
+%labels
+    Maintainer Belcour A.
+    Version v1.1.2
+    Description m2m Singularity recipe
+
 %files
      pathway-tools-23.0-linux-64-tier1-install /tmp
      Oog.jar /tmp

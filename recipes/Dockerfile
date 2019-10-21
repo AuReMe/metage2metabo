@@ -2,8 +2,8 @@
 #  TODO: test dockerfile.
 FROM ubuntu:18.04
 MAINTAINER "Belcour A."
-LABEL Version="0.1"
-LABEL Description="m2m Docker container"
+LABEL Version="1.1.2"
+LABEL Description="m2m Dockerfile"
 
 # Update repositories & install packages.
 # Create file needed by Pathway-Tools to find Blast binaries.
