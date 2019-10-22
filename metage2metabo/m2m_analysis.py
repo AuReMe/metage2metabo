@@ -26,6 +26,7 @@ import sys
 import time
 import subprocess
 import logging
+import zipfile
 
 from ete3 import NCBITaxa
 from itertools import combinations
@@ -273,6 +274,7 @@ def powergraph_analysis(gml_file_folder, output_dir, oog_jar):
         gml_input = gml_paths[gml_path]
         logger.info('######### Graph compression: ' + gml_path + ' #########')
         compression(gml_input, bbl_output)
+        logger.info('######### PowerGraph visualization: ' + gml_path + ' #########')
         bbl_to_svg(oog_jar, bbl_output, svg_path)
 
     logger.info(
@@ -543,6 +545,11 @@ def compression(gml_input, bbl_output):
         gml_input (str): gml file
         bbl_output (str): bbl output file
     """
+    starttime = time.time()
+    with open('powergrasp.cfg', 'w') as config_file:
+        config_file.write("[powergrasp options]\n")
+        config_file.write("SHOW_STORY = no\n")
+
     import powergrasp
     from bubbletools import BubbleTree
 
@@ -556,6 +563,31 @@ def compression(gml_input, bbl_output):
     logger.info('Number of powernodes: ' + str(len([powernode for powernode in tree.powernodes()])))
     logger.info('Number of poweredges: ' + str(tree.edge_number()))
 
+    os.remove('powergrasp.cfg')
+
+    logger.info(
+        "Compression runtime %.2f seconds ---\n" % (time.time() - starttime))
+
+
+def check_oog_jar_file(oog_jar):
+    oog_class = None
+    manifest_jar = None
+
+    with zipfile.ZipFile(oog_jar, "r") as jarfile:
+        for filename in jarfile.namelist():
+            if filename.startswith("org/mattlab/eaglevista/Oog.class".rstrip("/")):
+                oog_class = True
+            if filename.startswith("META-INF/MANIFEST.MF".rstrip("/")):
+                manifest_jar = True
+
+    if oog_class and manifest_jar:
+        return True
+    elif manifest_jar:
+        logger.info('No correct Oog.class in jar file.')
+        return True
+    else:
+        sys.exit('Not a correct jar file.')
+
 
 def bbl_to_svg(oog_jar, bbl_input, svg_output):
     """Powergraph picture creation
@@ -565,4 +597,8 @@ def bbl_to_svg(oog_jar, bbl_input, svg_output):
         bbl_input (str): bbl input file
         svg_output (str): svg output file
     """
-    subprocess.call(["java", "-jar", oog_jar, "-inputfiles=" + bbl_input, "-img", "-outputdir=" + svg_output])
+    check_oog = check_oog_jar_file(oog_jar)
+
+    if check_oog:
+        oog_cmds = ["java", "-jar", oog_jar, "-inputfiles=" + bbl_input, "-img", "-outputdir=" + svg_output]
+        subprocess.call(oog_cmds)
