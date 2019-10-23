@@ -570,6 +570,11 @@ def compression(gml_input, bbl_output):
 
 
 def check_oog_jar_file(oog_jar):
+    """Check Oog jar file
+
+    Args:
+        oog_jar (str): path to oog jar file
+    """
     oog_class = None
     manifest_jar = None
 

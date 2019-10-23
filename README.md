@@ -25,6 +25,7 @@ m2m can be used as a whole workflow ( ``` m2m workflow ``` ) or steps can be per
     - [m2m seeds](#m2m-seeds)
     - [m2m test](#m2m-test)
   - [Analysis of the minimal solutions](#analysis-of-the-minimal-solutions)
+  - [Release Notes](#release-notes)
   - [Additional features](#additional-features)
   - [Citation](#citation)
   - [Authors](#authors)
@@ -354,6 +355,10 @@ subcommands:
 
 Requires: Oog jar file (http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-command-line-tool.html) for powergraph visualization.
 ````
+
+## Release Notes
+
+Changes between version are listed on the [release page](https://github.com/AuReMe/metage2metabo/releases).
 
 ## Additional features
 
