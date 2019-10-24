@@ -63,16 +63,20 @@ def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_b
     instance_com, targets_cscope = cscope(sbml_dir, seeds, out_dir, host_mn)
     # ADDED VALUE
     newtargets = addedvalue(union_targets_iscope, targets_cscope)
-    # Add these targets to the instance
-    logger.info("Setting these " + str(len(newtargets)) + " as targets")
-    instance_w_targets = add_targets_to_instance(
-        instance_com, out_dir,
-        newtargets)
-    # MINCOM
-    mincom(instance_w_targets, out_dir)
-    # remove intermediate files
-    os.unlink(instance_com)
-    os.unlink(instance_w_targets)
+    if len(newtargets) > 0:
+        # Add these targets to the instance
+        logger.info("Setting these " + str(len(newtargets)) + " as targets")
+        instance_w_targets = add_targets_to_instance(
+            instance_com, out_dir,
+            newtargets)
+        # MINCOM
+        mincom(instance_w_targets, out_dir)
+        # remove intermediate files
+        os.unlink(instance_com)
+        os.unlink(instance_w_targets)
+    else:
+        logger.info("No newly producible coupounds, hence no community selection will be computed")
+        os.unlink(instance_com)
 
 
 def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clean):

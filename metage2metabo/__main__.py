@@ -339,9 +339,10 @@ def main_added_value(sbmldir, seeds, outdir, host):
     #logger.info(", ".join(iscope_metabolites))
     cscope_metabolites = main_cscope(sbmldir, seeds, outdir, host)
     newtargets = addedvalue(iscope_metabolites, cscope_metabolites)
-    sbml_management.create_species_sbml(newtargets, outdir + "/community_analysis/targets.sbml")
-    logger.info("Target file created with the addedvalue targets in: " +
-                outdir + "/community_analysis/targets.sbml")
+    if len(newtargets) > 0:
+        sbml_management.create_species_sbml(newtargets, outdir + "/community_analysis/targets.sbml")
+        logger.info("Target file created with the addedvalue targets in: " +
+                    outdir + "/community_analysis/targets.sbml")
 
 
 def main_mincom(sbmldir, seedsfiles, outdir, targets, host):
