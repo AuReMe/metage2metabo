@@ -35,6 +35,7 @@ import csv
 import xml.etree.ElementTree as etree
 from padmet.utils import sbmlPlugin
 from multiprocessing import Pool
+from xml.etree.ElementTree import ParseError
 
 
 logger = logging.getLogger(__name__)
@@ -573,7 +574,15 @@ def analyze_indiv_scope(jsonfile, seeds):
     for elem in d:
         d_set[elem] = set(d[elem])
 
-    seed_metabolites = readSBMLspecies_clyngor(seeds, "seeds")
+    try:
+        seed_metabolites = readSBMLspecies_clyngor(seeds, "seeds")
+    except FileNotFoundError:
+        logger.critical("File not found: "+seeds)
+        sys.exit(1)
+    except ParseError:
+        logger.critical("Invalid syntax in SBML file: "+seeds)
+        sys.exit(1)
+
     logger.info("%i metabolic models considered." %(len(d_set)))
     intersection_scope = set.intersection(*list(d_set.values()))
     logger.info('\n' + str(len(intersection_scope)) + " metabolites in core reachable by all organisms (intersection) \n")
