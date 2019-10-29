@@ -35,7 +35,6 @@ import csv
 import xml.etree.ElementTree as etree
 from padmet.utils import sbmlPlugin
 from multiprocessing import Pool
-from xml.etree.ElementTree import ParseError
 
 
 logger = logging.getLogger(__name__)
@@ -579,7 +578,7 @@ def analyze_indiv_scope(jsonfile, seeds):
     except FileNotFoundError:
         logger.critical("File not found: "+seeds)
         sys.exit(1)
-    except ParseError:
+    except etree.ParseError:
         logger.critical("Invalid syntax in SBML file: "+seeds)
         sys.exit(1)
 

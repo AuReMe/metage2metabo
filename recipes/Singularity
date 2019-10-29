@@ -3,7 +3,7 @@ From: ubuntu:18.04
 
 %labels
     Maintainer Belcour A.
-    Version v1.1.2
+    Version v1.1.4
     Description m2m Singularity recipe
 
 %files
