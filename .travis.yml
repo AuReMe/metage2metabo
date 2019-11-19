@@ -11,7 +11,8 @@ python:
 # Install packages
 before_script:
 - python3 setup.py develop
-- pip install powergrasp ete3
+- pip install graphviz ete3
+- pip install powergrasp
 - cd test
 
 script:
