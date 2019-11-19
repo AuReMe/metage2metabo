@@ -14,7 +14,7 @@ m2m_analysis needs:
 
     * `networkx <https://github.com/networkx/networkx>`__: to create graph from miscoto results
     * `ete3 <https://github.com/etetoolkit/ete>`__: to add taxonomy information on the graph if you used mpwt taxon file
-    * `powergrasp <https://github.com/Aluriak/PowerGrASP>`__: to compress networkx graph (which required graphviz)
+    * `powergrasp <https://github.com/Aluriak/PowerGrASP>`__: to compress networkx graph (which required `graphviz <https://github.com/graphp/graphviz>`__)
 
 Presentation
 ------------
@@ -158,26 +158,6 @@ It uses the following mandatory inputs (run ``m2m_analysis powergraph --help`` f
     .. code::
 
         ######### Graph compression: targets_toy #########
-        ERROR input config do not have any section.
-        INFO no config file
-        INFO searchers: clique, non-star-biclique, star
-        INFO recipe: None
-        SOLVE clingo --opt-mode=optN -c k=1 -c lowerbound=16 -c upperbound=16 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-star.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpqi0wb63l
-        SOLVE clingo --opt-mode=optN -c k=1 -c lowerbound=66 -c upperbound=120 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-clique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpdlj4u0aa
-        SOLVE clingo --opt-mode=optN -c k=1 -c lowerbound=79 -c upperbound=126 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-biclique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmp7z46p13h
-        COMPRESS…
-        INFO 5 clique motif of score 78 compressed
-        TIMER since start: 1.07s		since last motif: 1.07s
-        SOLVE clingo --opt-mode=optN -c k=2 -c lowerbound=2 -c upperbound=16 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-star.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpda54fewe
-        SOLVE clingo --opt-mode=optN -c k=2 -c lowerbound=13 -c upperbound=78 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-clique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpe4zkksn9
-        SOLVE clingo --opt-mode=optN -c k=2 -c lowerbound=13 -c upperbound=126 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-biclique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpf83t3v5i
-        COMPRESS…
-        INFO 1 non-star-biclique motif of score 48 compressed
-        TIMER since start: 2.06s		since last motif: 1.0s
-        SOLVE clingo --opt-mode=optN -c k=3 -c lowerbound=2 -c upperbound=12 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-star.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpimc4_94j
-        SOLVE clingo --opt-mode=optN -c k=3 -c lowerbound=3 -c upperbound=78 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-clique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpo3js7kjf
-        SOLVE clingo --opt-mode=optN -c k=3 -c lowerbound=4 -c upperbound=48 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-biclique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpwmldtyt6
-        TIMER since start: 2.98s		output generation: 0.0s
         Number of powernodes: 3
         Number of poweredges: 2
         ********************************************************************************
@@ -302,26 +282,6 @@ It uses the following mandatory inputs (run ``m2m_analysis workflow --help`` for
         --- Graph runtime 0.02 seconds ---
 
         ######### Graph compression: targets_toy #########
-        ERROR input config do not have any section.
-        INFO no config file
-        INFO searchers: clique, non-star-biclique, star
-        INFO recipe: None
-        SOLVE clingo --opt-mode=optN -c k=1 -c lowerbound=16 -c upperbound=16 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-star.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpqi0wb63l
-        SOLVE clingo --opt-mode=optN -c k=1 -c lowerbound=66 -c upperbound=120 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-clique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpdlj4u0aa
-        SOLVE clingo --opt-mode=optN -c k=1 -c lowerbound=79 -c upperbound=126 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-biclique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmp7z46p13h
-        COMPRESS…
-        INFO 5 clique motif of score 78 compressed
-        TIMER since start: 1.07s		since last motif: 1.07s
-        SOLVE clingo --opt-mode=optN -c k=2 -c lowerbound=2 -c upperbound=16 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-star.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpda54fewe
-        SOLVE clingo --opt-mode=optN -c k=2 -c lowerbound=13 -c upperbound=78 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-clique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpe4zkksn9
-        SOLVE clingo --opt-mode=optN -c k=2 -c lowerbound=13 -c upperbound=126 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-biclique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpf83t3v5i
-        COMPRESS…
-        INFO 1 non-star-biclique motif of score 48 compressed
-        TIMER since start: 2.06s		since last motif: 1.0s
-        SOLVE clingo --opt-mode=optN -c k=3 -c lowerbound=2 -c upperbound=12 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-star.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpimc4_94j
-        SOLVE clingo --opt-mode=optN -c k=3 -c lowerbound=3 -c upperbound=78 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-clique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpo3js7kjf
-        SOLVE clingo --opt-mode=optN -c k=3 -c lowerbound=4 -c upperbound=48 -n 0 /usr/local/lib/python3.6/dist-packages/powergrasp/asp/search-biclique.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/process-motif.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/scoring_powergraph.lp /usr/local/lib/python3.6/dist-packages/powergrasp/asp/block-constraint-cpu.lp /tmp/tmpwmldtyt6
-        TIMER since start: 2.98s		output generation: 0.0s
         Number of powernodes: 3
         Number of poweredges: 2
         ********************************************************************************

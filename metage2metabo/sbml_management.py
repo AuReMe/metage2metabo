@@ -1,7 +1,4 @@
-from padmet_utils.connection.pgdb_to_padmet import from_pgdb_to_padmet
-from padmet_utils.connection.sbmlGenerator import padmet_to_sbml, check
-from padmet_utils.connection.sbml_to_sbml import from_sbml_to_sbml
-from padmet_utils.connection.sbml_to_padmet import from_sbml_to_padmet
+from padmet.utils.connection import pgdb_to_padmet, sbmlGenerator, sbml_to_sbml, sbml_to_padmet
 from padmet.utils.sbmlPlugin import convert_from_coded_id
 from multiprocessing import Pool
 from metage2metabo import utils
@@ -58,10 +55,10 @@ def create_species_sbml(metabolites, outputfile):
         compound = compound.strip('"')
         name, stype, comp = convert_from_coded_id(compound)
         s = model.createSpecies()
-        check(s, 'create species')
-        check(s.setId(compound), 'set species id')
-        check(s.setName(name), 'set species name')
-        check(s.setCompartment(comp), 'set species compartment')
+        sbmlGenerator.check(s, 'create species')
+        sbmlGenerator.check(s.setId(compound), 'set species id')
+        sbmlGenerator.check(s.setName(name), 'set species name')
+        sbmlGenerator.check(s.setCompartment(comp), 'set species compartment')
     libsbml.writeSBMLToFile(document, outputfile)
 
 
@@ -80,7 +77,7 @@ def run_pgdb_to_sbml(species_multiprocess_data):
     noorphan_bool = species_multiprocess_data[3]
     padmet_file_dir = species_multiprocess_data[4]
 
-    padmet = from_pgdb_to_padmet(
+    padmet = pgdb_to_padmet.from_pgdb_to_padmet(
         pgdb_folder=species_pgdb_dir,
         extract_gene=True,
         no_orphan=noorphan_bool)
@@ -88,7 +85,7 @@ def run_pgdb_to_sbml(species_multiprocess_data):
     if padmet_file_dir:
         padmet.generateFile(padmet_file_dir)
 
-    padmet_to_sbml(padmet, species_sbml_file, sbml_lvl=sbml_level, verbose=False)
+    sbmlGenerator.padmet_to_sbml(padmet, species_sbml_file, sbml_lvl=sbml_level, verbose=False)
 
     sbml_check = utils.is_valid_path(species_sbml_file)
     return sbml_check
@@ -148,12 +145,8 @@ def pgdb_to_sbml(pgdb_dir, output_dir, noorphan_bool, padmet_bool, sbml_level, c
         sys.exit(1)
 
 
-def sbml_to_sbml(
-        sbml_file,
-        sbml_output_file,
-        level_wanted,
-        cpu=1
-):
+def transform_sbml_lvl(sbml_file, sbml_output_file,
+                        level_wanted, cpu=1):
     """Transform a sbml into another level sbml
 
     Args:
@@ -165,7 +158,7 @@ def sbml_to_sbml(
     Returns:
         sbml_check (bool): Check if sbml file exists
     """
-    from_sbml_to_sbml(sbml_file, sbml_output_file, level_wanted, cpu)
+    sbml_to_sbml.from_sbml_to_sbml(sbml_file, sbml_output_file, level_wanted, cpu)
 
     sbml_check = utils.is_valid_path(sbml_output_file)
     return sbml_check

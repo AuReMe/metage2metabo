@@ -58,7 +58,7 @@ m2m relies on several Python packages:
 
 * `mpwt <https://github.com/AuReMe/mpwt>`__ to automatize metabolic network reconstruction with Pathway-Tools.
 
-* `padmet <https://github.com/AuReMe/padmet>`__ and `padmet-utils <https://github.com/AuReMe/padmet-utils>`__ to manage metabolic networks.
+* `padmet <https://github.com/AuReMe/padmet>`__ to manage metabolic networks.
 
 * `menetools <https://github.com/cfrioux/MeneTools>`__ to analyze individual metabolic capabilities using logic programming.
 

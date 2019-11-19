@@ -4,7 +4,7 @@ Arpeggio==1.9.0
 atomicwrites==1.3.0
 attrs==19.1.0
 biopython==1.70
-clyngor==0.3.19
+clyngor>=0.3.24
 clyngor-with-clingo==5.3.post1
 cobra==0.14.0
 depinfo==1.5.1
@@ -20,8 +20,7 @@ mpwt>=0.5.2
 numpy==1.16.4
 optlang==1.4.4
 packaging==19.0
-padmet>=3.2.2
-padmet-utils>=0.0.9
+padmet>=4.0.0
 pandas==0.24.2
 pipdeptree==0.13.2
 pluggy==0.12.0

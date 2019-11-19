@@ -48,7 +48,7 @@ pip install -r requirements.txt --no-cache-dir
 ````
 In particular, m2m relies on:
 * [mpwt](https://github.com/AuReMe/mpwt) to automatize metabolic network reconstruction with Pathway Tools
-* [padmet](https://github.com/AuReMe/padmet) and [padmet-utils](https://github.com/AuReMe/padmet-utils) to manage metabolic networks
+* [padmet](https://github.com/AuReMe/padmet) to manage metabolic networks
 * [menetools](https://github.com/cfrioux/MeneTools) to analyze individual metabolic capabilities using logic programming
 * [miscoto](https://github.com/cfrioux/miscoto) to analyze collective metabolic capabilities and select communities within microbiota using logic programming
 

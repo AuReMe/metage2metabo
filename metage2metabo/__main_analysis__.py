@@ -6,11 +6,29 @@ import re
 import sys
 import tarfile
 import time
+
 from shutil import copyfile, which
 
-from metage2metabo.m2m_analysis import run_analysis_workflow, enumeration_analysis, stat_analysis, graph_analysis, powergraph_analysis
+try:
+    with open('powergrasp.cfg', 'w') as config_file:
+        config_file.write("[powergrasp options]\n")
+        config_file.write("SHOW_STORY = no\n")
+
+    from powergrasp import compress_by_cc
+    os.remove('powergrasp.cfg')
+except ImportError:
+    os.remove('powergrasp.cfg')
+    raise ImportError('Requires powergrasp (https://github.com/Aluriak/PowerGrASP).')
+
+try:
+    import ete3
+except ImportError:
+    raise ImportError('Requires ete3 (https://github.com/etetoolkit/ete).')
+
+
 from metage2metabo.__main__ import check_sbml
 from metage2metabo import sbml_management, utils
+from metage2metabo.m2m_analysis import run_analysis_workflow, enumeration_analysis, stat_analysis, graph_analysis, powergraph_analysis
 
 VERSION = pkg_resources.get_distribution("metage2metabo").version
 LICENSE = """Copyright (C) Dyliss

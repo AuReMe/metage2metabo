@@ -105,7 +105,7 @@ html_theme = 'sphinx_rtd_theme'
 autodoc_mock_imports = [
     "padmet", "grequests", "seaborn", "sklearn", "fastcluster", "matplotlib",
     "networkx", "numpy", "pandas", "libsbml", "docopt", "clyngor", "menetools",
-    "miscoto", "mpwt", "padmet_utils", "biopython", "clyngor-with-clingo"
+    "miscoto", "mpwt", "biopython", "clyngor-with-clingo"
 ]
 # -- Options for HTMLHelp output ---------------------------------------------
 
