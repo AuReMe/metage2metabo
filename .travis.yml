@@ -11,7 +11,7 @@ python:
 # Install packages
 before_script:
 - python3 setup.py develop
-- pip install networkx ete3
+- pip install powergrasp ete3
 - cd test
 
 script:
