@@ -21,7 +21,7 @@ from setuptools import setup
 
 setup(
     name='Metage2Metabo',
-    version='1.1.4',
+    version='1.1.5',
     url='https://github.com/aureme/metage2metabo',
     license='GPLv3+',
     description=
