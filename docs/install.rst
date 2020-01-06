@@ -107,13 +107,13 @@ Installation with Singularity (e.g. on a cluster)
 =================================================
 
 Singularity [Ku2017]_ can be used to launch m2m on a cluster. Please refer to the `recipe <https://github.com/AuReMe/metage2metabo/tree/master/recipes>`__   of the Github repository of the project.
-The Singularity image has to be created from the recipe. You might need to do it on a personal computer since it requires administrator priviledges.
-To use the image on a cluster, the path to Pathway Tools ptools folder should be indicated in the recipe. Therefore, you have to replace '/external/folder/ptools' with the path where you want to put the ptools-local folder (which will contain the PGDB created by Pathway-Tools).
+The Singularity container has to be created from the recipe. You might need to do it on a personal computer since it requires administrator priviledges.
+To use the container on a cluster, the path to Pathway Tools ptools folder should be indicated in the recipe. Therefore, you have to replace '/external/folder/ptools' with the path where you want to put the ptools-local folder (which will contain the PGDB created by Pathway-Tools).
 
 Like for the Dockerfile, Pathway-Tools installer is hardcoded in the recipe so if you use another version, you have to modify the recipe.
 And the **Pathway Tools installer** and **Oog.jar file** must be stored in the same folder than the Singularity recipe.
 
-To create the image named m2m.sif:
+To create a container named m2m.sif:
 
 .. code:: sh
 
@@ -128,14 +128,14 @@ To use Pathway-Tools, a .ncbirc file is required in the home directory, containi
     [ncbi]\nData=/usr/bin/data
 
 *Dealing with Pathway Tools ptools local folder*.
-You might need an external ptools-local folder when working on a cluster. A solution is to create the ptools-local in a local folder then move it inside the Singularity image.
-Eventually, you have to move it outside the Singularity image after it has been built.
+You might need an external ptools-local folder when working on a cluster. A solution is to create the ptools-local in a local folder then move it inside the Singularity container.
+Eventually, you have to move it outside the Singularity container after it has been built.
 
-First, enter the Singularity image:
+First, enter the Singularity container and mount the external folder:
 
 .. code:: sh
 
-    singularity run m2m.sif
+    singularity run -B /external/folder:/external/folder m2m.sif
 
 
 Then move the ptools-local folder from the Singularity folder to the folder in your local environment.
@@ -148,7 +148,7 @@ This will move the ptools-local folder (with permissions) from Singularity conta
 
 In this way, PGDBs can be stored in the folder outside your container.
 
-Finally, you can launch jobs with the Singularity image by giving a sh file containg m2m commands.
+Finally, you can launch jobs with the Singularity container by giving a sh file containg m2m commands.
 
 .. code:: sh
 
