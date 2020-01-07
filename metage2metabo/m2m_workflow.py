@@ -75,7 +75,7 @@ def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_b
         os.unlink(instance_com)
         os.unlink(instance_w_targets)
     else:
-        logger.info("No newly producible coupounds, hence no community selection will be computed")
+        logger.info("No newly producible compounds, hence no community selection will be computed")
         os.unlink(instance_com)
 
 
