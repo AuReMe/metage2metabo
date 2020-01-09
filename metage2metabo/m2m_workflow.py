@@ -292,6 +292,9 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
     try:
         mpwt.multiprocess_pwt(genomes_dir, pgdb_dir,
                             patho_inference=True,
+                            patho_hole_filler=False,
+                            patho_operon_predictor=False,
+                            no_download_articles=False,
                             dat_creation=True,
                             dat_extraction=True,
                             size_reduction=False,

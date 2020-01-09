@@ -11,7 +11,6 @@ m2m recon
 It uses the following mandatory inputs (run ``m2m recon --help`` for optional arguments):
 
 -g directory           directory of annotated genomes
--s file                seeds SBML file
 -o directory           output directory for results
 
 Optional arguments:
@@ -22,6 +21,7 @@ Optional arguments:
 --noorphan       ignore the reactions without gene or 
                  protein association in final metabolic networks
 -p               create padmet files from PGDB
+-l int           specify the level for the sbml to be created
 
 The inputs genomic data has to follow a strict structure:
 
@@ -52,7 +52,7 @@ By extracting this file, you will find the
 
 .. code:: sh
 
-    m2m recon -g workflow_genomes -o output_directory -c cpu_number [--clean] [--orphan]
+    m2m recon -g workflow_genomes -o output_directory -c cpu_number [--clean] [--orphan] [-p] [-l sbml_level]
 
 * standard output
     .. code:: 
@@ -96,7 +96,7 @@ By extracting this file, you will find the
         SBML files created in out1_test/sbml
         --- Total runtime 486.89 seconds ---
 
-        Here the ``--clean`` option was used. The output shows that PGDB are created with Pathway Tools. Then the .dat files are extracted and used to build SBML files of the metabolic models. 
+        The output shows that PGDB are created with Pathway Tools. Then the .dat files are extracted and used to build SBML files of the metabolic models.
 * files outputs
     * In `output_directory/pgdb` are found the .dat files of Pathway Tools. The corresponding SBMLs are in `output_directory/sbml`. The structure of the output directory after this ``recon`` command is shown below :
 
@@ -152,6 +152,7 @@ By extracting this file, you will find the
         │       ├── species.dat
         │       ├── terminators.dat
         │       └── transunits.dat
+        └── recon_stats.tsv
         └── sbml
             ├── GCA_003433665.sbml
             └── GCA_003433675.sbml
@@ -216,7 +217,7 @@ The resulting SBML will have such a design:
 iscope
 *******
 
-It uses the following mandatory inputs (run ``m2m mincom --help`` for optional arguments):
+It uses the following mandatory inputs (run ``m2m iscope --help`` for optional arguments):
 
 -n directory           directory of metabolic networks, 
                         in SBML format
@@ -247,13 +248,15 @@ It uses the following mandatory inputs (run ``m2m mincom --help`` for optional a
 cscope
 *******
 
-It uses the following mandatory inputs (run ``m2m mincom --help`` for optional arguments):
+It uses the following mandatory inputs (run ``m2m cscope --help`` for optional arguments):
 
 -n directory           directory of metabolic networks, 
                         in SBML format
 -s file                seeds SBML file
 -t file                targets SBML file
 -o directory           output directory for results
+-m file                host metabolic network SBML file
+-c int                 number of CPU to use
 
 .. code:: sh
 
@@ -283,6 +286,8 @@ It uses the following mandatory inputs (run ``m2m addedvalue --help`` for option
                         in SBML format
 -s file                seeds SBML file
 -o directory           output directory for results
+-m file                host metabolic network SBML file
+-c int                 number of CPU to use
 
 .. code:: sh
 
@@ -336,6 +341,8 @@ It uses the following mandatory inputs (run ``m2m mincom --help`` for optional a
 -s file                seeds SBML file
 -t file                targets SBML file
 -o directory           output directory for results
+-m file                host metabolic network SBML file
+-c int                 number of CPU to use
 
 .. code:: sh
 
@@ -544,6 +551,9 @@ Optional arguments:
         │   ├── mincom.json
         ├── indiv_scopes
         │   └── indiv_scopes.json
+        ├── padmet
+        │   ├── GCA_003433665.padmet
+        │   └── GCA_003433675.padmet
         ├── pgdb
         │   ├── GCA_003433665
         │   │   ├── classes.dat
@@ -593,6 +603,7 @@ Optional arguments:
         │       ├── species.dat
         │       ├── terminators.dat
         │       └── transunits.dat
+        └── recon_stats.tsv
         └── sbml
             ├── GCA_003433665.sbml
             └── GCA_003433675.sbml

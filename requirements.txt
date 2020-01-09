@@ -16,7 +16,7 @@ MeneTools>=2.0.3
 Miscoto>=2.0.6
 more-itertools==7.0.0
 mpmath==1.1.0
-mpwt>=0.5.2
+mpwt>=0.5.3
 numpy==1.16.4
 optlang==1.4.4
 packaging==19.0
