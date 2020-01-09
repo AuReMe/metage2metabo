@@ -2,7 +2,7 @@
 #  TODO: test dockerfile.
 FROM ubuntu:18.04
 MAINTAINER "Belcour A."
-LABEL Version="1.1.4"
+LABEL Version="1.1.6"
 LABEL Description="m2m Dockerfile"
 
 # Update repositories & install packages.
