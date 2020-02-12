@@ -300,12 +300,14 @@ def main_workflow(*allargs):
     run_workflow(*allargs)
 
 
-
 def main_recon(*allargs):
     """Run recon command
     """
-    pgdbdir, sbmldir = recon(*allargs)
+    pgdbdir, sbmldir, padmet_folder= recon(*allargs)
     logger.info("PGDB created in " + pgdbdir)
+    if allargs[3]:
+        logger.info("PADMET files created in " + padmet_folder)
+
     logger.info("SBML files created in " + sbmldir)
 
 

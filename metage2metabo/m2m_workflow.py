@@ -111,7 +111,7 @@ def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clea
 
     logger.info(
         "--- Recon runtime %.2f seconds ---\n" % (time.time() - starttime))
-    return pgdb_dir, sbml_dir
+    return pgdb_dir, sbml_dir, padmet_folder
 
 
 def iscope(sbmldir, seeds, out_dir):
@@ -183,6 +183,7 @@ def addedvalue(iscope_rm, cscope_rm):
     logger.info("\n")
     return newtargets
 
+
 def mincom(instance_w_targets, out_dir):
     """Compute minimal community selection and show analyses
     
@@ -244,6 +245,9 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
     
     Args:
         genomes_dir (str): genome repository
+        output_dir (str): output repository
+        cpu (int): number of CPUs to use
+        clean (bool): delete PGDBs in ptools-local coresponding to the input data
 
     Returns:
         pgdb_dir (str): pgdb repository
@@ -256,6 +260,7 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
         sys.exit(1)
 
     pgdb_dir = output_dir + "/pgdb"
+    log_dir = output_dir + "/pgdb_log"
     if not utils.is_valid_dir(pgdb_dir):
         logger.critical("Impossible to access/create output directory")
         sys.exit(1)
@@ -279,15 +284,19 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
         sys.exit(1)
 
     genomes_pgdbs = [genome_dir.lower() + 'cyc' for genome_dir in os.listdir(genomes_dir)]
-    already_here_pgdbs = mpwt.list_pgdb()
-    if clean and set(genomes_pgdbs).issubset(set(already_here_pgdbs)):
-        mpwt.cleaning(number_cpu=cpu, verbose=True)
+    if clean:
+        mpwt.remove_pgdbs(to_delete_pgdbs=genomes_pgdbs, number_cpu=cpu)
+        mpwt.cleaning_input(genomes_dir, verbose=False)
 
     # Check whether PGDBs are already created. If yes and not --clean, pursue without running ptools again
     pgdb_dirs = [pgdb_dir.lower() + 'cyc' for pgdb_dir in os.listdir(pgdb_dir)]
-    if set(pgdb_dirs) ==set(genomes_pgdbs):
+    if set(pgdb_dirs) == set(genomes_pgdbs):
         logger.warning("PGDBs are already created and will be used. To overrun them, run m2m with --clean option")
         return pgdb_dir
+
+    taxon_file = None
+    if 'taxon_id.tsv' in set(next(os.walk(genomes_dir))[2]):
+        taxon_file = True
 
     try:
         mpwt.multiprocess_pwt(genomes_dir, pgdb_dir,
@@ -299,10 +308,11 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
                             dat_extraction=True,
                             size_reduction=False,
                             number_cpu=cpu,
-                            patho_log=False,
-                            verbose=True)
+                            taxon_file=taxon_file,
+                            patho_log=log_dir,
+                            verbose=False)
     except:
-        logger.critical("Something went wrong running Pathway Tools")
+        logger.critical("Something went wrong running Pathway Tools. See the log file in " + log_dir + "/log_error.txt")
         sys.exit(1)
     return (pgdb_dir)
 
@@ -403,6 +413,7 @@ def mean_sd_data(datas):
         sd_data = None
 
     return mean_data, sd_data
+
 
 def analyze_recon(sbml_folder, output_stat_file, padmet_folder, padmet_bool=None, nb_cpu=1):
     """Analyze the sbml and/or the padmet files after metabolic network reconstruction.
@@ -516,7 +527,11 @@ def analyze_recon(sbml_folder, output_stat_file, padmet_folder, padmet_bool=None
 
     gene_reactions_assoc_percentages = []
     for species_name in reactions:
-        gene_reactions_assoc_percentages.append(((len(gene_associated_reactions[species_name]) / len(reactions[species_name]))*100))
+        if len(reactions[species_name]) > 0:
+            gene_reactions_assoc_percentages.append(((len(gene_associated_reactions[species_name]) / len(reactions[species_name]))*100))
+        else:
+            gene_reactions_assoc_percentages.append(0)
+            logger.info('Warning: ' + species_name + ' metabolic network contains 0 reactions.')
     if len(gene_reactions_assoc_percentages) > 1:
         mean_gene_reactions_assoc_percentages, sd_gene_reactions_assoc_percentages = mean_sd_data(gene_reactions_assoc_percentages)
         if mean_gene_reactions_assoc_percentages and sd_gene_reactions_assoc_percentages:
