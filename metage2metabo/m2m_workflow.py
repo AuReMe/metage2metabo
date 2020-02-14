@@ -312,7 +312,10 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
                             patho_log=log_dir,
                             verbose=False)
     except:
-        logger.critical("Something went wrong running Pathway Tools. See the log file in " + log_dir + "/log_error.txt")
+        if os.path.exists(log_dir + "/log_error.txt"):
+            logger.critical("Something went wrong running Pathway Tools. See the log file in " + log_dir + "/log_error.txt")
+        else:
+            logger.critical("Something went wrong running Pathway Tools.")
         sys.exit(1)
     return (pgdb_dir)
 
