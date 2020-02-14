@@ -438,6 +438,11 @@ def analyze_recon(sbml_folder, output_stat_file, padmet_folder, padmet_bool=None
         pathways = {}
 
         multiprocessing_data = []
+
+        if os.listdir(padmet_folder) == 0:
+            logger.critical("No padmet in " + padmet_folder)
+            sys.exit(1)
+
         for padmet in os.listdir(padmet_folder):
             padmet_file = padmet_folder + '/' + padmet
             species_name = padmet.replace('.padmet', '')
@@ -464,6 +469,11 @@ def analyze_recon(sbml_folder, output_stat_file, padmet_folder, padmet_bool=None
         gene_associated_reactions = {}
 
         multiprocessing_data = []
+
+        if os.listdir(sbml_folder) == 0:
+            logger.critical("No sbml in " + sbml_folder)
+            sys.exit(1)
+
         for sbml in os.listdir(sbml_folder):
             species_name = sbml.replace('.sbml','')
             sbml_file = sbml_folder + '/' + sbml
