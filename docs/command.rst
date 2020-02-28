@@ -45,8 +45,8 @@ m2m recon
 
     .. code::
 
-        usage: m2m recon [-h] -g GENOMES [--clean] -o OUPUT_DIR [-c CPU] [-q]
-                    [-l {2,3}] [--noorphan]
+        usage: m2m recon [-h] -g GENOMES -o OUPUT_DIR [-c CPU] [-q] [-l {2,3}]
+                        [--noorphan] [-p] [--clean]
 
         Run metabolic network reconstruction for each annotated genome of the input
         directory, using Pathway Tools
@@ -55,7 +55,6 @@ m2m recon
             -h, --help            show this help message and exit
             -g GENOMES, --genomes GENOMES
                                     annotated genomes directory
-            --clean               clean PGDBs if already present
             -o OUPUT_DIR, --out OUPUT_DIR
                                     output directory path
             -c CPU, --cpu CPU     cpu number for multi-process
@@ -64,6 +63,8 @@ m2m recon
                                     Level for SBML creation, 2 or 3
             --noorphan            use this option to ignore reactions without gene or
                                     protein association
+            -p, --padmet          create padmet files
+            --clean               clean PGDBs if already present
 
 m2m iscope
 ==========
