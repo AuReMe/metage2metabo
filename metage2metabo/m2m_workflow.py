@@ -64,6 +64,9 @@ def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_b
     # ADDED VALUE
     newtargets = addedvalue(union_targets_iscope, targets_cscope)
     if len(newtargets) > 0:
+        sbml_management.create_species_sbml(newtargets, out_dir + "/community_analysis/targets.sbml")
+        logger.info("Target file created with the addedvalue targets in: " +
+                    out_dir + "/community_analysis/targets.sbml")
         # Add these targets to the instance
         logger.info("Setting these " + str(len(newtargets)) + " as targets")
         instance_w_targets = add_targets_to_instance(
