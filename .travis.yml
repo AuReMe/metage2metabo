@@ -19,3 +19,4 @@ script:
 - pytest test_m2m_addedvalue.py --disable-pytest-warnings
 - pytest test_m2m_mincom.py --disable-pytest-warnings
 - pytest test_m2m_analysis.py --disable-pytest-warnings
+- pytest test_m2m_metacom.py --disable-pytest-warnings

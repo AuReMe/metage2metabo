@@ -22,6 +22,7 @@ m2m can be used as a whole workflow ( ``` m2m workflow ``` ) or steps can be per
     - [m2m addedvalue](#m2m-addedvalue)
     - [m2m mincom](#m2m-mincom)
     - [m2m workflow](#m2m-workflow)
+    - [m2m metacom](#m2m-metacom)
     - [m2m seeds](#m2m-seeds)
     - [m2m test](#m2m-test)
   - [Analysis of the minimal solutions](#analysis-of-the-minimal-solutions)
@@ -126,7 +127,8 @@ There is NO WARRANTY, to the extent permitted by law.
 
 
 usage: m2m [-h] [-v]
-           {recon,iscope,cscope,addedvalue,mincom,seeds,workflow,test} ...
+           {recon,iscope,cscope,addedvalue,mincom,seeds,workflow,metacom,test}
+           ...
 
 From metabolic network reconstruction with annotated genomes to metabolic
 capabilities screening to identify organisms of interest in a large
@@ -139,7 +141,7 @@ optional arguments:
 subcommands:
   valid subcommands:
 
-  {recon,iscope,cscope,addedvalue,mincom,seeds,workflow,test}
+  {recon,iscope,cscope,addedvalue,mincom,seeds,workflow,metacom,test}
     recon               metabolic network reconstruction
     iscope              individual scope computation
     cscope              community scope computation
@@ -148,6 +150,7 @@ subcommands:
     mincom              minimal communtity selection
     seeds               creation of seeds SBML file
     workflow            whole workflow
+    metacom             whole metabolism community analysis
     test                test on sample data from rumen experiments
 
 Requires: Pathway Tools installed and in $PATH, and NCBI Blast
@@ -181,7 +184,7 @@ optional arguments:
 ### m2m iscope
 
 ````
-usage: m2m iscope [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR [-c CPU] [-q]
+usage: m2m iscope [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR [-q]
 
 Compute individual scopes (reachable metabolites from seeds) for each
 metabolic network of the input directory
@@ -194,7 +197,6 @@ optional arguments:
                         seeds (growth medium) for metabolic analysis
   -o OUPUT_DIR, --out OUPUT_DIR
                         output directory path
-  -c CPU, --cpu CPU     cpu number for multi-process
   -q, --quiet           quiet mode
 ````
 
@@ -202,7 +204,7 @@ optional arguments:
 
 ````
 usage: m2m cscope [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR [-m MODELHOST]
-                  [-c CPU] [-q]
+                  [-q]
 
 Compute the community scope of all metabolic networks
 
@@ -216,7 +218,6 @@ optional arguments:
                         output directory path
   -m MODELHOST, --modelhost MODELHOST
                         host metabolic model for community analysis
-  -c CPU, --cpu CPU     cpu number for multi-process
   -q, --quiet           quiet mode
 ````
 
@@ -224,7 +225,7 @@ optional arguments:
 
 ````
 usage: m2m addedvalue [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR
-                      [-m MODELHOST] [-c CPU] [-q]
+                      [-m MODELHOST] [-q]
 
 Compute metabolites that are reachable by the community/microbiota and not by
 individual organisms
@@ -239,7 +240,6 @@ optional arguments:
                         output directory path
   -m MODELHOST, --modelhost MODELHOST
                         host metabolic model for community analysis
-  -c CPU, --cpu CPU     cpu number for multi-process
   -q, --quiet           quiet mode
 ````
 
@@ -247,7 +247,7 @@ optional arguments:
 
 ````
 usage: m2m mincom [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR [-m MODELHOST]
-                  [-c CPU] [-q] -t TARGETS
+                  [-q] -t TARGETS
 
 Select minimal-size community to make reachable a set of metabolites
 
@@ -261,7 +261,6 @@ optional arguments:
                         output directory path
   -m MODELHOST, --modelhost MODELHOST
                         host metabolic model for community analysis
-  -c CPU, --cpu CPU     cpu number for multi-process
   -q, --quiet           quiet mode
   -t TARGETS, --targets TARGETS
                         targets for metabolic analysis
@@ -292,6 +291,28 @@ optional arguments:
                         protein association
   -p, --padmet          create padmet files
   --clean               clean PGDBs if already present
+````
+
+### m2m metacom
+
+````
+usage: m2m metacom [-h] -n NETWORKS_DIR -s SEEDS [-m MODELHOST] -o OUPUT_DIR
+                   [-q]
+
+Run the whole metabolism community analysis: individual and community scope
+analysis and community selection
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -n NETWORKS_DIR, --networksdir NETWORKS_DIR
+                        metabolic networks directory
+  -s SEEDS, --seeds SEEDS
+                        seeds (growth medium) for metabolic analysis
+  -m MODELHOST, --modelhost MODELHOST
+                        host metabolic model for community analysis
+  -o OUPUT_DIR, --out OUPUT_DIR
+                        output directory path
+  -q, --quiet           quiet mode
 ````
 
 ### m2m seeds

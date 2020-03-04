@@ -153,8 +153,7 @@ def main():
         "iscope",
         help="individual scope computation",
         parents=[
-            parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_c,
-            parent_parser_q
+            parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_q
         ],
         description=
         "Compute individual scopes (reachable metabolites from seeds) for each metabolic network of the input directory"
@@ -164,7 +163,7 @@ def main():
         help="community scope computation",
         parents=[
             parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m,
-            parent_parser_c, parent_parser_q
+            parent_parser_q
         ],
         description="Compute the community scope of all metabolic networks")
     added_value_parser = subparsers.add_parser(
@@ -172,7 +171,7 @@ def main():
         help="added value of microbiota's metabolism over individual's",
         parents=[
             parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m,
-            parent_parser_c, parent_parser_q
+            parent_parser_q
         ],
         description=
         "Compute metabolites that are reachable by the community/microbiota and not by individual organisms"
@@ -182,7 +181,7 @@ def main():
         help="minimal communtity selection",
         parents=[
             parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m,
-            parent_parser_c, parent_parser_q
+            parent_parser_q
         ],
         description=
         "Select minimal-size community to make reachable a set of metabolites")

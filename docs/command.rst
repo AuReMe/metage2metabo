@@ -14,7 +14,8 @@ Features
 
 
         usage: m2m [-h] [-v]
-                {recon,iscope,cscope,addedvalue,mincom,seeds,workflow} ...
+                {recon,iscope,cscope,addedvalue,mincom,seeds,workflow,metacom,test}
+                ...
 
         From metabolic network reconstruction with annotated genomes to metabolic
         capabilities screening to identify organisms of interest in a large
@@ -27,7 +28,7 @@ Features
         subcommands:
         valid subcommands:
 
-        {recon,iscope,cscope,addedvalue,mincom,seeds,workflow}
+        {recon,iscope,cscope,addedvalue,mincom,seeds,workflow,metacom,test}
             recon               metabolic network reconstruction
             iscope              individual scope computation
             cscope              community scope computation
@@ -36,8 +37,10 @@ Features
             mincom              minimal communtity selection
             seeds               creation of seeds SBML file
             workflow            whole workflow
+            metacom             whole metabolism community analysis
+            test                test on sample data from rumen experiments
 
-        Requirements here Pathway Tools installed and in $PATH, and NCBI Blast
+        Requires: Pathway Tools installed and in $PATH, and NCBI Blast
 
 
 m2m recon
@@ -71,7 +74,7 @@ m2m iscope
 
     .. code::
 
-        usage: m2m iscope [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR [-c CPU] [-q]
+        usage: m2m iscope [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR [-q]
 
         Compute individual scopes (reachable metabolites from seeds) for each
         metabolic network of the input directory
@@ -84,7 +87,6 @@ m2m iscope
                                     seeds (growth medium) for metabolic analysis
             -o OUPUT_DIR, --out OUPUT_DIR
                                     output directory path
-            -c CPU, --cpu CPU     cpu number for multi-process
             -q, --quiet           quiet mode
 
 m2m cscope
@@ -93,7 +95,7 @@ m2m cscope
     .. code::
 
         usage: m2m cscope [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR [-m MODELHOST]
-                    [-c CPU] [-q]
+                    [-q]
 
         Compute the community scope of all metabolic networks
 
@@ -107,7 +109,6 @@ m2m cscope
                                     output directory path
             -m MODELHOST, --modelhost MODELHOST
                                     host metabolic model for community analysis
-            -c CPU, --cpu CPU     cpu number for multi-process
             -q, --quiet           quiet mode
 
 
@@ -116,21 +117,24 @@ m2m addedvalue
 
     .. code::
 
+        usage: m2m addedvalue [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR
+                            [-m MODELHOST] [-q]
+
         Compute metabolites that are reachable by the community/microbiota and not by
         individual organisms
 
         optional arguments:
-            -h, --help            show this help message and exit
-            -n NETWORKS_DIR, --networksdir NETWORKS_DIR
-                                    metabolic networks directory
-            -s SEEDS, --seeds SEEDS
-                                    seeds (growth medium) for metabolic analysis
-            -o OUPUT_DIR, --out OUPUT_DIR
-                                    output directory path
-            -m MODELHOST, --modelhost MODELHOST
-                                    host metabolic model for community analysis
-            -c CPU, --cpu CPU     cpu number for multi-process
-            -q, --quiet           quiet mode
+        -h, --help            show this help message and exit
+        -n NETWORKS_DIR, --networksdir NETWORKS_DIR
+                                metabolic networks directory
+        -s SEEDS, --seeds SEEDS
+                                seeds (growth medium) for metabolic analysis
+        -o OUPUT_DIR, --out OUPUT_DIR
+                                output directory path
+        -m MODELHOST, --modelhost MODELHOST
+                                host metabolic model for community analysis
+        -q, --quiet           quiet mode
+
 
 m2m mincom
 ==========
@@ -138,7 +142,7 @@ m2m mincom
     .. code::
 
         usage: m2m mincom [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR [-m MODELHOST]
-                    [-c CPU] [-q] -t TARGETS
+                    [-q] -t TARGETS
 
         Select minimal-size community to make reachable a set of metabolites
 
@@ -152,7 +156,6 @@ m2m mincom
                                     output directory path
             -m MODELHOST, --modelhost MODELHOST
                                     host metabolic model for community analysis
-            -c CPU, --cpu CPU     cpu number for multi-process
             -q, --quiet           quiet mode
             -t TARGETS, --targets TARGETS
                                 targets for metabolic analysis
@@ -183,6 +186,30 @@ m2m workflow
             -q, --quiet           quiet mode
             --noorphan            use this option to ignore reactions without gene or
                                     protein association
+
+
+m2m metacom
+===========
+
+    .. code::
+
+        usage: m2m metacom [-h] -n NETWORKS_DIR -s SEEDS [-m MODELHOST] -o OUPUT_DIR
+                        [-q]
+
+        Run the whole metabolism community analysis: individual and community scope
+        analysis and community selection
+
+        optional arguments:
+        -h, --help            show this help message and exit
+        -n NETWORKS_DIR, --networksdir NETWORKS_DIR
+                                metabolic networks directory
+        -s SEEDS, --seeds SEEDS
+                                seeds (growth medium) for metabolic analysis
+        -m MODELHOST, --modelhost MODELHOST
+                                host metabolic model for community analysis
+        -o OUPUT_DIR, --out OUPUT_DIR
+                                output directory path
+        -q, --quiet           quiet mode
 
 
 m2m seeds
