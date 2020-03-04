@@ -100,7 +100,7 @@ def test_m2m_mincom_call():
     with tarfile.open(inppath + 'toy_bact.tar.gz') as tar:
         tar.extractall(path=respath)
     subprocess.call([
-        'm2m', 'mincom', '-n', respath + '/toy_bact', '-o', respath, '-c', '1',
+        'm2m', 'mincom', '-n', respath + '/toy_bact', '-o', respath,
         '-s', inppath + '/seeds_toy.sbml', '-t', inppath + '/targets_toy.sbml',
         '-q'
     ])

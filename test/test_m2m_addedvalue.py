@@ -97,7 +97,7 @@ def test_m2m_addedvalue_call():
         tar.extractall(path=respath)
     subprocess.call([
         'm2m', 'addedvalue', '-n', respath + '/toy_bact', '-o',
-        respath, '-c', '1', '-s', inppath + '/seeds_toy.sbml', '-q'
+        respath, '-s', inppath + '/seeds_toy.sbml', '-q'
     ])
     target_file = respath + 'community_analysis/targets.sbml'
     iscope_file = respath + 'indiv_scopes/indiv_scopes.json'
