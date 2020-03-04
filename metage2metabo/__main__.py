@@ -8,7 +8,7 @@ import tarfile
 import time
 from shutil import copyfile,which
 
-from metage2metabo.m2m_workflow import run_workflow, recon, iscope, cscope, addedvalue, mincom, instance_community
+from metage2metabo.m2m_workflow import run_workflow, recon, iscope, cscope, addedvalue, mincom, instance_community, metacom_analysis
 from metage2metabo import sbml_management, utils
 
 VERSION = pkg_resources.get_distribution("metage2metabo").version
@@ -214,6 +214,16 @@ def main():
         description=
         "Run the whole workflow: metabolic network reconstruction, individual and community scope analysis and community selection"
     )
+    metacom_parser = subparsers.add_parser(
+        "metacom",
+        help="whole metabolism community analysis",
+        parents=[
+            parent_parser_n, parent_parser_s, parent_parser_m, parent_parser_o,
+            parent_parser_q
+        ],
+        description=
+        "Run the whole metabolism community analysis: individual and community scope analysis and community selection"
+    )
     test_parser = subparsers.add_parser(
         "test",
         help="test on sample data from rumen experiments",
@@ -247,7 +257,7 @@ def main():
         sys.exit()
 
     #if modelhost is given as an arg: check the SBML level and turn it into 2 if needed
-    if args.cmd in ["workflow", "mincom", "cscope", "addedvalue"] and args.modelhost:
+    if args.cmd in ["workflow", "metacom", "mincom", "cscope", "addedvalue"] and args.modelhost:
         new_arg_modelhost = check_sbml(args.modelhost, args.out, folder=False)
     else:
         new_arg_modelhost = None
@@ -257,7 +267,7 @@ def main():
     if args.cmd == "workflow":
         main_workflow(args.genomes, args.out, args.cpu, args.clean, args.seeds,
                       args.noorphan, args.padmet, new_arg_modelhost)
-    elif args.cmd in ["iscope", "cscope", "addedvalue", "mincom"]:
+    elif args.cmd in ["iscope", "cscope", "addedvalue", "mincom", "metacom"]:
         if not os.path.isdir(args.networksdir):
             logger.critical(args.networksdir + " is not a correct directory path")
             sys.exit(1)
@@ -279,6 +289,8 @@ def main():
                     sys.exit(1)
                 else:
                     main_mincom(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
+            elif args.cmd == "metacom":
+                main_metacom(network_dir, args.out, args.seeds, new_arg_modelhost)
     elif args.cmd == "recon":
         main_recon(args.genomes, args.out, args.noorphan, args.padmet, args.level, args.cpu,
                    args.clean)
@@ -298,6 +310,12 @@ def main_workflow(*allargs):
     """Run main workflow
     """
     run_workflow(*allargs)
+
+
+def main_metacom(*allargs):
+    """Run main workflow
+    """
+    metacom_analysis(*allargs)
 
 
 def main_recon(*allargs):

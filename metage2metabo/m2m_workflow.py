@@ -40,6 +40,7 @@ from multiprocessing import Pool
 logger = logging.getLogger(__name__)
 logging.getLogger("menetools").setLevel(logging.CRITICAL)
 logging.getLogger("miscoto").setLevel(logging.CRITICAL)
+logging.getLogger("mpwt").setLevel(logging.CRITICAL)
 
 
 def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_bool, host_mn):
@@ -57,6 +58,20 @@ def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_b
     """
     # METABOLIC NETWORK RECONSTRUCTION
     sbml_dir = recon(inp_dir, out_dir, noorphan_bool, padmet_bool, 2, nb_cpu, clean)[1]
+
+    # METABOLISM COMMUNITY ANALYSIS
+    metacom_analysis(sbml_dir, out_dir, seeds, host_mn)
+
+
+def metacom_analysis(sbml_dir, out_dir, seeds, host_mn):
+    """Run the metabolism community analysis part of m2m
+
+    Args:
+        sbml_dir (str): sbml input directory
+        out_dir (str): results directory
+        seeds (str): seeds file
+        host_mn (str): metabolic network file for host
+    """
     # INDIVIDUAL SCOPES
     union_targets_iscope = iscope(sbml_dir, seeds, out_dir)
     # COMMUNITY SCOPE
