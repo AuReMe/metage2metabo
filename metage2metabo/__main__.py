@@ -1,3 +1,4 @@
+import logging
 import argparse
 import logging
 import os
@@ -24,11 +25,8 @@ REQUIRES = """
 Requires: Pathway Tools installed and in $PATH, and NCBI Blast
 """
 
-root_logger = logging.getLogger()
-root_logger.setLevel(logging.INFO)
-logging.basicConfig(
-        format='%(message)s', level=logging.INFO)  #%(name)s:%(message)s
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 # Check ASP binaries.
 if not which('clingo'):
@@ -78,6 +76,7 @@ def main():
         required=True,
         help="output directory path",
         metavar="OUPUT_DIR")
+
     parent_parser_no = argparse.ArgumentParser(add_help=False)
     parent_parser_no.add_argument(
         "--noorphan",
@@ -239,11 +238,22 @@ def main():
         parser.print_help()
         sys.exit(1)
 
-    # set up the logger
+    logger = logging.getLogger()    #TODO: get ride of it once mpwt's logger is fixed
+    logger.setLevel(logging.DEBUG)  #TODO: get ride of it once mpwt's logger is fixed
+    # add logger in file
+    formatter = logging.Formatter('%(message)s')
+    file_handler = logging.FileHandler(f'{args.out}/m2m_{args.cmd}.log', 'w+')
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    # set up the default console logger
+    console_handler = logging.StreamHandler()
+    console_handler = logger.handlers[0]  #TODO: get ride of it once mpwt's logger is fixed
+    console_handler.setLevel(logging.INFO)
+    console_handler.setFormatter(formatter)
     if args.quiet:
-        root_logger.setLevel(logging.CRITICAL)
-    else:
-        root_logger.setLevel(logging.INFO)
+        console_handler.setLevel(logging.CRITICAL)
+    logger.addHandler(console_handler)
 
     # test writing in out_directory if a subcommand is given else print version and help
     if args.cmd:
@@ -303,6 +313,7 @@ def main():
         main_test(args.out, args.cpu)
 
     logger.info("--- Total runtime %.2f seconds ---" % (time.time() - start_time))
+    logger.critical(f'--- Logs written in {args.out}/m2m_{args.cmd}.log ---')
 
 
 def main_workflow(*allargs):

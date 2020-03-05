@@ -19,7 +19,7 @@
 
 import json
 import logging
-import mpwt
+from mpwt import cleaning_input, remove_pgdbs, multiprocess_pwt
 import os
 import tempfile
 import time
@@ -243,14 +243,14 @@ def mincom(instance_w_targets, out_dir):
     # Give intersection of solutions
     intersection = all_results['inter_bacteria']
     logger.info('######### Essential symbionts: Intersection of minimal communities #########')
-    logger.info("# Bacteria occurring in ALL minimal community enabling the producibility of the target metabolites given as inputs")
+    logger.info("# Bacteria occurring in ALL minimal communities enabling the producibility of the target metabolites given as inputs")
     logger.info("Essential symbionts = " +
                 str(len(intersection)))
     logger.info("\n".join(intersection))
     # Give keystones, essential and alternative symbionts
     alternative_symbionts = list(set(union) - set(intersection))
     logger.info('######### Alternative symbionts: Difference between Union and Intersection #########')
-    logger.info("# Bacteria occurring in at least one minimal community but not all minimal community enabling the producibility of the target metabolites given as inputs")
+    logger.info("# Bacteria occurring in at least one minimal community but not all minimal communities enabling the producibility of the target metabolites given as inputs")
     logger.info("Alternative symbionts = " +
                 str(len(alternative_symbionts)))
     logger.info("\n".join(alternative_symbionts))
@@ -303,8 +303,8 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
 
     genomes_pgdbs = [genome_dir.lower() + 'cyc' for genome_dir in os.listdir(genomes_dir)]
     if clean:
-        mpwt.remove_pgdbs(to_delete_pgdbs=genomes_pgdbs, number_cpu=cpu)
-        mpwt.cleaning_input(genomes_dir, verbose=False)
+        remove_pgdbs(to_delete_pgdbs=genomes_pgdbs, number_cpu=cpu)
+        cleaning_input(genomes_dir, verbose=False)
 
     # Check whether PGDBs are already created. If yes and not --clean, pursue without running ptools again
     pgdb_dirs = [pgdb_dir.lower() + 'cyc' for pgdb_dir in os.listdir(pgdb_dir)]
@@ -317,7 +317,7 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
         taxon_file = True
 
     try:
-        mpwt.multiprocess_pwt(genomes_dir, pgdb_dir,
+        multiprocess_pwt(genomes_dir, pgdb_dir,
                             patho_inference=True,
                             patho_hole_filler=False,
                             patho_operon_predictor=False,
