@@ -238,8 +238,8 @@ def main():
         parser.print_help()
         sys.exit(1)
 
-    logger = logging.getLogger()    #TODO: get ride of it once mpwt's logger is fixed
-    logger.setLevel(logging.DEBUG)  #TODO: get ride of it once mpwt's logger is fixed
+    logger = logging.getLogger()    #TODO: get rid of it once mpwt's logger is fixed
+    logger.setLevel(logging.DEBUG)  #TODO: get rid of it once mpwt's logger is fixed
     # add logger in file
     formatter = logging.Formatter('%(message)s')
     file_handler = logging.FileHandler(f'{args.out}/m2m_{args.cmd}.log', 'w+')
@@ -248,7 +248,7 @@ def main():
     logger.addHandler(file_handler)
     # set up the default console logger
     console_handler = logging.StreamHandler()
-    console_handler = logger.handlers[0]  #TODO: get ride of it once mpwt's logger is fixed
+    console_handler = logger.handlers[0]  #TODO: get rid of it once mpwt's logger is fixed
     console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(formatter)
     if args.quiet:

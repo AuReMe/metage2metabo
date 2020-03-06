@@ -19,7 +19,8 @@
 
 import json
 import logging
-from mpwt import cleaning_input, remove_pgdbs, multiprocess_pwt
+from mpwt.mpwt_workflow import multiprocess_pwt
+from mpwt.utils import cleaning_input, remove_pgdbs
 import os
 import tempfile
 import time
