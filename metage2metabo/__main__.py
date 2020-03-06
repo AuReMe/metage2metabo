@@ -238,6 +238,16 @@ def main():
         parser.print_help()
         sys.exit(1)
 
+    # test writing in out_directory if a subcommand is given else print version and help
+    if args.cmd:
+        if not utils.is_valid_dir(args.out):
+            logger.critical("Impossible to access/create output directory")
+            sys.exit(1)
+    else:
+        logger.info("m2m " + VERSION + "\n" + LICENSE)
+        parser.print_help()
+        sys.exit()
+
     logger = logging.getLogger()    #TODO: get rid of it once mpwt's logger is fixed
     logger.setLevel(logging.DEBUG)  #TODO: get rid of it once mpwt's logger is fixed
     # add logger in file
@@ -254,16 +264,6 @@ def main():
     if args.quiet:
         console_handler.setLevel(logging.CRITICAL)
     logger.addHandler(console_handler)
-
-    # test writing in out_directory if a subcommand is given else print version and help
-    if args.cmd:
-        if not utils.is_valid_dir(args.out):
-            logger.critical("Impossible to access/create output directory")
-            sys.exit(1)
-    else:
-        logger.info("m2m " + VERSION + "\n" + LICENSE)
-        parser.print_help()
-        sys.exit()
 
     #if modelhost is given as an arg: check the SBML level and turn it into 2 if needed
     if args.cmd in ["workflow", "metacom", "mincom", "cscope", "addedvalue"] and args.modelhost:
