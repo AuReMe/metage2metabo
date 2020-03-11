@@ -113,13 +113,11 @@ def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clea
         tuple: PGDB directory (str), SBML directory (str)
     """
     starttime = time.time()
+
     # Create PGDBs
-    try:
-        pgdb_dir = genomes_to_pgdb(inp_dir, out_dir, nb_cpu,
+    pgdb_dir = genomes_to_pgdb(inp_dir, out_dir, nb_cpu,
                                    clean)
-    except:
-        logger.info("Could not run Pathway Tools")
-        sys.exit(1)
+
     # Create SBMLs from PGDBs
     sbml_dir = sbml_management.pgdb_to_sbml(pgdb_dir, out_dir, noorphan_bool,
                                             padmet_bool, sbml_level, nb_cpu)
@@ -317,25 +315,26 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
     if 'taxon_id.tsv' in set(next(os.walk(genomes_dir))[2]):
         taxon_file = True
 
-    try:
-        multiprocess_pwt(genomes_dir, pgdb_dir,
-                            patho_inference=True,
-                            patho_hole_filler=False,
-                            patho_operon_predictor=False,
-                            no_download_articles=False,
-                            dat_creation=True,
-                            dat_extraction=True,
-                            size_reduction=False,
-                            number_cpu=cpu,
-                            taxon_file=taxon_file,
-                            patho_log=log_dir,
-                            verbose=False)
-    except:
+    multiprocess_pwt(genomes_dir, pgdb_dir,
+                        patho_inference=True,
+                        patho_hole_filler=False,
+                        patho_operon_predictor=False,
+                        no_download_articles=False,
+                        dat_creation=True,
+                        dat_extraction=True,
+                        size_reduction=False,
+                        number_cpu=cpu,
+                        taxon_file=taxon_file,
+                        patho_log=log_dir,
+                        verbose=False)
+
+    if len(os.listdir(pgdb_dir)) != len(os.listdir(genomes_dir)):
         if os.path.exists(log_dir + "/log_error.txt"):
             logger.critical("Something went wrong running Pathway Tools. See the log file in " + log_dir + "/log_error.txt")
         else:
             logger.critical("Something went wrong running Pathway Tools.")
         sys.exit(1)
+
     return (pgdb_dir)
 
 
