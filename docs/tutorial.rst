@@ -23,7 +23,7 @@ Optional arguments:
 -p               create padmet files from PGDB
 -l int           specify the level for the sbml to be created
 
-The inputs genomic data has to follow a strict structure:
+The input genomic data has to follow a strict structure:
 
 ::
 
@@ -49,6 +49,9 @@ By extracting this file, you will find the
         │   └── GCA_003433665.gbk
         ├── GCA_003433675
         │   └── GCA_003433675.gbk
+
+In addition, the genbank files also follow the strict requirements of Pathway Tools.
+Please go check the `documentation of mpwt <https://github.com/AuReMe/mpwt#genbank>`__ for more details, especially if you get errors from Pathway Tools at the ``recon`` step.
 
 .. code:: sh
 

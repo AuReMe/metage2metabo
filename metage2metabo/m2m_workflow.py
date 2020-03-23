@@ -220,7 +220,7 @@ def mincom(instance_w_targets, out_dir):
     for key in all_results:
         all_results[key] = list(all_results[key])
     with open(miscoto_dir + "/mincom.json", 'w') as dumpfile:
-        json.dump(all_results, dumpfile, default=lambda x: x.__dict__)
+        json.dump(all_results, dumpfile, indent=4, default=lambda x: x.__dict__)
     logger.info("Community scopes for all metabolic networks available in " +
                 miscoto_dir + "/comm_scopes.json")
     # Give one solution
@@ -602,7 +602,7 @@ def indiv_scope_run(sbml_dir, seeds, output_dir):
             logger.critical("Something went wrong running Menetools")
 
     with open(menetools_dir + "/indiv_scopes.json", 'w') as dumpfile:
-        json.dump(all_scopes, dumpfile)
+        json.dump(all_scopes, dumpfile, indent=4)
     return menetools_dir + "/indiv_scopes.json"
 
 
@@ -699,7 +699,7 @@ def comm_scope_run(instance, output_dir):
         sys.exit(1)
     microbiota_scope = run_scopes(instance)
     with open(miscoto_dir + "/comm_scopes.json", 'w') as dumpfile:
-        json.dump(microbiota_scope, dumpfile)
+        json.dump(microbiota_scope, dumpfile, indent=4)
     logger.info("Community scopes for all metabolic networks available in " +
                 miscoto_dir + "/comm_scopes.json")
     return set(microbiota_scope['com_scope'])
