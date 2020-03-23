@@ -7,6 +7,8 @@ import re
 import sys
 import tarfile
 import time
+import traceback
+import subprocess
 from shutil import copyfile,which
 
 from metage2metabo.m2m_workflow import run_workflow, recon, iscope, cscope, addedvalue, mincom, instance_community, metacom_analysis
@@ -33,6 +35,15 @@ if not which('clingo'):
     logger.critical('clingo is not in the Path, m2m can not work without it.')
     logger.critical('You can install with: pip install clyngor-with-clingo') 
     sys.exit(1)
+
+# Check if clingo is accessible.
+try:
+    subprocess.call(['clingo', '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+except:
+    logger.critical('Error with clingo.')
+    logger.critical(traceback.format_exc())
+    sys.exit(1)
+
 
 def main():
     """Run programm
@@ -248,8 +259,6 @@ def main():
         parser.print_help()
         sys.exit()
 
-    logger = logging.getLogger()    #TODO: get rid of it once mpwt's logger is fixed
-    logger.setLevel(logging.DEBUG)  #TODO: get rid of it once mpwt's logger is fixed
     # add logger in file
     formatter = logging.Formatter('%(message)s')
     file_handler = logging.FileHandler(f'{args.out}/m2m_{args.cmd}.log', 'w+')
@@ -258,7 +267,6 @@ def main():
     logger.addHandler(file_handler)
     # set up the default console logger
     console_handler = logging.StreamHandler()
-    console_handler = logger.handlers[0]  #TODO: get rid of it once mpwt's logger is fixed
     console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(formatter)
     if args.quiet:

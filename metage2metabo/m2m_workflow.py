@@ -36,7 +36,7 @@ import csv
 import xml.etree.ElementTree as etree
 from padmet.utils import sbmlPlugin
 from multiprocessing import Pool
-
+import traceback
 
 logger = logging.getLogger(__name__)
 logging.getLogger("menetools").setLevel(logging.CRITICAL)
@@ -106,6 +106,7 @@ def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clea
         out_dir (str): results directory
         noorphan_bool (bool): ignores orphan reactions if True
         padmet_bool (bool): creates padmet files if True
+        sbml_level (str): SBML level (2 or 3)
         nb_cpu (int): number of CPU for multiprocessing
         clean (bool): re-run metabolic reconstructions that are already available if found
 
@@ -599,7 +600,12 @@ def indiv_scope_run(sbml_dir, seeds, output_dir):
             all_scopes[bname] = run_menescope(
                 draft_sbml=os.path.join(sbml_dir, f), seeds_sbml=seeds)
         except:
-            logger.critical("Something went wrong running Menetools")
+            traceback_str = traceback.format_exc()
+            # Don't print the traceback if the error is linked to SystemExit as the error has been hanled by menetools.
+            if 'SystemExit: 1' not in traceback_str:
+                logger.critical(traceback_str)
+            logger.critical("---------------Something went wrong running Menetools on " + f + "---------------")
+            sys.exit(1)
 
     with open(menetools_dir + "/indiv_scopes.json", 'w') as dumpfile:
         json.dump(all_scopes, dumpfile, indent=4)
@@ -629,6 +635,13 @@ def analyze_indiv_scope(jsonfile, seeds):
         sys.exit(1)
     except etree.ParseError:
         logger.critical("Invalid syntax in SBML file: "+seeds)
+        sys.exit(1)
+    except:
+        traceback_str = traceback.format_exc()
+        # Don't print the traceback if the error is linked to SystemExit as the error has been hanled by menetools.
+        if 'SystemExit: 1' not in traceback_str:
+            logger.critical(traceback_str)
+        logger.critical("---------------Something went wrong running Menetools on " + f + "---------------")
         sys.exit(1)
 
     logger.info("%i metabolic models considered." %(len(d_set)))
