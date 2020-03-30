@@ -45,7 +45,7 @@ logging.getLogger("mpwt").setLevel(logging.CRITICAL)
 
 
 def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_bool, host_mn):
-    """Run the whole m2m workflow
+    """Run the whole m2m workflow.
     
     Args:
         inp_dir (str): genomes directory
@@ -65,7 +65,7 @@ def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_b
 
 
 def metacom_analysis(sbml_dir, out_dir, seeds, host_mn):
-    """Run the metabolism community analysis part of m2m
+    """Run the metabolism community analysis part of m2m.
 
     Args:
         sbml_dir (str): sbml input directory
@@ -78,7 +78,7 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn):
     # COMMUNITY SCOPE
     instance_com, targets_cscope = cscope(sbml_dir, seeds, out_dir, host_mn)
     # ADDED VALUE
-    newtargets = addedvalue(union_targets_iscope, targets_cscope)
+    newtargets = addedvalue(union_targets_iscope, targets_cscope, out_dir)
     if len(newtargets) > 0:
         sbml_management.create_species_sbml(newtargets, out_dir + "/community_analysis/targets.sbml")
         logger.info("Target file created with the addedvalue targets in: " +
@@ -99,7 +99,7 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn):
 
 
 def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clean):
-    """Run metabolic network reconstruction with Pathway Tools and get SBMLs
+    """Run metabolic network reconstruction with Pathway Tools and get SBMLs.
     
     Args:
         inp_dir (str): genomes directory
@@ -133,7 +133,7 @@ def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clea
 
 
 def iscope(sbmldir, seeds, out_dir):
-    """Compute individual scopes (reachable metabolites) for SBML files in a directory
+    """Compute individual scopes (reachable metabolites) for SBML files in a directory.
     
     Args:
         sbmldir (str): SBML files directory
@@ -161,7 +161,7 @@ def iscope(sbmldir, seeds, out_dir):
 
 
 def cscope(sbmldir, seeds, outdir, host=None):
-    """Run community scope
+    """Run community scope.
     
     Args:
         sbmldir (str): SBML files directory
@@ -183,8 +183,8 @@ def cscope(sbmldir, seeds, outdir, host=None):
     return instance_com, community_reachable_metabolites
 
 
-def addedvalue(iscope_rm, cscope_rm):
-    """Compute the added value of considering interaction with microbiota metabolism rather than individual metabolisms
+def addedvalue(iscope_rm, cscope_rm, out_dir):
+    """Compute the added value of considering interaction with microbiota metabolism rather than individual metabolisms.
     
     Args:
         iscope_rm (set): union of metabolites in all individual scopes
@@ -199,11 +199,18 @@ def addedvalue(iscope_rm, cscope_rm):
                 str(len(newtargets)) + " newly reachable metabolites: \n")
     logger.info('\n'.join(newtargets))
     logger.info("\n")
+    miscoto_dir = out_dir + "/community_analysis"
+    if not utils.is_valid_dir(miscoto_dir):
+        logger.critical("Impossible to access/create output directory")
+        sys.exit(1)
+    with open(miscoto_dir + "/addedvalue.json", 'w') as dumpfile:
+        json.dump(newtargets, dumpfile, indent=4, default=lambda x: x.__dict__)
+    logger.info(f"Added-value of cooperation written in {miscoto_dir}/addedvalue.json")
     return newtargets
 
 
 def mincom(instance_w_targets, out_dir):
-    """Compute minimal community selection and show analyses
+    """Compute minimal community selection and show analyses.
     
     Args:
         instance_w_targets (str): ASP instance filepath
@@ -573,7 +580,7 @@ def analyze_recon(sbml_folder, output_stat_file, padmet_folder, padmet_bool=None
 
 
 def indiv_scope_run(sbml_dir, seeds, output_dir):
-    """Run Menetools and analyse individual metabolic capabilities
+    """Run Menetools and analyse individual metabolic capabilities.
     
     Args:
         sbml_dir (str): directory of SBML files
@@ -663,7 +670,7 @@ def analyze_indiv_scope(jsonfile, seeds):
 
 
 def instance_community(sbml_dir, seeds, output_dir, targets = None, host_mn=None):
-    """Create ASP instance for community analysis
+    """Create ASP instance for community analysis.
     
     Args:
         sbml_dir (str): directory of symbionts SBML files
@@ -719,7 +726,7 @@ def comm_scope_run(instance, output_dir):
 
 
 def add_targets_to_instance(instancefile, output_dir, target_set):
-    """Add targets to the ASP community instance file
+    """Add targets to the ASP community instance file.
     
     Args:
         instancefile (str): instance filepath
@@ -739,7 +746,7 @@ def add_targets_to_instance(instancefile, output_dir, target_set):
 
 
 def compute_mincom(instancefile, output_dir):
-    """Run minimal community selection and analysis
+    """Run minimal community selection and analysis.
     
     Args:
         instancefile (str): filepath to instance file

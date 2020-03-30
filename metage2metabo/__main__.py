@@ -46,7 +46,7 @@ except:
 
 
 def main():
-    """Run programm
+    """Run programm.
     """
     start_time = time.time()
     parser = argparse.ArgumentParser(
@@ -325,19 +325,19 @@ def main():
 
 
 def main_workflow(*allargs):
-    """Run main workflow
+    """Run main workflow.
     """
     run_workflow(*allargs)
 
 
 def main_metacom(*allargs):
-    """Run main workflow
+    """Run main workflow.
     """
     metacom_analysis(*allargs)
 
 
 def main_recon(*allargs):
-    """Run recon command
+    """Run recon command.
     """
     pgdbdir, sbmldir, padmet_folder= recon(*allargs)
     logger.info("PGDB created in " + pgdbdir)
@@ -348,13 +348,13 @@ def main_recon(*allargs):
 
 
 def main_iscope(*allargs):
-    """Run iscope command
+    """Run iscope command.
     """
     return iscope(*allargs)
 
 
 def main_cscope(*allargs):
-    """Run cscope command
+    """Run cscope command.
     """
     instance_com, comscope = cscope(*allargs)
     logger.info("\n" + str(len(comscope)) + " metabolites (excluding the seeds) reachable by the whole community/microbiota: \n")
@@ -365,7 +365,7 @@ def main_cscope(*allargs):
 
 
 def main_added_value(sbmldir, seeds, outdir, host):
-    """Run addedvalue command
+    """Run addedvalue command.
     
     Args:
         sbmldir (str): SBML file directory
@@ -376,7 +376,7 @@ def main_added_value(sbmldir, seeds, outdir, host):
     iscope_metabolites = main_iscope(sbmldir, seeds, outdir)
     #logger.info(", ".join(iscope_metabolites))
     cscope_metabolites = main_cscope(sbmldir, seeds, outdir, host)
-    newtargets = addedvalue(iscope_metabolites, cscope_metabolites)
+    newtargets = addedvalue(iscope_metabolites, cscope_metabolites, outdir)
     if len(newtargets) > 0:
         sbml_management.create_species_sbml(newtargets, outdir + "/community_analysis/targets.sbml")
         logger.info("Target file created with the addedvalue targets in: " +
@@ -384,7 +384,7 @@ def main_added_value(sbmldir, seeds, outdir, host):
 
 
 def main_mincom(sbmldir, seedsfiles, outdir, targets, host):
-    """Run mincom command
+    """Run mincom command.
     
     Args:
         sbmldir (str): SBML files directory
@@ -402,7 +402,7 @@ def main_mincom(sbmldir, seedsfiles, outdir, targets, host):
 
 
 def main_seeds(metabolites_file, outdir):
-    """Run seeds command
+    """Run seeds command.
     
     Args:
         metabolites_file (str): text file with metabolites IDs, one per line
@@ -424,7 +424,7 @@ def main_seeds(metabolites_file, outdir):
 
 
 def main_test(outdir, cpu):
-    """Run test command
+    """Run test command.
 
     Args:
         outdir (str): directory containing the test data and the test output
@@ -448,7 +448,7 @@ def main_test(outdir, cpu):
 
 
 def check_sbml(inpt, outdir, folder = True):
-    """Check whether one or several SBML level 3 files are in directory. If yes, convert them into a new directory and copy the SBML files that are correct into this same directory
+    """Check whether one or several SBML level 3 files are in directory. If yes, convert them into a new directory and copy the SBML files that are correct into this same directory.
     
     Args:
         inpt (str): SBML files directory
