@@ -203,8 +203,9 @@ def addedvalue(iscope_rm, cscope_rm, out_dir):
     if not utils.is_valid_dir(miscoto_dir):
         logger.critical("Impossible to access/create output directory")
         sys.exit(1)
+    dict_av = {"addedvalue": list(newtargets)}
     with open(miscoto_dir + "/addedvalue.json", 'w') as dumpfile:
-        json.dump(newtargets, dumpfile, indent=4, default=lambda x: x.__dict__)
+        json.dump(dict_av, dumpfile, indent=4, default=lambda x: x.__dict__)
     logger.info(f"Added-value of cooperation written in {miscoto_dir}/addedvalue.json")
     return newtargets
 
