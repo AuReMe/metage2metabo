@@ -64,9 +64,11 @@ m2m relies on several Python packages:
 
 * `miscoto <https://github.com/cfrioux/miscoto>`__ to analyze collective metabolic capabilities and select communities within microbiota using logic programming.
 
+A list of Python dependencies is available in `requirements.txt <https://github.com/AuReMe/metage2metabo/blob/master/requirements.txt>`__
+
 Tested on Linux (Ubuntu, Fedora, Debian) and MacOs (version 10.14).
 
-Tested with Python3.6
+Tested with Python v3.6, v3.7, v3.8.
 
 Installation with pip
 =====================

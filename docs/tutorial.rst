@@ -285,7 +285,7 @@ Optional arguments:
 
     651 metabolites are reachable by the microbiota. This does not include the seeds. The list of metabolites is given in output. 
 * files outputs
-    * In addition to the logs at the rooth of the results directory, a json file with the results is created in `output_directory/community_analysis/indiv_scopes.json`.
+    * In addition to the logs at the root of the results directory, a json file with the results is created in `output_directory/community_analysis/indiv_scopes.json`.
 
 addedvalue
 **********

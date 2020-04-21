@@ -10,6 +10,17 @@ m2m can be used as a whole workflow (``m2m workflow``) or steps can be performed
 
 This project is licensed under the GNU General Public License - see the `LICENSE.md <https://github.com/AuReMe/metage2metabo/blob/master/LICENSE>`__ file for details.
 
+General information about the modelling
+========================================
+
+M2M has two main depenpencies for modelling metabolic networks: `MeneTools <https://github.com/cfrioux/MeneTools>`__ and `Miscoto <https://github.com/cfrioux/miscoto>`__. Accordingly metabolic models in M2M follow the producibility in metabolic networks as defined by the `network expansion <http://www.ncbi.nlm.nih.gov/pubmed/15712108>`__ algorithm.
+Mainly, two rules are followed:
+* a *recursive rule*: the products of a reactions are producible if **all** reactants of this reaction are themselves producible
+* an *initiation rule*: producibility is initiated by the presence of nutrients, called *seeds*. 
+
+A metabolite that is producible from a set of nutrients is described as being "in the scope of the seeds".
+The computation is made using logic solvers (Answer Set Programming). The present modelling ignores the stoichiometry of reactions (2A + B --> C is considered equivalent to A + B --> C), and is therefore suited to non-curated or draft metabolic networks, as the ones built using M2M with the PathoLogic software of `Pathway Tools <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5036846/pdf/bbv079.pdf>`__ handled by `Mpwt <https://github.com/AuReMe/mpwt>`__. Many works have relied on network expansion to study organisms (`here <http://doi.wiley.com/10.1111/tpj.12627>`__, `here <https://dx.plos.org/10.1371/journal.pcbi.1000049>`__ or `there <http://dx.plos.org/10.1371/journal.pcbi.1005276>`__) and communities (`here <https://academic.oup.com/bioinformatics/article/34/17/i934/5093211>`__, `here <https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-018-4786-7>`__, or `here <https://www.ncbi.nlm.nih.gov/pubmed/18546499>`__). It has been `compared <http://www.ncbi.nlm.nih.gov/pubmed/19425125>`__, `combined <https://www.cambridge.org/core/product/identifier/S1471068418000455/type/journal_article>`__ to steady-state modelling (Flux Balance Analysis). 
+
 m2m's documentation
 ===================
 
@@ -28,7 +39,7 @@ m2m's documentation
 Additional features
 ===================
 
-M2M relies on packages that can also be used independantly with more features:
+M2M relies on packages that can also be used independantly with more features and additional options:
 
 * `mpwt <https://github.com/AuReMe/mpwt>`__: command-line and multi-process solutions to run Pathway Tools. Suitable to multiple reconstruction, for example genomes of a microbiota
 
