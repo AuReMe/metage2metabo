@@ -18,10 +18,11 @@
 # -*- coding: utf-8 -*-
 
 from setuptools import setup
+import metage2metabo
 
 setup(
     name='Metage2Metabo',
-    version='1.1.6',
+    version=__version__,
     url='https://github.com/aureme/metage2metabo',
     license='GPLv3+',
     description=
