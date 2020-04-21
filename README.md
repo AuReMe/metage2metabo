@@ -1,4 +1,4 @@
-[![PyPI version](https://img.shields.io/pypi/v/metage2metabo.svg)](https://pypi.org/project/Metage2Metabo/) [![GitHub license](https://img.shields.io/github/license/AuReMe/metage2metabo.svg)](https://github.com/AuReMe/metage2metabo/blob/master/LICENSE) [![Build Status](https://travis-ci.org/AuReMe/metage2metabo.svg?branch=master)](https://travis-ci.org/AuReMe/metage2metabo) [![Documentation Status](https://readthedocs.org/projects/metage2metabo/badge/?version=latest)](https://metage2metabo.readthedocs.io/en/latest/?badge=latest)
+[![PyPI version](https://img.shields.io/pypi/v/metage2metabo.svg)](https://pypi.org/project/Metage2Metabo/) [![GitHub license](https://img.shields.io/github/license/AuReMe/metage2metabo.svg)](https://github.com/AuReMe/metage2metabo/blob/master/LICENSE) [![Actions Status](https://github.com/AuReMe/metage2metabo/workflows/Python%20package/badge.svg)](https://github.com/AuReMe/metage2metabo/actions) [![Documentation Status](https://readthedocs.org/projects/metage2metabo/badge/?version=latest)](https://metage2metabo.readthedocs.io/en/latest/?badge=latest)
 # M2M - metage2metabo
 Metage2metabo is a Python3 (Python >= 3.6) tool to perform graph-based metabolic analysis starting from annotated genomes (**reference genomes or metagenome-assembled genomes**). It uses *Pathway Tools* in a automatic and parallel way to **reconstruct metabolic networks** for a large number of genomes. The obtained metabolic networks are then **analyzed individually and collectively** in order to get the **added value of metabolic cooperation in microbiota over individual metabolism** and to **identify and screen interesting organisms** among all. 
 
@@ -8,9 +8,9 @@ m2m can be used as a whole workflow ( ``` m2m workflow ``` ) or steps can be per
 ## Table of contents
 - [M2M - metage2metabo](#m2m---metage2metabo)
   - [Table of contents](#table-of-contents)
-  - [General information](#general-information)
+  - [General information about the modelling](#general-information-about-the-modelling)
+  - [License](#license)
   - [Documentation](#documentation)
-  - [License](#License)
   - [Technologies](#technologies)
   - [Requirements](#requirements)
   - [Installation](#installation)
