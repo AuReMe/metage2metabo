@@ -22,7 +22,7 @@ import metage2metabo
 
 setup(
     name='Metage2Metabo',
-    version=__version__,
+    version=metage2metabo.__version__,
     url='https://github.com/aureme/metage2metabo',
     license='GPLv3+',
     description=
