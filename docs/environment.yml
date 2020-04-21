@@ -1,6 +1,5 @@
 name: metage2metabo
-channels:
-- bioconda
 dependencies:
-- python=3.6
-- biopython
+ - python=3.6
+ - pip:
+   - biopython
