@@ -180,7 +180,7 @@ def test_m2m_metacom_call():
     resfile = respath + 'community_analysis/mincom.json'
     # ISCOPE ANALYSIS
     # ensure there is the right number of computed indiv scopes
-    with open(iscope_file) as json_idata:
+    with open(iscope_file, 'r') as json_idata:
         d_iscope = json.load(json_idata)
     assert len(d_iscope) == NUMBER_BACT
     # ensure the union and intersection are ok
@@ -192,7 +192,7 @@ def test_m2m_metacom_call():
     intersection_scope = set.intersection(*list(d_iscope_set.values()))
     assert len(intersection_scope) == SIZE_INTERSECTION
     # CSCOPE ANALYSIS
-    with open(cscope_file) as json_cdata:
+    with open(cscope_file, 'r') as json_cdata:
         d_cscope = json.load(json_cdata)
     assert len(d_cscope['com_scope']) == SIZE_CSCOPE
     # ADDEDVALUE ANALYSIS
@@ -201,7 +201,7 @@ def test_m2m_metacom_call():
     new_targets = set([specie.getId() for specie in document.getModel().getListOfSpecies()])
     assert new_targets == EXPECTED_TARGETS
     # MINCOM ANALYSIS
-    with open(resfile) as json_data:
+    with open(resfile, 'r') as json_data:
         d_mincom = json.load(json_data)
     # ensure the minimal number of bacteria in a minimal community is ok
     assert len(d_mincom['bacteria']) == MIN_SIZE_COM
