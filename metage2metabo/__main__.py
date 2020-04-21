@@ -27,7 +27,7 @@ REQUIRES = """
 Requires: Pathway Tools installed and in $PATH, and NCBI Blast
 """
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('metage2metabo')
 logger.setLevel(logging.DEBUG)
 
 # Check ASP binaries.
@@ -259,8 +259,8 @@ def main():
         parser.print_help()
         sys.exit()
 
-    logger = logging.getLogger()    #TODO: get rid of it once mpwt's logger is fixed
-    logger.setLevel(logging.DEBUG)  #TODO: get rid of it once mpwt's logger is fixed
+    # logger = logging.getLogger()    #TODO: get rid of it once mpwt's logger is fixed
+    # logger.setLevel(logging.DEBUG)  #TODO: get rid of it once mpwt's logger is fixed
     # add logger in file
     formatter = logging.Formatter('%(message)s')
     file_handler = logging.FileHandler(f'{args.out}/m2m_{args.cmd}.log', 'w+')
@@ -268,11 +268,11 @@ def main():
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
     # set up the default console logger
-    console_handler = logging.StreamHandler()
+    console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(formatter)
     if args.quiet:
-        console_handler.setLevel(logging.CRITICAL)
+        console_handler.setLevel(logging.WARNING)
     logger.addHandler(console_handler)
 
     #if modelhost is given as an arg: check the SBML level and turn it into 2 if needed
@@ -323,7 +323,7 @@ def main():
         main_test(args.out, args.cpu)
 
     logger.info("--- Total runtime %.2f seconds ---" % (time.time() - start_time))
-    logger.critical(f'--- Logs written in {args.out}/m2m_{args.cmd}.log ---')
+    logger.warning(f'--- Logs written in {args.out}/m2m_{args.cmd}.log ---')
 
 
 def main_workflow(*allargs):
