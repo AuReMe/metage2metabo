@@ -104,7 +104,7 @@ def test_m2m_addedvalue_call():
     cscope_file = respath + 'community_analysis/comm_scopes.json'
     # ISCOPE ANALYSIS
     # ensure there is the right number of computed indiv scopes
-    with open(iscope_file) as json_idata:
+    with open(iscope_file, 'r') as json_idata:
         d_iscope = json.load(json_idata)
     assert len(d_iscope) == NUMBER_BACT
     # ensure the union and intersection are ok
@@ -116,7 +116,7 @@ def test_m2m_addedvalue_call():
     intersection_scope = set.intersection(*list(d_iscope_set.values()))
     assert len(intersection_scope) == SIZE_INTERSECTION
     # CSCOPE ANALYSIS
-    with open(cscope_file) as json_cdata:
+    with open(cscope_file, 'r') as json_cdata:
         d_cscope = json.load(json_cdata)
     assert len(d_cscope['com_scope']) == SIZE_CSCOPE
     # ADDEDVALUE ANALYSIS

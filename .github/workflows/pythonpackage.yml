@@ -45,3 +45,4 @@ jobs:
         pytest test_m2m_metacom.py
         pytest test_m2m_mincom.py
         pytest test_m2m_addedvalue.py
+        pytest test_m2m_analysis.py

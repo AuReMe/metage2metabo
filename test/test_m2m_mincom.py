@@ -106,7 +106,7 @@ def test_m2m_mincom_call():
     ])
     resfile = respath + 'community_analysis/mincom.json'
     # MINCOM ANALYSIS
-    with open(resfile) as json_data:
+    with open(resfile, 'r') as json_data:
         d_mincom = json.load(json_data)
     # ensure the minimal number of bacteria in a minimal community is ok
     assert len(d_mincom['bacteria']) == MIN_SIZE_COM

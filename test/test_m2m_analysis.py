@@ -81,7 +81,7 @@ def test_m2m_analysis_call():
     json_file = respath +'json' + '/' + 'targets_toy.json'
 
     # KEYSTONE SPECIES ANALYSIS
-    with open(json_file) as json_data:
+    with open(json_file, 'r') as json_data:
         d_m2m_analysis = json.load(json_data)
     assert sorted(d_m2m_analysis['union_bacteria']) == sorted(KEYSTONE_SPECIES)
     assert sorted(d_m2m_analysis['inter_bacteria']) == sorted(ESSENTIAL_SYMBIONTS)
