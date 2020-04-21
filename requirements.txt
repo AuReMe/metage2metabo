@@ -2,6 +2,7 @@ argcomplete==1.11.1
 argh==0.26.2
 Arpeggio==1.9.2
 attrs==19.3.0
+biopython==1.74
 certifi==2020.4.5.1
 chardet==3.0.4
 clyngor==0.3.31
