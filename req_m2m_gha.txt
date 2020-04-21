@@ -1,0 +1,6 @@
+clyngor>=0.3.31
+clyngor-with-clingo>=5.3.post1
+MeneTools>=2.0.6
+Miscoto>=2.0.7
+mpwt>=0.5.4
+padmet>=4.0
