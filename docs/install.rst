@@ -68,7 +68,7 @@ A list of Python dependencies is available in `requirements.txt <https://github.
 
 Tested on Linux (Ubuntu, Fedora, Debian) and MacOs (version 10.14).
 
-Tested with Python v3.6, v3.7, v3.8.
+Tested with Python v3.6, v3.7.
 
 Installation with pip
 =====================
