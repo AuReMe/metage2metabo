@@ -1,0 +1,5 @@
+name: metage2metabo
+dependencies:
+ - python=3.6
+ - pip:
+   - biopython 
