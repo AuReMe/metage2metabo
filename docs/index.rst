@@ -13,7 +13,7 @@ This project is licensed under the GNU General Public License - see the `LICENSE
 General information about the modelling
 ========================================
 
-M2M has two main depenpencies for modelling metabolic networks: `MeneTools <https://github.com/cfrioux/MeneTools>`__ and `Miscoto <https://github.com/cfrioux/miscoto>`__. Accordingly metabolic models in M2M follow the producibility in metabolic networks as defined by the `network expansion <http://www.ncbi.nlm.nih.gov/pubmed/15712108>`__ algorithm.
+M2M has two main dependencies for modelling metabolic networks: `MeneTools <https://github.com/cfrioux/MeneTools>`__ and `Miscoto <https://github.com/cfrioux/miscoto>`__. Accordingly metabolic models in M2M follow the producibility in metabolic networks as defined by the `network expansion <http://www.ncbi.nlm.nih.gov/pubmed/15712108>`__ algorithm.
 Mainly, two rules are followed:
 * a *recursive rule*: the products of a reactions are producible if **all** reactants of this reaction are themselves producible
 * an *initiation rule*: producibility is initiated by the presence of nutrients, called *seeds*. 
