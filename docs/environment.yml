@@ -1,5 +1,15 @@
 name: metage2metabo
+python:
+  version: 3.7
+  install:
+    - requirements: docs/requirements.txt
+    - requirements: requirements.txt
+  system_packages: true
 dependencies:
- - python=3.6
- - pip:
-   - biopython
+  - python=3.7
+  - pip:
+    - biopython
+sphinx:
+  builder: html
+  configuration: conf.py
+  fail_on_warning: true
