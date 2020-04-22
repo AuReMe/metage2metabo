@@ -1,13 +1,7 @@
 name: metage2metabo
-python:
-  version: 3.6
-  install:
-    - requirements: docs/requirements.txt
-    - requirements: requirements.txt
-    - method: pip
-  system_packages: true
 dependencies:
   - python=3.6
   - pip
   - pip:
     - biopython
+    - mpwt
