@@ -8,5 +8,6 @@ python:
   system_packages: true
 dependencies:
   - python=3.6
+  - pip
   - pip:
     - biopython
