@@ -2,6 +2,11 @@
 Commands
 ========
 
+Outputs and logs
+-----------------
+
+By default, ``m2m`` writes into the console (stdout) and into a log file located at the root of the results directory and named after the subcommand that wad executed. The option ``-q`` can be given to any ``m2m`` subcommand to write in the log file and write to stdout only the warnings, errors and critical issues, together with the path to the log file.
+
 Features
 ========
 
