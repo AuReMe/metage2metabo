@@ -553,8 +553,6 @@ def compression(gml_input, bbl_output):
     import powergrasp
     from bubbletools import BubbleTree
 
-    powernodes = 0
-    poweredges = 0
     with open(bbl_output, "w") as fd:
         for line in powergrasp.compress_by_cc(gml_input):
             fd.write(line + "\n")

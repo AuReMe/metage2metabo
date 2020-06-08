@@ -57,7 +57,13 @@ def create_species_sbml(metabolites, outputfile):
         s = model.createSpecies()
         sbmlGenerator.check(s, 'create species')
         sbmlGenerator.check(s.setId(compound), 'set species id')
+        if not name:
+            logger.critical("No name for " + compound)
+            sys.exit(1)
         sbmlGenerator.check(s.setName(name), 'set species name')
+        if not comp:
+            logger.critical("No compartment for " + compound)
+            sys.exit(1)
         sbmlGenerator.check(s.setCompartment(comp), 'set species compartment')
     libsbml.writeSBMLToFile(document, outputfile)
 
