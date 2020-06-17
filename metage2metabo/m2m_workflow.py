@@ -337,7 +337,9 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
                         patho_log=log_dir,
                         verbose=False)
 
-    if len(os.listdir(pgdb_dir)) != len(os.listdir(genomes_dir)):
+    nb_genomes_dir = len([folder for folder in os.listdir(genomes_dir) if os.path.isdir(genomes_dir+'/'+folder)])
+    nb_pgdb_dir = len([folder for folder in os.listdir(pgdb_dir) if os.path.isdir(pgdb_dir+'/'+folder)])
+    if nb_pgdb_dir != nb_genomes_dir:
         if os.path.exists(log_dir + "/log_error.txt"):
             logger.critical("Something went wrong running Pathway Tools. See the log file in " + log_dir + "/log_error.txt")
         else:
