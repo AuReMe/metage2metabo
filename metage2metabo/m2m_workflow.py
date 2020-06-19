@@ -41,7 +41,7 @@ import traceback
 logger = logging.getLogger(__name__)
 logging.getLogger("menetools").setLevel(logging.CRITICAL)
 logging.getLogger("miscoto").setLevel(logging.CRITICAL)
-logging.getLogger("mpwt").setLevel(logging.CRITICAL)
+logging.getLogger("mpwt").setLevel(logging.INFO)
 
 
 def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_bool, host_mn):

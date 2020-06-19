@@ -27,7 +27,7 @@ REQUIRES = """
 Requires: Pathway Tools installed and in $PATH, and NCBI Blast
 """
 
-logger = logging.getLogger('metage2metabo')
+logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
 # Check ASP binaries.
