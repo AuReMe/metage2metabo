@@ -6,8 +6,16 @@ name: Python package
 on:
   push:
     branches: [ master ]
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - '.readthedocs.yml'
   pull_request:
     branches: [ master ]
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - '.readthedocs.yml'
 
 jobs:
   build:
