@@ -226,8 +226,9 @@ def main():
         sys.exit()
 
     # Check Oog.jar file
-    if args.oog:
-        check_oog_jar_file(args.oog)
+    if args.cmd in ["workflow", "powergraph"]:
+        if args.oog:
+            check_oog_jar_file(args.oog)
 
     #if modelhost is given as an arg: check the SBML level and turn it into 2 if needed
     if args.cmd in ["workflow", "enum"]:
