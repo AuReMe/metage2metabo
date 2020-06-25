@@ -573,23 +573,32 @@ def check_oog_jar_file(oog_jar):
     Args:
         oog_jar (str): path to oog jar file
     """
+    if not os.path.isfile(oog_jar):
+        sys.exit('Check Oog.jar: ' + oog_jar + ' is not an available file.')
+
+    try:
+        jarfile = zipfile.ZipFile(oog_jar, "r")
+    except zipfile.BadZipFile:
+        sys.exit('Check Oog.jar: ' + oog_jar + ' is not a valid .jar file (as it is not a correct zip file).')
+
     oog_class = None
     manifest_jar = None
 
-    with zipfile.ZipFile(oog_jar, "r") as jarfile:
-        for filename in jarfile.namelist():
-            if filename.startswith("org/mattlab/eaglevista/Oog.class".rstrip("/")):
-                oog_class = True
-            if filename.startswith("META-INF/MANIFEST.MF".rstrip("/")):
-                manifest_jar = True
+    for filename in jarfile.namelist():
+        if filename.startswith("org/mattlab/eaglevista/Oog.class".rstrip("/")):
+            oog_class = True
+        if filename.startswith("META-INF/MANIFEST.MF".rstrip("/")):
+            manifest_jar = True
+
+    jarfile.close()
 
     if oog_class and manifest_jar:
         return True
     elif manifest_jar:
-        logger.info('No correct Oog.class in jar file.')
+        logger.info('Check Oog.jar: no correct Oog.class in jar file ' + oog_jar)
         return True
     else:
-        sys.exit('Not a correct jar file.')
+        sys.exit('Check Oog.jar: not a correct jar file ' + oog_jar)
 
 
 def bbl_to_svg(oog_jar, bbl_input, svg_output):
