@@ -1,6 +1,5 @@
-===
 Metage2Metabo (M2M)
-===
+===================
 
 Metage2metabo is a Python3 tool to perform graph-based metabolic analysis starting from annotated genomes (**reference genomes or metagenome-assembled genomes**.
 It uses **Pathway Tools** in a automatic and parallel way to *reconstruct metabolic networks* for a large number of genomes.

@@ -106,6 +106,35 @@ It uses the following mandatory inputs (run ``m2m_analysis enum --help`` for opt
         ├── json
         │   ├── targets_toy.json
 
+m2m_analysis stats
+++++++++++++++++++
+``m2m_analysis stats`` computes statistics on keystone species.
+
+It uses the following mandatory inputs (run ``m2m_analysis stats --help`` for optional arguments):
+
+-j directory           directory of miscoto output JSONs or single JSON
+-o directory           output directory for results
+--taxon file           mpwt taxon file
+
+.. code:: sh
+
+    m2m_analysis stats -j output_directory/json -o output_directory --taxon taxon_id.tsv
+
+* standard output
+    .. code::
+
+        --- Stats runtime 0.00 seconds ---
+
+        --- Total runtime 0.01 seconds ---
+
+* files output
+    ::
+
+        output_directory
+        ├── keystone_species_stats.tsv
+        ├── keystone_species_supdata.tsv
+        ├── miscoto_stats.txt
+
 m2m_analysis graph
 ++++++++++++++++++
 ``m2m_analysis graph`` creates the graph containing the solutions.
@@ -152,7 +181,7 @@ It uses the following mandatory inputs (run ``m2m_analysis powergraph --help`` f
 
 .. code:: sh
 
-    m2m_analysis graph --oog Oog.jar -g output_directory/gml -o output_directory
+    m2m_analysis powergraph --oog Oog.jar -g output_directory/gml -o output_directory
 
 * standard output
     .. code::
@@ -225,7 +254,7 @@ It uses the following mandatory inputs (run ``m2m_analysis workflow --help`` for
 
 .. code:: sh
 
-    m2m_analysis enum -n toy_bact -s metabolic_data/seeds_toy.sbml -t metabolic_data/targets_toy.sbml -o output_directory --oog Oog.jar --taxon taxon_id.tsv
+    m2m_analysis workflow -n toy_bact -s metabolic_data/seeds_toy.sbml -t metabolic_data/targets_toy.sbml -o output_directory --oog Oog.jar --taxon taxon_id.tsv
 
 * standard output
     .. code::

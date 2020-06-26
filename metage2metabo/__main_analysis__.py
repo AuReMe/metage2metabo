@@ -136,7 +136,7 @@ def main():
         "--json",
         metavar="JSON_DIR_OR_FILE",
         help="Folder containing JSON file of single JSON file containing miscoto enumeration results",
-        required=False,
+        required=True,
         type = str)
     parent_parser_g = argparse.ArgumentParser(add_help=False)
     parent_parser_g.add_argument(
