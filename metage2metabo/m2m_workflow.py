@@ -44,7 +44,7 @@ logging.getLogger("miscoto").setLevel(logging.CRITICAL)
 logging.getLogger("mpwt").setLevel(logging.INFO)
 
 
-def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_bool, host_mn):
+def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_bool, host_mn, targets_file):
     """Run the whole m2m workflow.
     
     Args:
@@ -56,15 +56,16 @@ def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_b
         noorphan_bool (bool): ignores orphan reactions if True
         padmet_bool (bool): creates padmet files if True
         host_mn (str): metabolic network file for host
+        targets_file (str): targets file
     """
     # METABOLIC NETWORK RECONSTRUCTION
     sbml_dir = recon(inp_dir, out_dir, noorphan_bool, padmet_bool, 2, nb_cpu, clean)[1]
 
     # METABOLISM COMMUNITY ANALYSIS
-    metacom_analysis(sbml_dir, out_dir, seeds, host_mn)
+    metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file)
 
 
-def metacom_analysis(sbml_dir, out_dir, seeds, host_mn):
+def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
     """Run the metabolism community analysis part of m2m.
 
     Args:
@@ -72,17 +73,36 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn):
         out_dir (str): results directory
         seeds (str): seeds file
         host_mn (str): metabolic network file for host
+        targets_file (str): targets file
     """
     # INDIVIDUAL SCOPES
     union_targets_iscope = iscope(sbml_dir, seeds, out_dir)
     # COMMUNITY SCOPE
     instance_com, targets_cscope = cscope(sbml_dir, seeds, out_dir, host_mn)
-    # ADDED VALUE
-    newtargets = addedvalue(union_targets_iscope, targets_cscope, out_dir)
-    if len(newtargets) > 0:
-        sbml_management.create_species_sbml(newtargets, out_dir + "/community_analysis/targets.sbml")
-        logger.info("Target file created with the addedvalue targets in: " +
-                    out_dir + "/community_analysis/targets.sbml")
+
+    if targets_file is None:
+        # ADDED VALUE
+        newtargets = addedvalue(union_targets_iscope, targets_cscope, out_dir)
+        if len(newtargets) > 0:
+            sbml_management.create_species_sbml(newtargets, out_dir + "/community_analysis/targets.sbml")
+            logger.info("Target file created with the addedvalue targets in: " +
+                        out_dir + "/community_analysis/targets.sbml")
+            # Add these targets to the instance
+            logger.info("Setting these " + str(len(newtargets)) + " as targets")
+            instance_w_targets = add_targets_to_instance(
+                instance_com, out_dir,
+                newtargets)
+            # MINCOM
+            mincom(instance_w_targets, out_dir)
+            # remove intermediate files
+            os.unlink(instance_com)
+            os.unlink(instance_w_targets)
+        else:
+            logger.info("No newly producible compounds, hence no community selection will be computed")
+            os.unlink(instance_com)
+    else:
+        # Use target as input to mincom
+        newtargets = sbml_management.get_compounds(targets_file)
         # Add these targets to the instance
         logger.info("Setting these " + str(len(newtargets)) + " as targets")
         instance_w_targets = add_targets_to_instance(
@@ -93,9 +113,6 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn):
         # remove intermediate files
         os.unlink(instance_com)
         os.unlink(instance_w_targets)
-    else:
-        logger.info("No newly producible compounds, hence no community selection will be computed")
-        os.unlink(instance_com)
 
 
 def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clean):

@@ -12,6 +12,7 @@ import subprocess
 import tarfile
 import json
 from libsbml import SBMLReader
+import metage2metabo
 
 
 EXPECTED_TARGETS = {
@@ -213,6 +214,56 @@ def test_m2m_metacom_call():
     assert set(d_mincom['newly_prod']) == NEWLYPROD_TARGETS
     # clean
     shutil.rmtree(respath)
+
+
+def test_m2m_metacom_targets_import():
+    """
+    Test m2m metacom when called in terminal.
+    """
+    # RUN THE COMMAND
+    inppath = 'metabolic_data/'
+    respath = 'metacom_output/'
+    if not os.path.exists(respath):
+        os.makedirs(respath)
+    with tarfile.open(inppath + 'toy_bact.tar.gz') as tar:
+        tar.extractall(path=respath)
+    metage2metabo.m2m_workflow.metacom_analysis(sbml_dir=respath + '/toy_bact', out_dir=respath,
+                seeds=inppath + '/seeds_toy.sbml', host_mn=None, targets_file=inppath + '/targets_toy.sbml')
+
+    iscope_file = respath + 'indiv_scopes/indiv_scopes.json'
+    cscope_file = respath + 'community_analysis/comm_scopes.json'
+    resfile = respath + 'community_analysis/mincom.json'
+    # ISCOPE ANALYSIS
+    # ensure there is the right number of computed indiv scopes
+    with open(iscope_file, 'r') as json_idata:
+        d_iscope = json.load(json_idata)
+    assert len(d_iscope) == NUMBER_BACT
+    # ensure the union and intersection are ok
+    d_iscope_set = {}
+    for elem in d_iscope:
+        d_iscope_set[elem] = set(d_iscope[elem])
+    union_scope = set.union(*list(d_iscope_set.values()))
+    assert len(union_scope) == SIZE_UNION
+    intersection_scope = set.intersection(*list(d_iscope_set.values()))
+    assert len(intersection_scope) == SIZE_INTERSECTION
+    # CSCOPE ANALYSIS
+    with open(cscope_file, 'r') as json_cdata:
+        d_cscope = json.load(json_cdata)
+    assert len(d_cscope['com_scope']) == SIZE_CSCOPE
+    # MINCOM ANALYSIS
+    with open(resfile, 'r') as json_data:
+        d_mincom = json.load(json_data)
+    # ensure the minimal number of bacteria in a minimal community is ok
+    assert len(d_mincom['bacteria']) == MIN_SIZE_COM
+    # ensure the bacteria in union are ok
+    assert set(d_mincom['union_bacteria']) == UNION
+    # ensure the bacteria in intersection are ok
+    assert set(d_mincom['inter_bacteria']) == INTERSECTION
+    # ensure the newly producible targets are ok
+    assert set(d_mincom['newly_prod']) == NEWLYPROD_TARGETS
+    # clean
+    shutil.rmtree(respath)
+
 
 if __name__ == "__main__":
     test_m2m_metacom_call()

@@ -143,6 +143,20 @@ def main():
         required=False,
         action="store_true",
         default=None)
+    parent_parser_t_required = argparse.ArgumentParser(add_help=False)
+    parent_parser_t_required.add_argument(
+        "-t",
+        "--targets",
+        help="targets for metabolic analysis",
+        required=True
+        )
+    parent_parser_t_optionnal = argparse.ArgumentParser(add_help=False)
+    parent_parser_t_optionnal.add_argument(
+        "-t",
+        "--targets",
+        help="Optionnal targets for metabolic analysis, if not used metage2metabo will use the addedvalue of the community",
+        required=False
+        )
 
     # subparsers
     subparsers = parser.add_subparsers(
@@ -191,16 +205,10 @@ def main():
         help="minimal communtity selection",
         parents=[
             parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m,
-            parent_parser_q
+            parent_parser_q, parent_parser_t_required
         ],
         description=
         "Select minimal-size community to make reachable a set of metabolites")
-    mincom_parser.add_argument(
-        "-t",
-        "--targets",
-        help="targets for metabolic analysis",
-        required=True
-        )
     seeds_parser = subparsers.add_parser(
         "seeds",
         help="creation of seeds SBML file",
@@ -218,7 +226,8 @@ def main():
         help="whole workflow",
         parents=[
             parent_parser_g, parent_parser_s, parent_parser_m, parent_parser_o,
-            parent_parser_c, parent_parser_q, parent_parser_no, parent_parser_p, parent_parser_cl
+            parent_parser_c, parent_parser_q, parent_parser_no, parent_parser_p,
+            parent_parser_t_optionnal, parent_parser_cl
         ],
         description=
         "Run the whole workflow: metabolic network reconstruction, individual and community scope analysis and community selection"
@@ -228,7 +237,7 @@ def main():
         help="whole metabolism community analysis",
         parents=[
             parent_parser_n, parent_parser_s, parent_parser_m, parent_parser_o,
-            parent_parser_q
+            parent_parser_t_optionnal, parent_parser_q
         ],
         description=
         "Run the whole metabolism community analysis: individual and community scope analysis and community selection"
@@ -281,11 +290,16 @@ def main():
     else:
         new_arg_modelhost = None
 
+    if args.cmd in ["metacom", "mincom", "workflow"]:
+        if args.targets is not None:
+            if not utils.is_valid_file(args.targets):
+                logger.critical(args.targets + " is not a correct filepath")
+                sys.exit(1)
 
     # deal with given subcommand
     if args.cmd == "workflow":
         main_workflow(args.genomes, args.out, args.cpu, args.clean, args.seeds,
-                      args.noorphan, args.padmet, new_arg_modelhost)
+                      args.noorphan, args.padmet, new_arg_modelhost, args.targets)
     elif args.cmd in ["iscope", "cscope", "addedvalue", "mincom", "metacom"]:
         if not os.path.isdir(args.networksdir):
             logger.critical(args.networksdir + " is not a correct directory path")
@@ -303,13 +317,9 @@ def main():
                 main_added_value(network_dir, args.seeds, args.out,
                                 new_arg_modelhost)
             elif args.cmd == "mincom":
-                if not utils.is_valid_file(args.targets):
-                    logger.critical(args.targets + " is not a correct filepath")
-                    sys.exit(1)
-                else:
-                    main_mincom(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
+                main_mincom(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
             elif args.cmd == "metacom":
-                main_metacom(network_dir, args.out, args.seeds, new_arg_modelhost)
+                main_metacom(network_dir, args.out, args.seeds, new_arg_modelhost, args.targets)
     elif args.cmd == "recon":
         main_recon(args.genomes, args.out, args.noorphan, args.padmet, args.level, args.cpu,
                    args.clean)

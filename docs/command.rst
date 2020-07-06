@@ -170,8 +170,8 @@ m2m workflow
 
     .. code::
 
-        usage: m2m workflow [-h] -g GENOMES [--clean] -s SEEDS [-m MODELHOST] -o
-                            OUPUT_DIR [-c CPU] [-q] [--noorphan]
+        usage: m2m workflow [-h] -g GENOMES -s SEEDS [-m MODELHOST] -o OUPUT_DIR
+                            [-c CPU] [-q] [--noorphan] [-p] [-t TARGETS] [--clean]
 
         Run the whole workflow: metabolic network reconstruction, individual and
         community scope analysis and community selection
@@ -180,7 +180,6 @@ m2m workflow
             -h, --help            show this help message and exit
             -g GENOMES, --genomes GENOMES
                                     annotated genomes directory
-            --clean               clean PGDBs if already present
             -s SEEDS, --seeds SEEDS
                                     seeds (growth medium) for metabolic analysis
             -m MODELHOST, --modelhost MODELHOST
@@ -191,6 +190,11 @@ m2m workflow
             -q, --quiet           quiet mode
             --noorphan            use this option to ignore reactions without gene or
                                     protein association
+            -p, --padmet          create padmet files
+            -t TARGETS, --targets TARGETS
+                                    Optionnal targets for metabolic analysis, if not used
+                                    metage2metabo will use the addedvalue of the community
+            --clean               clean PGDBs if already present
 
 
 m2m metacom
@@ -199,7 +203,7 @@ m2m metacom
     .. code::
 
         usage: m2m metacom [-h] -n NETWORKS_DIR -s SEEDS [-m MODELHOST] -o OUPUT_DIR
-                        [-q]
+                        [-t TARGETS] [-q]
 
         Run the whole metabolism community analysis: individual and community scope
         analysis and community selection
@@ -214,6 +218,9 @@ m2m metacom
                                 host metabolic model for community analysis
         -o OUPUT_DIR, --out OUPUT_DIR
                                 output directory path
+        -t TARGETS, --targets TARGETS
+                            Optionnal targets for metabolic analysis, if not used
+                            metage2metabo will use the addedvalue of the community
         -q, --quiet           quiet mode
 
 

@@ -457,6 +457,8 @@ It uses the following mandatory inputs (run ``m2m metacom --help`` for optional 
 Optional arguments:
 
 -m file                host metabolic network SBML file
+-t file                Optionnal targets for metabolic analysis, if not used
+                       metage2metabo will use the addedvalue of the community
 -q                     quiet mode
 
 .. code:: sh
@@ -597,6 +599,8 @@ Optional arguments:
 --noorphan       ignore the reactions without gene or 
                  protein association in final metabolic networks
 -p               create padmet files from PGDB
+-t file          Optionnal targets for metabolic analysis, if not used
+                 metage2metabo will use the addedvalue of the community
 -q               quiet mode
 
 You can run the workflow analysis with the two genbanks files available in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/metage2metabo>`__ (`workflow_data`). Two genomes are available in the compressed archive workflow_genomes.tar.gz. The archive has to be uncompressed before testing.
