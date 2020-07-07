@@ -241,14 +241,17 @@ def mincom(instance_w_targets, out_dir):
         sys.exit(1)
     # Compute community selection
     logger.info("Running minimal community selection")
-    all_results = compute_mincom(instance_w_targets, out_dir)
+    all_results = compute_mincom(instance_w_targets, miscoto_dir)
 
     for key in all_results:
         all_results[key] = list(all_results[key])
-    with open(miscoto_dir + "/mincom.json", 'w') as dumpfile:
-        json.dump(all_results, dumpfile, indent=4, default=lambda x: x.__dict__)
+
     logger.info("Community scopes for all metabolic networks available in " +
                 miscoto_dir + "/comm_scopes.json")
+    producible_targets = all_results['newly_prod']
+    unproducible_targets = all_results['still_unprod']
+    logger.info("In the minimal communities, " + str(len(producible_targets)) + " targets are newly producible and " + str(len(unproducible_targets)) + " remain unproducible.")
+    logger.info("Minimal communities are available in " + miscoto_dir + "/mincom.json")
     # Give one solution
     one_sol_bact = []
     for bact in all_results['bacteria']:
@@ -765,17 +768,17 @@ def add_targets_to_instance(instancefile, output_dir, target_set):
     return new_instance_file
 
 
-def compute_mincom(instancefile, output_dir):
+def compute_mincom(instancefile, miscoto_dir):
     """Run minimal community selection and analysis.
     
     Args:
         instancefile (str): filepath to instance file
-        output_dir (str): directory with results
-    
+        miscoto_dir (str): directory with results
+
     Returns:
         dict: results of miscoto_mincom analysis
     """
-    miscoto_dir = output_dir + "/community_analysis"
+    mincom_json_file = miscoto_dir + "/mincom.json"
     if not utils.is_valid_dir(miscoto_dir):
         logger.critical("Impossible to access/create output directory")
         sys.exit(1)
@@ -784,5 +787,6 @@ def compute_mincom(instancefile, output_dir):
                             lp_instance_file=instancefile,
                             optsol=True,
                             union=True,
-                            intersection=True)
+                            intersection=True,
+                            output_json=mincom_json_file)
     return results_dic
