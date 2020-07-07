@@ -302,7 +302,7 @@ optional arguments:
                         protein association
   -p, --padmet          create padmet files
   -t TARGETS, --targets TARGETS
-                        Optionnal targets for metabolic analysis, if not used
+                        Optional targets for metabolic analysis, if not used
                         metage2metabo will use the addedvalue of the community
   --clean               clean PGDBs if already present
 ````
@@ -327,7 +327,7 @@ optional arguments:
   -o OUPUT_DIR, --out OUPUT_DIR
                         output directory path
   -t TARGETS, --targets TARGETS
-                        Optionnal targets for metabolic analysis, if not used
+                        Optional targets for metabolic analysis, if not used
                         metage2metabo will use the addedvalue of the community
   -q, --quiet           quiet mode
 ````
