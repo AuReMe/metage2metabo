@@ -150,11 +150,11 @@ def main():
         help="targets for metabolic analysis",
         required=True
         )
-    parent_parser_t_optionnal = argparse.ArgumentParser(add_help=False)
-    parent_parser_t_optionnal.add_argument(
+    parent_parser_t_optional = argparse.ArgumentParser(add_help=False)
+    parent_parser_t_optional.add_argument(
         "-t",
         "--targets",
-        help="Optionnal targets for metabolic analysis, if not used metage2metabo will use the addedvalue of the community",
+        help="Optional targets for metabolic analysis, if not used metage2metabo will use the addedvalue of the community",
         required=False
         )
 
@@ -227,7 +227,7 @@ def main():
         parents=[
             parent_parser_g, parent_parser_s, parent_parser_m, parent_parser_o,
             parent_parser_c, parent_parser_q, parent_parser_no, parent_parser_p,
-            parent_parser_t_optionnal, parent_parser_cl
+            parent_parser_t_optional, parent_parser_cl
         ],
         description=
         "Run the whole workflow: metabolic network reconstruction, individual and community scope analysis and community selection"
@@ -237,7 +237,7 @@ def main():
         help="whole metabolism community analysis",
         parents=[
             parent_parser_n, parent_parser_s, parent_parser_m, parent_parser_o,
-            parent_parser_t_optionnal, parent_parser_q
+            parent_parser_t_optional, parent_parser_q
         ],
         description=
         "Run the whole metabolism community analysis: individual and community scope analysis and community selection"

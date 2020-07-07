@@ -457,7 +457,7 @@ It uses the following mandatory inputs (run ``m2m metacom --help`` for optional 
 Optional arguments:
 
 -m file                host metabolic network SBML file
--t file                Optionnal targets for metabolic analysis, if not used
+-t file                Optional targets for metabolic analysis, if not used
                        metage2metabo will use the addedvalue of the community
 -q                     quiet mode
 
@@ -599,7 +599,7 @@ Optional arguments:
 --noorphan       ignore the reactions without gene or 
                  protein association in final metabolic networks
 -p               create padmet files from PGDB
--t file          Optionnal targets for metabolic analysis, if not used
+-t file          Optional targets for metabolic analysis, if not used
                  metage2metabo will use the addedvalue of the community
 -q               quiet mode
 
