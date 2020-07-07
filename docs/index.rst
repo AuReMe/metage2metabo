@@ -5,7 +5,7 @@ Metage2metabo is a Python3 tool to perform graph-based metabolic analysis starti
 It uses **Pathway Tools** in a automatic and parallel way to *reconstruct metabolic networks* for a large number of genomes.
 The obtained metabolic networks are then *analyzed individually and collectively* in order to get the *added value of metabolic cooperation in microbiota* over individual metabolism, and to *identify and screen interesting organisms* among all.
 
-M2M can be used as a whole workflow (``m2m workflow``) or steps can be performed individually (``m2m recon``, ``m2m iscope``, ``m2m cscope``, ``m2m addedvalue``, ``m2m mincom``, ``m2m seeds``).
+M2M can be used as a whole workflow (``m2m workflow``, ``m2m metacom``) or steps can be performed individually (``m2m recon``, ``m2m iscope``, ``m2m cscope``, ``m2m addedvalue``, ``m2m mincom``, ``m2m seeds``).
 
 This project is licensed under the GNU General Public License - see the `LICENSE.md <https://github.com/AuReMe/metage2metabo/blob/master/LICENSE>`__ file for details.
 
