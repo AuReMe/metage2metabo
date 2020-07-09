@@ -80,29 +80,29 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
     # COMMUNITY SCOPE
     instance_com, targets_cscope = cscope(sbml_dir, seeds, out_dir, host_mn)
 
-    if targets_file is None:
-        # ADDED VALUE
-        newtargets = addedvalue(union_targets_iscope, targets_cscope, out_dir)
-        if len(newtargets) > 0:
+    # ADDED VALUE
+    newtargets = addedvalue(union_targets_iscope, targets_cscope, out_dir)
+
+    if targets_file is not None:
+        user_targets = sbml_management.get_compounds(targets_file)
+        newtargets = set(user_targets).intersection(set(newtargets))
+        individually_producible_targets = set(user_targets).intersection(set(union_targets_iscope))
+        if len(individually_producible_targets) > 0:
+            logger.info('\n' + str(len(individually_producible_targets)) + " targets in core reachable by all organisms (intersection) \n")
+            logger.info("\n".join(individually_producible_targets))
+
+    if len(newtargets) > 0:
+        if targets_file is not None:
+            logger.info("Target file created with the addedvalue targets and the input targets file in: " +
+                        out_dir + "/community_analysis/targets.sbml")
+
+        else:
             sbml_management.create_species_sbml(newtargets, out_dir + "/community_analysis/targets.sbml")
             logger.info("Target file created with the addedvalue targets in: " +
                         out_dir + "/community_analysis/targets.sbml")
-            # Add these targets to the instance
-            logger.info("Setting these " + str(len(newtargets)) + " as targets")
-            instance_w_targets = add_targets_to_instance(
-                instance_com, out_dir,
-                newtargets)
-            # MINCOM
-            mincom(instance_w_targets, out_dir)
-            # remove intermediate files
-            os.unlink(instance_com)
-            os.unlink(instance_w_targets)
-        else:
-            logger.info("No newly producible compounds, hence no community selection will be computed")
-            os.unlink(instance_com)
-    else:
-        # Use target as input to mincom
-        newtargets = sbml_management.get_compounds(targets_file)
+
+        sbml_management.create_species_sbml(newtargets, out_dir + "/community_analysis/targets.sbml")
+
         # Add these targets to the instance
         logger.info("Setting these " + str(len(newtargets)) + " as targets")
         instance_w_targets = add_targets_to_instance(
@@ -113,6 +113,9 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
         # remove intermediate files
         os.unlink(instance_com)
         os.unlink(instance_w_targets)
+    else:
+        logger.info("No newly producible compounds, hence no community selection will be computed")
+        os.unlink(instance_com)
 
 
 def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clean):
