@@ -233,6 +233,7 @@ def test_m2m_metacom_targets_import():
     iscope_file = respath + 'indiv_scopes/indiv_scopes.json'
     cscope_file = respath + 'community_analysis/comm_scopes.json'
     resfile = respath + 'community_analysis/mincom.json'
+    targetfile = respath + 'producibility_targets.json'
     # ISCOPE ANALYSIS
     # ensure there is the right number of computed indiv scopes
     with open(iscope_file, 'r') as json_idata:
@@ -253,6 +254,9 @@ def test_m2m_metacom_targets_import():
     # MINCOM ANALYSIS
     with open(resfile, 'r') as json_data:
         d_mincom = json.load(json_data)
+    # Targets results
+    with open(targetfile, 'r') as json_data:
+        d_target = json.load(json_data)
     # ensure the minimal number of bacteria in a minimal community is ok
     assert len(d_mincom['bacteria']) == MIN_SIZE_COM
     # ensure the bacteria in union are ok
@@ -261,6 +265,10 @@ def test_m2m_metacom_targets_import():
     assert set(d_mincom['inter_bacteria']) == INTERSECTION
     # ensure the newly producible targets are ok
     assert set(d_mincom['newly_prod']) == NEWLYPROD_TARGETS
+    # ensure the bacteria in union are ok
+    assert set(d_target['com_all_bacteria']) == UNION
+    # ensure the newly producible targets are ok
+    assert set(d_target['com_producible']) == NEWLYPROD_TARGETS
     # clean
     shutil.rmtree(respath)
 

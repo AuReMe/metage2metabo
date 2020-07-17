@@ -230,7 +230,7 @@ It uses the following mandatory inputs (run ``m2m_analysis powergraph --help`` f
         ├── svg
         │   ├── targets_toy.bbl.svg
 
-The ERROR and INFO are not real errors, it is jsut powergrasp saying that it does not find config file so it will use default option.
+
 
 This command creates the following svg:
 
