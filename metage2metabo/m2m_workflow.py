@@ -17,26 +17,33 @@
 # along with metage2metabo.  If not, see <http://www.gnu.org/licenses/>.
 # -*- coding: utf-8 -*-
 
+import csv
 import json
 import logging
-from mpwt.mpwt_workflow import multiprocess_pwt
-from mpwt.utils import cleaning_input, remove_pgdbs
 import os
+import statistics
+import sys
 import tempfile
 import time
-import sys
-import statistics
+import traceback
+import xml.etree.ElementTree as etree
+
 from menetools import run_menescope
 from menetools.sbml import readSBMLspecies_clyngor
+
 from metage2metabo import utils, sbml_management
+
 from miscoto import run_scopes, run_mincom, run_instance
-from shutil import copyfile
-from padmet.classes.padmetSpec import PadmetSpec
-import csv
-import xml.etree.ElementTree as etree
-from padmet.utils import sbmlPlugin
+
+from mpwt.mpwt_workflow import multiprocess_pwt
+from mpwt.utils import cleaning_input, remove_pgdbs
+
 from multiprocessing import Pool
-import traceback
+
+from padmet.classes.padmetSpec import PadmetSpec
+from padmet.utils import sbmlPlugin
+
+from shutil import copyfile
 
 logger = logging.getLogger(__name__)
 logging.getLogger("menetools").setLevel(logging.CRITICAL)
@@ -81,15 +88,18 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
     instance_com, targets_cscope = cscope(sbml_dir, seeds, out_dir, host_mn)
 
     # ADDED VALUE
-    newtargets = addedvalue(union_targets_iscope, targets_cscope, out_dir)
+    addedvalue_targets = addedvalue(union_targets_iscope, targets_cscope, out_dir)
 
+    # If user gives a target file, check if the targets are in the addevalue
     if targets_file is not None:
-        user_targets = sbml_management.get_compounds(targets_file)
-        newtargets = set(user_targets).intersection(set(newtargets))
-        individually_producible_targets = set(user_targets).intersection(set(union_targets_iscope))
+        user_targets = set(sbml_management.get_compounds(targets_file))
+        newtargets = user_targets.intersection(addedvalue_targets)
+        individually_producible_targets = user_targets.intersection(union_targets_iscope)
         if len(individually_producible_targets) > 0:
-            logger.info('\n' + str(len(individually_producible_targets)) + " targets in core reachable by all organisms (intersection) \n")
+            logger.info('\n' + str(len(individually_producible_targets)) + " targets in core reachable by at least one organism \n")
             logger.info("\n".join(individually_producible_targets))
+    else:
+        newtargets = addedvalue_targets
 
     if len(newtargets) > 0:
         if targets_file is not None:
@@ -105,6 +115,9 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
 
         # Add these targets to the instance
         logger.info("Setting these " + str(len(newtargets)) + " as targets")
+        if len(newtargets) != len(addedvalue_targets):
+            logger.info("\n".join(newtargets))
+
         instance_w_targets = add_targets_to_instance(
             instance_com, out_dir,
             newtargets)
@@ -116,6 +129,32 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
     else:
         logger.info("No newly producible compounds, hence no community selection will be computed")
         os.unlink(instance_com)
+
+    # Create targets result file
+    if targets_file is not None:
+        prod_targets = {}
+        unproducible_targets = user_targets - union_targets_iscope - targets_cscope
+        producible_targets = user_targets.intersection(union_targets_iscope.union(targets_cscope))
+        prod_targets["unproducible"] = list(unproducible_targets)
+        prod_targets["producible"] = list(producible_targets)
+
+        prod_targets["indiv_producible"] = list(user_targets.intersection(union_targets_iscope))
+        prod_targets["indiv_species"] = {}
+        with open(out_dir + '/indiv_scopes/indiv_scopes.json') as json_data:
+            producible_compounds = json.load(json_data)
+        for target in user_targets:
+            species_producing_target = [species for species in producible_compounds if target in producible_compounds[species]]
+            if species_producing_target != []:
+                prod_targets["indiv_species"][target] = ','.join(species_producing_target)
+
+        if os.path.exists(out_dir + '/community_analysis/mincom.json'):
+            with open(out_dir + '/community_analysis/mincom.json') as json_data:
+                com_producible_compounds = json.load(json_data)
+            prod_targets["com_producible"]  = com_producible_compounds['newly_prod']
+            prod_targets["com_all_bacteria"]  = com_producible_compounds['union_bacteria']
+
+        with open(out_dir + "/producibility_targets.json", 'w') as dumpfile:
+            json.dump(prod_targets, dumpfile, indent=4)
 
 
 def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clean):
@@ -250,7 +289,8 @@ def mincom(instance_w_targets, out_dir):
         all_results[key] = list(all_results[key])
 
     logger.info("Community scopes for all metabolic networks available in " +
-                miscoto_dir + "/comm_scopes.json")
+                miscoto_dir + "/comm_scopes.json\n")
+
     producible_targets = all_results['newly_prod']
     unproducible_targets = all_results['still_unprod']
     logger.info("In the minimal communities, " + str(len(producible_targets)) + " targets are newly producible and " + str(len(unproducible_targets)) + " remain unproducible.")
@@ -671,10 +711,10 @@ def analyze_indiv_scope(jsonfile, seeds):
         sys.exit(1)
     except:
         traceback_str = traceback.format_exc()
-        # Don't print the traceback if the error is linked to SystemExit as the error has been hanled by menetools.
+        # Don't print the traceback if the error is linked to SystemExit as the error has been handled by menetools.
         if 'SystemExit: 1' not in traceback_str:
             logger.critical(traceback_str)
-        logger.critical("---------------Something went wrong running Menetools on " + f + "---------------")
+        logger.critical("---------------Something went wrong running Menetools on " + seeds + "---------------")
         sys.exit(1)
 
     logger.info("%i metabolic models considered." %(len(d_set)))
