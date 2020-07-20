@@ -1,29 +1,15 @@
-from padmet.utils.connection import pgdb_to_padmet, sbmlGenerator, sbml_to_sbml, sbml_to_padmet
-from padmet.utils.sbmlPlugin import convert_from_coded_id
-from multiprocessing import Pool
-from metage2metabo import utils
-from libsbml import SBMLReader, writeSBMLToFile, SBMLDocument
 import libsbml
-import os
 import logging
+import os
 import sys
 
+from libsbml import SBMLReader, writeSBMLToFile, SBMLDocument
+from multiprocessing import Pool
+from metage2metabo import utils
+from padmet.utils.connection import pgdb_to_padmet, sbmlGenerator
+from padmet.utils.sbmlPlugin import convert_from_coded_id
 
 logger = logging.getLogger(__name__)
-
-
-def get_sbml_level(sbml_file):
-    """Get SBML Level of a file
-
-    Args:
-        sbml_file (str): SBML file
-
-    Returns:
-        int: SBML Level
-    """
-    reader = SBMLReader()
-    document = reader.readSBML(sbml_file)
-    return document.getLevel()
 
 
 def get_compounds(sbml_file):
@@ -57,14 +43,18 @@ def create_species_sbml(metabolites, outputfile):
         s = model.createSpecies()
         sbmlGenerator.check(s, 'create species')
         sbmlGenerator.check(s.setId(compound), 'set species id')
-        if not name:
-            logger.critical("No name for " + compound)
-            sys.exit(1)
-        sbmlGenerator.check(s.setName(name), 'set species name')
-        if not comp:
-            logger.critical("No compartment for " + compound)
-            sys.exit(1)
-        sbmlGenerator.check(s.setCompartment(comp), 'set species compartment')
+
+        # Add name and compartment if found by padmet
+        if name is not None:
+            sbmlGenerator.check(s.setName(name), 'set species name')
+        elif name is None:
+            logger.warning("No name for " + compound)
+
+        if comp is not None:
+            sbmlGenerator.check(s.setCompartment(comp), 'set species compartment')
+        elif comp is None:
+            logger.warning("No compartment for " + compound)
+
     libsbml.writeSBMLToFile(document, outputfile)
 
 
@@ -149,22 +139,3 @@ def pgdb_to_sbml(pgdb_dir, output_dir, noorphan_bool, padmet_bool, sbml_level, c
     else:
         logger.critical("Error during padmet/sbml creation.")
         sys.exit(1)
-
-
-def transform_sbml_lvl(sbml_file, sbml_output_file,
-                        level_wanted, cpu=1):
-    """Transform a sbml into another level sbml
-
-    Args:
-        sbml_file (string): pathname to species sbml file
-        sbml_output_file (string): pathname to output sbml file
-        level_wanted (int): SBML level of the output SBML
-        version (string): version of tthe database
-
-    Returns:
-        sbml_check (bool): Check if sbml file exists
-    """
-    sbml_to_sbml.from_sbml_to_sbml(sbml_file, sbml_output_file, level_wanted, cpu)
-
-    sbml_check = utils.is_valid_path(sbml_output_file)
-    return sbml_check

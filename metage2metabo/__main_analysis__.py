@@ -26,7 +26,6 @@ except ImportError:
     raise ImportError('Requires ete3 (https://github.com/etetoolkit/ete).')
 
 
-from metage2metabo.__main__ import check_sbml
 from metage2metabo import sbml_management, utils
 from metage2metabo.m2m_analysis import run_analysis_workflow, enumeration_analysis, stat_analysis, graph_analysis, powergraph_analysis, check_oog_jar_file
 
@@ -235,7 +234,7 @@ def main():
         if not os.path.isdir(args.networksdir):
             logger.critical(args.networksdir + " is not a correct directory path")
             sys.exit(1)
-        network_dir = check_sbml(args.networksdir, args.out)
+        network_dir = args.networksdir
 
         if not utils.is_valid_file(args.seeds):
             logger.critical(args.seeds + " is not a correct filepath")
@@ -244,7 +243,7 @@ def main():
             logger.critical(args.targets + " is not a correct filepath")
             sys.exit(1)
         if args.modelhost:
-            new_arg_modelhost = check_sbml(args.modelhost, args.out, folder=False)
+            new_arg_modelhost = args.modelhost
         else:
             new_arg_modelhost = None
 
