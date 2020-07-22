@@ -99,6 +99,7 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
             logger.info('\n' + str(len(individually_producible_targets)) + " targets in core reachable by at least one organism \n")
             logger.info("\n".join(individually_producible_targets))
     else:
+        user_targets = None
         newtargets = addedvalue_targets
 
     if len(newtargets) > 0:
@@ -131,30 +132,7 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
         os.unlink(instance_com)
 
     # Create targets result file
-    if targets_file is not None:
-        prod_targets = {}
-        unproducible_targets = user_targets - union_targets_iscope - targets_cscope
-        producible_targets = user_targets.intersection(union_targets_iscope.union(targets_cscope))
-        prod_targets["unproducible"] = list(unproducible_targets)
-        prod_targets["producible"] = list(producible_targets)
-
-        prod_targets["indiv_producible"] = list(user_targets.intersection(union_targets_iscope))
-        prod_targets["indiv_species"] = {}
-        with open(out_dir + '/indiv_scopes/indiv_scopes.json') as json_data:
-            producible_compounds = json.load(json_data)
-        for target in user_targets:
-            species_producing_target = [species for species in producible_compounds if target in producible_compounds[species]]
-            if species_producing_target != []:
-                prod_targets["indiv_species"][target] = ','.join(species_producing_target)
-
-        if os.path.exists(out_dir + '/community_analysis/mincom.json'):
-            with open(out_dir + '/community_analysis/mincom.json') as json_data:
-                com_producible_compounds = json.load(json_data)
-            prod_targets["com_producible"]  = com_producible_compounds['newly_prod']
-            prod_targets["com_all_bacteria"]  = com_producible_compounds['union_bacteria']
-
-        with open(out_dir + "/producibility_targets.json", 'w') as dumpfile:
-            json.dump(prod_targets, dumpfile, indent=4)
+    targets_producibility(out_dir, union_targets_iscope, targets_cscope, addedvalue_targets, user_targets)
 
 
 def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clean):
@@ -290,9 +268,6 @@ def mincom(instance_w_targets, out_dir):
     for key in all_results:
         all_results[key] = list(all_results[key])
 
-    logger.info("Community scopes for all metabolic networks available in " +
-                miscoto_dir + "/comm_scopes.json\n")
-
     producible_targets = all_results['newly_prod']
     unproducible_targets = all_results['still_unprod']
     logger.info("In the minimal communities, " + str(len(producible_targets)) + " targets are newly producible and " + str(len(unproducible_targets)) + " remain unproducible.")
@@ -329,6 +304,72 @@ def mincom(instance_w_targets, out_dir):
     logger.info("\n".join(alternative_symbionts))
     logger.info(
         "--- Mincom runtime %.2f seconds ---\n" % (time.time() - starttime))
+
+
+def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, addedvalue_targets, user_targets=None):
+    """Create a json summarizing the producibility of the targets (either the addedvalue or the user provided targets)
+
+    Args:
+        m2m_out_dir (str): M2M results directory
+        union_targets_iscope (list): targets producible by indiviual
+        targets_cscope (list): targets producible by community
+        addedvalue_targets (list): targets produbed by the community and not by individual
+        user_targets (list): targets provided by the user
+    """
+    prod_targets = {}
+
+    if user_targets:
+        selected_targets = user_targets
+        unproducible_targets = user_targets - union_targets_iscope - targets_cscope
+        producible_targets = user_targets.intersection(union_targets_iscope.union(targets_cscope))
+        indiv_producible = user_targets.intersection(union_targets_iscope)
+    else:
+        selected_targets = addedvalue_targets
+        unproducible_targets = []
+        producible_targets = addedvalue_targets
+        indiv_producible = []
+
+    prod_targets["unproducible"] = list(unproducible_targets)
+    prod_targets["producible"] = list(producible_targets)
+    prod_targets["indiv_producible"] = list(indiv_producible)
+
+    if os.path.exists(m2m_out_dir + '/indiv_scopes/indiv_scopes.json'):
+        prod_targets["individually_producing"] = {}
+        with open(m2m_out_dir + '/indiv_scopes/indiv_scopes.json') as json_data:
+            producible_compounds = json.load(json_data)
+        for target in selected_targets:
+            species_producing_target = [species for species in producible_compounds if target in producible_compounds[species]]
+            if species_producing_target != []:
+                prod_targets["individually_producing"][target] = species_producing_target
+
+    if os.path.exists(m2m_out_dir + '/community_analysis/comm_scopes.json'):
+        prod_targets["com_producing"] = {}
+        with open(m2m_out_dir + '/community_analysis/comm_scopes.json') as json_data:
+            com_producible_compounds = json.load(json_data)
+        for target in selected_targets:
+            if target in com_producible_compounds['targets_producers']:
+                prod_targets["com_producing"][target] = com_producible_compounds['targets_producers'][target]
+
+    if os.path.exists(m2m_out_dir + '/community_analysis/mincom.json'):
+        with open(m2m_out_dir + '/community_analysis/mincom.json') as json_data:
+            mincom_producible_compounds = json.load(json_data)
+        prod_targets["mincom_producible"] = mincom_producible_compounds['newly_prod']
+        prod_targets["mincom_all_bacteria"] = mincom_producible_compounds['union_bacteria']
+        prod_targets["mincom_optsol_producing"] = {}
+        prod_targets["mincom_union_producing"] = {}
+        prod_targets["mincom_inter_producing"] = {}
+        for target in selected_targets:
+            if target in mincom_producible_compounds['one_model_targetsproducers']:
+                prod_targets["mincom_optsol_producing"][target] = mincom_producible_compounds['one_model_targetsproducers'][target]
+            if target in mincom_producible_compounds['union_targetsproducers']:
+                prod_targets["mincom_union_producing"][target] = mincom_producible_compounds['union_targetsproducers'][target]
+            if target in mincom_producible_compounds['inter_targetsproducers']:
+                prod_targets["mincom_inter_producing"][target] = mincom_producible_compounds['inter_targetsproducers'][target]
+
+    with open(m2m_out_dir + "/producibility_targets.json", 'w') as dumpfile:
+        json.dump(prod_targets, dumpfile, indent=4)
+
+    logger.info("Targets producibility are available at " + m2m_out_dir + "/producibility_targets.json")
 
 
 def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
