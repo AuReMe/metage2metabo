@@ -93,7 +93,7 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
     # If user gives a target file, check if the targets are in the addevalue
     if targets_file is not None:
         user_targets = set(sbml_management.get_compounds(targets_file))
-        newtargets = user_targets.intersection(addedvalue_targets)
+        newtargets = user_targets
         individually_producible_targets = user_targets.intersection(union_targets_iscope)
         if len(individually_producible_targets) > 0:
             logger.info('\n' + str(len(individually_producible_targets)) + " targets in core reachable by at least one organism \n")
@@ -343,12 +343,13 @@ def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, add
                 prod_targets["individually_producing"][target] = species_producing_target
 
     if os.path.exists(m2m_out_dir + '/community_analysis/comm_scopes.json'):
-        prod_targets["com_producing"] = {}
+        prod_targets["com_only_producing"] = {}
         with open(m2m_out_dir + '/community_analysis/comm_scopes.json') as json_data:
             com_producible_compounds = json.load(json_data)
         for target in selected_targets:
             if target in com_producible_compounds['targets_producers']:
-                prod_targets["com_producing"][target] = com_producible_compounds['targets_producers'][target]
+                only_com_producing_species = list(set(com_producible_compounds['targets_producers'][target]) - set(prod_targets["individually_producing"][target]))
+                prod_targets["com_only_producing"][target] = only_com_producing_species
 
     if os.path.exists(m2m_out_dir + '/community_analysis/mincom.json'):
         with open(m2m_out_dir + '/community_analysis/mincom.json') as json_data:
