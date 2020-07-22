@@ -334,38 +334,38 @@ def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, add
     prod_targets["indiv_producible"] = list(indiv_producible)
 
     if os.path.exists(m2m_out_dir + '/indiv_scopes/indiv_scopes.json'):
-        prod_targets["individually_producing"] = {}
+        prod_targets["individual_producers"] = {}
         with open(m2m_out_dir + '/indiv_scopes/indiv_scopes.json') as json_data:
             producible_compounds = json.load(json_data)
         for target in selected_targets:
             species_producing_target = [species for species in producible_compounds if target in producible_compounds[species]]
             if species_producing_target != []:
-                prod_targets["individually_producing"][target] = species_producing_target
+                prod_targets["individual_producers"][target] = species_producing_target
 
     if os.path.exists(m2m_out_dir + '/community_analysis/comm_scopes.json'):
-        prod_targets["com_only_producing"] = {}
+        prod_targets["com_only_producers"] = {}
         with open(m2m_out_dir + '/community_analysis/comm_scopes.json') as json_data:
             com_producible_compounds = json.load(json_data)
         for target in selected_targets:
             if target in com_producible_compounds['targets_producers']:
-                only_com_producing_species = list(set(com_producible_compounds['targets_producers'][target]) - set(prod_targets["individually_producing"][target]))
-                prod_targets["com_only_producing"][target] = only_com_producing_species
+                only_com_producing_species = list(set(com_producible_compounds['targets_producers'][target]) - set(prod_targets["individual_producers"][target]))
+                prod_targets["com_only_producers"][target] = only_com_producing_species
 
     if os.path.exists(m2m_out_dir + '/community_analysis/mincom.json'):
         with open(m2m_out_dir + '/community_analysis/mincom.json') as json_data:
             mincom_producible_compounds = json.load(json_data)
         prod_targets["mincom_producible"] = mincom_producible_compounds['newly_prod']
-        prod_targets["mincom_all_bacteria"] = mincom_producible_compounds['union_bacteria']
-        prod_targets["mincom_optsol_producing"] = {}
-        prod_targets["mincom_union_producing"] = {}
-        prod_targets["mincom_inter_producing"] = {}
+        prod_targets["keystone_species"] = mincom_producible_compounds['union_bacteria']
+        prod_targets["mincom_optsol_producers"] = {}
+        prod_targets["mincom_union_producers"] = {}
+        prod_targets["mincom_inter_producers"] = {}
         for target in selected_targets:
             if target in mincom_producible_compounds['one_model_targetsproducers']:
-                prod_targets["mincom_optsol_producing"][target] = mincom_producible_compounds['one_model_targetsproducers'][target]
+                prod_targets["mincom_optsol_producers"][target] = mincom_producible_compounds['one_model_targetsproducers'][target]
             if target in mincom_producible_compounds['union_targetsproducers']:
-                prod_targets["mincom_union_producing"][target] = mincom_producible_compounds['union_targetsproducers'][target]
+                prod_targets["mincom_union_producers"][target] = mincom_producible_compounds['union_targetsproducers'][target]
             if target in mincom_producible_compounds['inter_targetsproducers']:
-                prod_targets["mincom_inter_producing"][target] = mincom_producible_compounds['inter_targetsproducers'][target]
+                prod_targets["mincom_inter_producers"][target] = mincom_producible_compounds['inter_targetsproducers'][target]
 
     with open(m2m_out_dir + "/producibility_targets.json", 'w') as dumpfile:
         json.dump(prod_targets, dumpfile, indent=4)
