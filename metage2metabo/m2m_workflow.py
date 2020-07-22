@@ -85,7 +85,7 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
     # INDIVIDUAL SCOPES
     union_targets_iscope = iscope(sbml_dir, seeds, out_dir)
     # COMMUNITY SCOPE
-    instance_com, targets_cscope = cscope(sbml_dir, seeds, out_dir, host_mn)
+    instance_com, targets_cscope = cscope(sbml_dir, seeds, out_dir, targets_file, host_mn)
 
     # ADDED VALUE
     addedvalue_targets = addedvalue(union_targets_iscope, targets_cscope, out_dir)
@@ -219,13 +219,14 @@ def iscope(sbmldir, seeds, out_dir):
         sys.exit(1)
 
 
-def cscope(sbmldir, seeds, outdir, host=None):
+def cscope(sbmldir, seeds, outdir, targets_file=None, host=None):
     """Run community scope.
     
     Args:
         sbmldir (str): SBML files directory
         seeds (str): SBML file for seeds
         outdir (str): output directory
+        targets_file (str): targets file
         host (str, optional): Defaults to None. Host metabolic network (SBML)
     
     Returns:
@@ -233,7 +234,7 @@ def cscope(sbmldir, seeds, outdir, host=None):
     """
     starttime = time.time()
     # Create instance for community analysis
-    instance_com = instance_community(sbmldir, seeds, outdir, None, host)
+    instance_com = instance_community(sbmldir, seeds, outdir, targets_file, host)
     # Run community scope
     logger.info("Running whole-community metabolic scopes")
     community_reachable_metabolites = comm_scope_run(instance_com, outdir)
@@ -248,7 +249,8 @@ def addedvalue(iscope_rm, cscope_rm, out_dir):
     Args:
         iscope_rm (set): union of metabolites in all individual scopes
         cscope_rm (set): metabolites reachable by community/microbiota
-    
+        out_dir (str): output directory
+
     Returns:
         set: set of metabolites that can only be reached by a community
     """
@@ -735,13 +737,15 @@ def analyze_indiv_scope(jsonfile, seeds):
     return union_scope
 
 
-def instance_community(sbml_dir, seeds, output_dir, targets = None, host_mn=None):
+def instance_community(sbml_dir, seeds, output_dir, targets_file = None, host_mn=None):
     """Create ASP instance for community analysis.
     
     Args:
         sbml_dir (str): directory of symbionts SBML files
         seeds (str): seeds SBML file
         output_dir (str): directory for results
+        targets_file (str): targets file
+        host_mn (str): metabolic network file for host
 
     Returns:
         str: instance filepath
@@ -761,7 +765,7 @@ def instance_community(sbml_dir, seeds, output_dir, targets = None, host_mn=None
         bacteria_dir=sbml_dir,
         seeds_file=seeds,
         host_file=host_mn,
-        targets_file=targets,
+        targets_file=targets_file,
         output=outputfile)
 
     logger.info("Created instance in " + instance_filepath)
@@ -773,7 +777,6 @@ def comm_scope_run(instance, output_dir):
     
     Args:
         sbml_dir (str): directory of SBML files
-        seeds (str): seeds SBML file
         output_dir (str): directory for results
     
     Returns:
@@ -783,7 +786,7 @@ def comm_scope_run(instance, output_dir):
     if not utils.is_valid_dir(miscoto_dir):
         logger.critical("Impossible to access/create output directory")
         sys.exit(1)
-    microbiota_scope = run_scopes(instance)
+    microbiota_scope = run_scopes(lp_instance_file=instance)
     with open(miscoto_dir + "/comm_scopes.json", 'w') as dumpfile:
         json.dump(microbiota_scope, dumpfile, indent=4)
     logger.info("Community scopes for all metabolic networks available in " +
@@ -796,6 +799,7 @@ def add_targets_to_instance(instancefile, output_dir, target_set):
     
     Args:
         instancefile (str): instance filepath
+        output_dir (str): directory for results
         target_set (set): targets to be added
     
     Returns:

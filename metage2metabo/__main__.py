@@ -187,7 +187,7 @@ def main():
         help="community scope computation",
         parents=[
             parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m,
-            parent_parser_q
+            parent_parser_q, parent_parser_t_optional
         ],
         description="Compute the community scope of all metabolic networks")
     added_value_parser = subparsers.add_parser(
@@ -312,7 +312,7 @@ def main():
             if args.cmd == "iscope":
                 main_iscope(network_dir, args.seeds, args.out)
             elif args.cmd == "cscope":
-                main_cscope(network_dir, args.seeds, args.out, new_arg_modelhost)
+                main_cscope(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
             elif args.cmd == "addedvalue":
                 main_added_value(network_dir, args.seeds, args.out,
                                 new_arg_modelhost)
