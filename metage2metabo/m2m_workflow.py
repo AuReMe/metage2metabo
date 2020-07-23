@@ -270,7 +270,7 @@ def mincom(instance_w_targets, out_dir):
 
     producible_targets = all_results['newly_prod']
     unproducible_targets = all_results['still_unprod']
-    logger.info("In the minimal communities, " + str(len(producible_targets)) + " targets are newly producible and " + str(len(unproducible_targets)) + " remain unproducible.")
+    logger.info("In the minimal communities, through cooperation " + str(len(producible_targets)) + " targets are newly producible and " + str(len(unproducible_targets)) + " remain unproducible.")
     logger.info("Minimal communities are available in " + miscoto_dir + "/mincom.json")
     # Give one solution
     one_sol_bact = []
@@ -348,7 +348,10 @@ def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, add
             com_producible_compounds = json.load(json_data)
         for target in selected_targets:
             if target in com_producible_compounds['targets_producers']:
-                only_com_producing_species = list(set(com_producible_compounds['targets_producers'][target]) - set(prod_targets["individual_producers"][target]))
+                if target in prod_targets["individual_producers"]:
+                    only_com_producing_species = list(set(com_producible_compounds['targets_producers'][target]) - set(prod_targets["individual_producers"][target]))
+                else:
+                    only_com_producing_species = com_producible_compounds['targets_producers'][target]
                 prod_targets["com_only_producers"][target] = only_com_producing_species
 
     if os.path.exists(m2m_out_dir + '/community_analysis/mincom.json'):
