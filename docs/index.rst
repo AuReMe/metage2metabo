@@ -30,6 +30,7 @@ Documentation of M2M
     install
     command
     tutorial
+    output
     suppinformation
     api
     m2m_analysis

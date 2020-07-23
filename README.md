@@ -215,7 +215,7 @@ optional arguments:
 
 ````
 usage: m2m cscope [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR [-m MODELHOST]
-                  [-q]
+                  [-q] [-t TARGETS]
 
 Compute the community scope of all metabolic networks
 
@@ -230,6 +230,9 @@ optional arguments:
   -m MODELHOST, --modelhost MODELHOST
                         host metabolic model for community analysis
   -q, --quiet           quiet mode
+  -t TARGETS, --targets TARGETS
+                        Optional targets for metabolic analysis, if not used
+                        metage2metabo will use the addedvalue of the community
 ````
 
 ### m2m addedvalue
