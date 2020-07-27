@@ -86,7 +86,6 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
     union_targets_iscope = iscope(sbml_dir, seeds, out_dir)
     # COMMUNITY SCOPE
     instance_com, targets_cscope = cscope(sbml_dir, seeds, out_dir, targets_file, host_mn)
-
     # ADDED VALUE
     addedvalue_targets = addedvalue(union_targets_iscope, targets_cscope, out_dir)
 
@@ -175,7 +174,8 @@ def iscope(sbmldir, seeds, out_dir):
     Args:
         sbmldir (str): SBML files directory
         seeds (str): SBML seeds file
-    
+        out_dir (str): output directory
+
     Returns:
         set: union of reachable metabolites for all metabolic networks
     """
@@ -197,13 +197,13 @@ def iscope(sbmldir, seeds, out_dir):
         sys.exit(1)
 
 
-def cscope(sbmldir, seeds, outdir, targets_file=None, host=None):
+def cscope(sbmldir, seeds, out_dir, targets_file=None, host=None):
     """Run community scope.
     
     Args:
         sbmldir (str): SBML files directory
         seeds (str): SBML file for seeds
-        outdir (str): output directory
+        out_dir (str): output directory
         targets_file (str): targets file
         host (str, optional): Defaults to None. Host metabolic network (SBML)
     
@@ -212,10 +212,10 @@ def cscope(sbmldir, seeds, outdir, targets_file=None, host=None):
     """
     starttime = time.time()
     # Create instance for community analysis
-    instance_com = instance_community(sbmldir, seeds, outdir, targets_file, host)
+    instance_com = instance_community(sbmldir, seeds, out_dir, targets_file, host)
     # Run community scope
     logger.info("Running whole-community metabolic scopes")
-    community_reachable_metabolites = comm_scope_run(instance_com, outdir)
+    community_reachable_metabolites = comm_scope_run(instance_com, out_dir)
     logger.info("--- Community scope runtime %.2f seconds ---\n" %
                 (time.time() - starttime))
     return instance_com, community_reachable_metabolites
@@ -697,6 +697,7 @@ def indiv_scope_run(sbml_dir, seeds, output_dir):
     
     Args:
         sbml_dir (str): directory of SBML files
+        seeds (str): SBML seeds file
         output_dir (str): directory for results
     
     Returns:
@@ -737,6 +738,10 @@ def analyze_indiv_scope(jsonfile, seeds):
     
     Args:
         jsonfile (str): output of menescope
+        seeds (str): SBML seeds file
+
+    Returns:
+        set: union of all the individual scopes
     """
     with open(jsonfile) as json_data:
         d = json.load(json_data)
@@ -818,10 +823,10 @@ def instance_community(sbml_dir, seeds, output_dir, targets_file = None, host_mn
 
 
 def comm_scope_run(instance, output_dir):
-    """Run Miscoto_scope and analyse individual metabolic capabilities
+    """Run Miscoto_scope and analyse community metabolic capabilities
     
     Args:
-        sbml_dir (str): directory of SBML files
+        instance (str): instance filepath
         output_dir (str): directory for results
     
     Returns:

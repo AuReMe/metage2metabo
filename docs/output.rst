@@ -1,9 +1,8 @@
 ===========
-M2M Outputs
+m2m Outputs
 ===========
 
-* M2M will create multiple results files in an output folder. 
-    * All the possible files created by M2M are listed below:
+* m2m steps will create multiple results files in an output folder:
 
     .. code ::
 
@@ -55,40 +54,44 @@ M2M Outputs
 m2m_command.log
 ---------------
 
-A log file named after the command used with m2m. For example, if you launch m2m metacom, the file will be named m2m_metacom.log.
+A log file named after the command used. For example, if you launch ``m2m metacom``, the file will be named ``m2m_metacom.log``.
 
-This file contains all the logs return by m2m, it summarizes the information of a run.
+This file contains all the logs return by m2m.
 
 pgdb folder
 -----------
 
 If you use the reconstruction (with ``m2m recon`` or ``m2m workflow``), the draft metabolic network inferred by Pathway Tools for each of your species will be stored in this ``pgdb`` folder.
 
-For each genome, if no error occurs, there will be a folder named the genome containing the Pathway-Genome Database (PGDB). The PGDB is stored using attribute-values flat files (the .dat extension file).
+For each genome, if no errors occur, there will be a folder named after the genome folder name containing the Pathway-Genome Database (PGDB). The PGDB is stored using attribute-values flat files (the .dat extension file).
 
 sbml
 ----
 
-After Pathway Tools metabolic network reconstruction, m2m will create SBML from the attribute-values files (as SBML are the input of the following steps). All the sbml are stored in this ``sbml`` folder.
+After Pathway Tools metabolic network reconstruction, m2m will create SBML files from the PGDB attribute-values files. All the sbml are stored in this ``sbml`` folder.
 
-There is one sbml for each genome given as input to m2m.
+There is one sbml for each genome given as input to m2m. These metabolic network in SBML are the input of the non-reconstruction step of m2m.
 
 padmet
 ------
 
 If you use the ``-p`` argument with the reconstruction, m2m will also create padmet file, a format used to store metabolic network information and metadata.
 
+One padmet file is created for each genome in the PGDB folder.
+
 recon_stats.tsv
 ---------------
 
-After the reconstruction, m2m will also computes statistics about the draft metabolic networks, especially the number of genes, reactions, compounds and pathways in the metabolic network. All of these informations are stored in this file.
+After the reconstruction, m2m will summary the information of the draft metabolic networks in this file.
+
+It will contain the number of genes, reactions, compounds and pathways in each metabolic networks.
 
 indiv_scopes
 ------------
 
-The indiv_scopes is created after the individual scopes computation (with ``m2m worfklow``, ``m2m metacom`` or ``m2m iscope``). This computation use a folder containing multiples metabolic network in SBMLs and a seed file (also in SBML).
+The indiv_scopes folder is created after the individual scopes step (in ``m2m worfklow``, ``m2m metacom`` or ``m2m iscope``). This step uses a folder containing multiples metabolic network in SBMLs and a seed file (also in SBML).
 
-The results are stored in a json file ``indiv_scopes.json``. The key in this file are each metabolic network and the value are the compounds that can be produced individually by each species.
+The results are stored in a json file named ``indiv_scopes.json``. The keys in this file are each metabolic network and the values are the compounds that can be produced individually by the metabolic network.
 
 community_analysis
 ------------------
@@ -102,11 +105,11 @@ First step of the community analysis after the individual production analysis, t
 
 The results are stored in a json with 8 keys:
 
-* ``host_prodtargets``: if a host is given as input, this contains the targets producible by the host.
+* ``host_prodtargets``: if a host is given as input, contains the targets producible by the host.
 
-* ``host_unprodtargets``: if a host is given as input, this contains the targets not producible by the host.
+* ``host_unprodtargets``: if a host is given as input, contains the targets not producible by the host.
 
-* ``host_scope``: if a host is given as input, this contains all the compounds producible by the host.
+* ``host_scope``: if a host is given as input, contains all the compounds producible by the host. If no host is given as input, contains the seeds.
 
 * ``com_prodtargets``: the targets producible by the community.
 
@@ -121,14 +124,14 @@ The results are stored in a json with 8 keys:
 addedvalue.json
 ===============
 
-After the individual scopes and the community scopes, the addedvalue (``m2m worfklow``, ``m2m metacom``, ``m2m addedvalue``), computes the compounds that are producible by the community but not by individual organism.
+After the individual scopes and the community scopes, the addedvalue (``m2m worfklow``, ``m2m metacom``, ``m2m addedvalue``), extracts the compounds that are producible by the community but not by individual organism.
 
-The result are stored in a json file with one key ``addedvalue`` which lists all the compounds producible by the community but not by the individual organism.
+The result are stored in a json file with one key ``addedvalue`` which enumerates all the compounds producible by the community but not by the individual organism.
 
 targets.sbml
 ============
 
-After the addedvalue (``m2m worfklow``, ``m2m metacom``, ``m2m addedvalue``), all the compounds that have been found by this step are stored in this sbml file.
+After the addedvalue (``m2m worfklow``, ``m2m metacom``, ``m2m addedvalue``), all the compounds that have been found by this step are stored in this sbml file. It is used as the targets file for the following step.
 
 mincom.json
 ===========
@@ -141,7 +144,7 @@ The results are stored in a json with 17 keys:
 
 * ``still_unprod``: compounds unproducible by the community.
 
-* ``newly_prod``: compounds newly producible by the community.
+* ``newly_prod``: compounds producible by the community.
 
 * ``union_bacteria``: bacteria from all the minimal communities.
 
