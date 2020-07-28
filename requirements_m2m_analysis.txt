@@ -16,7 +16,7 @@ gffutils==0.9
 graphviz==0.13
 importlib-metadata==0.17
 MeneTools>=2.0.3
-Miscoto>=2.1.0
+Miscoto>=2.1.1
 more-itertools==7.0.0
 mpmath==1.1.0
 mpwt>=0.5.3

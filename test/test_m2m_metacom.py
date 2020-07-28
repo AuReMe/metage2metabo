@@ -266,12 +266,26 @@ def test_m2m_metacom_targets_import():
     # ensure the newly producible targets are ok
     assert set(d_mincom['newly_prod']) == NEWLYPROD_TARGETS
     # ensure the bacteria in union are ok
-    assert set(d_target['com_all_bacteria']) == UNION
+    assert set(d_target['keystone_species']) == UNION
     # ensure the newly producible targets are ok
-    assert set(d_target['com_producible']) == NEWLYPROD_TARGETS
+    assert set(d_target['mincom_producible']) == NEWLYPROD_TARGETS
+
+    # Ensure the final producers in com_only_producers contains reactions producing the targets
+    sbml_products = {}
+    for sbml_file in os.listdir(respath + '/toy_bact'):
+        reader = SBMLReader()
+        document = reader.readSBML(respath + '/toy_bact/' + sbml_file)
+        model = document.getModel()
+        sbml_name, _ = os.path.splitext(sbml_file)
+        sbml_products[sbml_name] = [product.getSpecies() for sbml_reaction in model.getListOfReactions() for product in sbml_reaction.getListOfProducts()]
+
+    for target in d_target['com_only_producers']:
+        for species in d_target['com_only_producers'][target]:
+            assert target in sbml_products[species]
     # clean
     shutil.rmtree(respath)
 
 
 if __name__ == "__main__":
     test_m2m_metacom_call()
+    test_m2m_metacom_targets_import()

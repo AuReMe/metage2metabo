@@ -119,7 +119,7 @@ The results are stored in a json with 8 keys:
 
 * ``com_scope``: all the compounds producible by the community.
 
-* ``targets_producers``: for each target, it lists the species that are involved in the last reaction to produce this target.
+* ``targets_producers``: for each target, the list of organisms able to produce this target. It is empty if you use ``m2m worfklow`` or ``m2m metacom`` without targets because cscope needs target to find the targets_producers.
 
 addedvalue.json
 ===============
