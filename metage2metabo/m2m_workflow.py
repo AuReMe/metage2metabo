@@ -27,7 +27,6 @@ import tempfile
 import time
 import traceback
 import xml.etree.ElementTree as etree
-import pandas as pd
 
 from menetools import run_menescope
 from menetools.sbml import readSBMLspecies_clyngor
@@ -892,6 +891,7 @@ def compute_mincom(instancefile, miscoto_dir):
                             output_json=mincom_json_file)
     return results_dic
 
+
 def reverse_scope(json_scope, output_dir):
     """Reverse a scope dictionary by focusing on metabolite producers.
 
@@ -909,24 +909,18 @@ def reverse_scope(json_scope, output_dir):
     for k,v in initial_dict.items():
         for x in v:
             new_dic.setdefault(x,[]).append(k)
-    
-    with open(f"{output_dir}/rev_iscope.json", "w") as g:
+
+    with open(f"{output_dir}/indiv_scopes/rev_iscope.json", "w") as g:
         json.dump(new_dic, g, indent=True, sort_keys=True)
-    
-    # reshape the data as a matrix
-    df = pd.DataFrame([(key, var) for (key, L) in initial_dict.items() for var in L], columns=['genome', 'metabolite'])
 
-    df.insert(2, 'occurrence', '1')
+    all_compounds = [compound for compound in new_dic]
+    all_species = [species for species in initial_dict]
 
-    res = df.pivot_table(
-                        index='genome',
-                        columns='metabolite',
-                        values='occurrence',
-                        aggfunc='sum',
-                        fill_value=0
-                        )
-    # res.reset_index().rename_axis(None,1)
+    # For each species get the possibility of production of each compounds.
+    with open(f"{output_dir}/indiv_scopes/rev_iscope.tsv", "w") as output_file:
+        csvwriter = csv.writer(output_file, delimiter="\t")
+        csvwriter.writerow(["", *all_compounds])
+        for species in all_species:
+             csvwriter.writerow([species, *[1 if species in new_dic[compound] else 0 for compound in all_compounds]])
 
-    res.to_csv(f"{output_dir}/rev_iscope.tsv", sep = "\t")
-
-    return(f"{output_dir}rev_iscope.json", f"{output_dir}rev_iscope.tsv")
+    return(f"{output_dir}/indiv_scopes/rev_iscope.json", f"{output_dir}/indiv_scopes/rev_iscope.tsv")

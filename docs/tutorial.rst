@@ -351,7 +351,8 @@ Optional arguments:
         │   └── targets.sbml
         ├── indiv_scopes
         │   └── indiv_scopes.json
-
+        │   └── rev_iscope.json
+        │   └── rev_iscope.tsv
 
 m2m mincom
 ----------
@@ -588,6 +589,8 @@ Optional arguments:
         │   ├── targets.sbml
         ├── indiv_scopes
         │   └── indiv_scopes.json
+        │   └── rev_iscope.json
+        │   └── rev_iscope.tsv
 
 m2m workflow
 ------------
@@ -752,6 +755,8 @@ Optional arguments:
         │   ├── targets.sbml
         ├── indiv_scopes
         │   └── indiv_scopes.json
+        │   └── rev_iscope.json
+        │   └── rev_iscope.tsv
         ├── padmet
         │   ├── GCA_003433665.padmet
         │   └── GCA_003433675.padmet
