@@ -27,6 +27,7 @@ import tempfile
 import time
 import traceback
 import xml.etree.ElementTree as etree
+import pandas as pd
 
 from menetools import run_menescope
 from menetools.sbml import readSBMLspecies_clyngor
@@ -189,6 +190,9 @@ def iscope(sbmldir, seeds, out_dir):
         logger.info("Individual scopes for all metabolic networks available in " + scope_json)
         # Analyze the individual scopes results (json file)
         reachable_metabolites_union = analyze_indiv_scope(scope_json, seeds)
+        # Compute the reverse iscopes (who produces each metabolite)
+        reverse_scope_json, reverse_scope_tsv = reverse_scope(scope_json, out_dir)
+        logger.info(f"Analysis of functional redundancy (producers of all metabolites) is computed as a dictionary in {reverse_scope_json} and as a matrix in {reverse_scope_tsv}.")
         logger.info("--- Indiv scopes runtime %.2f seconds ---\n" %
                     (time.time() - starttime))
         return reachable_metabolites_union
@@ -887,3 +891,42 @@ def compute_mincom(instancefile, miscoto_dir):
                             intersection=True,
                             output_json=mincom_json_file)
     return results_dic
+
+def reverse_scope(json_scope, output_dir):
+    """Reverse a scope dictionary by focusing on metabolite producers.
+
+    Args:
+        json_scope (txt): path to JSON dict of scope
+        output_dir (txt): path to output directory
+    
+    Returns:
+        (txt, txt): paths to the JSON and TSV outputs
+    """
+    with open(json_scope, 'r') as f:
+        initial_dict = json.load(f)
+
+    new_dic = {}
+    for k,v in initial_dict.items():
+        for x in v:
+            new_dic.setdefault(x,[]).append(k)
+    
+    with open(f"{output_dir}/rev_iscope.json", "w") as g:
+        json.dump(new_dic, g, indent=True, sort_keys=True)
+    
+    # reshape the data as a matrix
+    df = pd.DataFrame([(key, var) for (key, L) in initial_dict.items() for var in L], columns=['genome', 'metabolite'])
+
+    df.insert(2, 'occurrence', '1')
+
+    res = df.pivot_table(
+                        index='genome',
+                        columns='metabolite',
+                        values='occurrence',
+                        aggfunc='sum',
+                        fill_value=0
+                        )
+    # res.reset_index().rename_axis(None,1)
+
+    res.to_csv(f"{output_dir}/rev_iscope.tsv", sep = "\t")
+
+    return(f"{output_dir}rev_iscope.json", f"{output_dir}rev_iscope.tsv")
