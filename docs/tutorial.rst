@@ -293,6 +293,7 @@ Optional arguments:
     651 metabolites are reachable by the microbiota. This does not include the seeds. The list of metabolites is given in output. 
 * files outputs
     * In addition to the logs at the root of the results directory, a json file with the results is created in `output_directory/community_analysis/indiv_scopes.json`.
+    * To screen the putative redundancy of metabolite producibility predicted for the genomes, we also provide `rev_iscope.tsv` and `rev_iscope.json` that reverse the information from `indiv_scopes.json`. This means that if org1 produces A and B, org2 produces B and C, `indiv_scopes.json` will describe the following: {'org1': ['A', 'B'], 'org2: ['B', 'C']}. `reverse_scope.json` will contain {'A': ['org1'], 'B': ['org1', 'org2'], 'C': ['org2']}, and `reverse_scope.tsv` will contain the same information as a matrix. 
 
 addedvalue
 **********
