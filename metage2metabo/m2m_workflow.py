@@ -95,20 +95,26 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
         newtargets = user_targets
         individually_producible_targets = user_targets.intersection(union_targets_iscope)
         if len(individually_producible_targets) > 0:
-            logger.info('\n' + str(len(individually_producible_targets)) + " targets in core reachable by at least one organism \n")
+            logger.info('\n The following' + str(len(individually_producible_targets)) + " targets individually reachable by at least one organism: \n")
             logger.info("\n".join(individually_producible_targets))
+        commonly_producible_targets = user_targets.intersection(targets_cscope)
+        if len(commonly_producible_targets) > 0:
+            logger.info('\n The following' + str(len(commonly_producible_targets)) + " targets are additionally reachable through putative cooperation events: \n")
+            logger.info("\n".join(commonly_producible_targets))
+        else:
+            logger.info("Cooperation events do not enable the producibility of additional targets")
     else:
         user_targets = None
         newtargets = addedvalue_targets
 
     if len(newtargets) > 0:
         if targets_file is not None:
-            logger.info("Target file created with the addedvalue targets and the input targets file in: " +
+            logger.info("\nTarget file created with the targets provided by the user in: " +
                         out_dir + "/community_analysis/targets.sbml")
 
         else:
             sbml_management.create_species_sbml(newtargets, out_dir + "/community_analysis/targets.sbml")
-            logger.info("Target file created with the addedvalue targets in: " +
+            logger.info("\nTarget file created with the addedvalue targets in: " +
                         out_dir + "/community_analysis/targets.sbml")
 
         sbml_management.create_species_sbml(newtargets, out_dir + "/community_analysis/targets.sbml")
@@ -273,7 +279,12 @@ def mincom(instance_w_targets, out_dir):
 
     producible_targets = all_results['newly_prod']
     unproducible_targets = all_results['still_unprod']
-    logger.info("In the minimal communities, through cooperation " + str(len(producible_targets)) + " targets are newly producible and " + str(len(unproducible_targets)) + " remain unproducible.")
+    logger.info("\nIn the initial and minimal communities " + str(len(producible_targets)) + " targets are producible and " + str(len(unproducible_targets)) + " remain unproducible.")
+    logger.info("\n" + str(len(producible_targets)) + " producible targets:") 
+    logger.info("\n".join(producible_targets))
+    logger.info("\n" + str(len(producible_targets)) + " still unproducible targets:") 
+    logger.info("\n".join(unproducible_targets))
+
     logger.info("Minimal communities are available in " + miscoto_dir + "/mincom.json")
     # Give one solution
     one_sol_bact = []
