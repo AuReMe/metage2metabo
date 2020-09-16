@@ -97,7 +97,7 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
         if len(individually_producible_targets) > 0:
             logger.info('\n The following ' + str(len(individually_producible_targets)) + " targets individually reachable by at least one organism: \n")
             logger.info("\n".join(individually_producible_targets))
-        commonly_producible_targets = user_targets.intersection(targets_cscope)
+        commonly_producible_targets = user_targets.intersection(addedvalue_targets)
         if len(commonly_producible_targets) > 0:
             logger.info('\n The following ' + str(len(commonly_producible_targets)) + " targets are additionally reachable through putative cooperation events: \n")
             logger.info("\n".join(commonly_producible_targets))
@@ -120,9 +120,9 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
         sbml_management.create_species_sbml(newtargets, out_dir + "/community_analysis/targets.sbml")
 
         # Add these targets to the instance
-        logger.info("Setting these " + str(len(newtargets)) + " as targets \n")
-        if len(newtargets) != len(addedvalue_targets):
-            logger.info("\n".join(newtargets))
+        logger.info("Setting " + str(len(newtargets)) + " compounds as targets \n")
+        # if len(newtargets) != len(addedvalue_targets):
+        #     logger.info("\n".join(newtargets))
 
         instance_w_targets = add_targets_to_instance(
             instance_com, out_dir,
