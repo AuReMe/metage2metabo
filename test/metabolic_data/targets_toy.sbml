@@ -121,6 +121,7 @@
       <species id="M_CPD__45__421_c" name="CPD-421" compartment="c"/>
       <species id="M_CPD__45__9852_c" name="CPD-9852" compartment="c"/>
       <species id="M_CPD__45__12305_c" name="CPD-12305" compartment="c"/>
+      <species id="M_MANNITOL_c" name="MANNITOL" compartment="c"/>
     </listOfSpecies>
   </model>
 </sbml>

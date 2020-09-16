@@ -15,7 +15,7 @@ from libsbml import SBMLReader
 import metage2metabo
 
 
-EXPECTED_TARGETS = {
+EXPECTED_TARGETS_ADVAL = {
         'M_3__45__OCTAPRENYL__45__4__45__HYDROXYBENZOATE_c',
         'M_CPD__45__16607_c', 'M_CPD__45__221_c', 'M_CPD__45__16020_c',
         'M_D__45__LACTOYL__45__COA_c', 'M_CPD__45__7695_c',
@@ -93,7 +93,7 @@ INTERSECTION = {
     'GCA_003438055', 'GCA_003437905', 'GCA_003437195', 'GCA_003437885'
 }
 MIN_SIZE_COM = 13
-NEWLYPROD_TARGETS = {
+PROD_TARGETS = {
     "M_ALPHA__45__GLC__45__6__45__P_c", "M_CPD__45__448_c", "M_CPD__45__650_c",
     "M_GLC__45__6__45__P_c", "M_CPD__45__12117_c",
     "M_ALL__45__TRANS__45__HEPTAPRENYL__45__DIPHOSPHATE_c", "M_FADH2_c",
@@ -151,7 +151,7 @@ NEWLYPROD_TARGETS = {
     "M_CPD__45__14378_c", "M_INDOLEYL__45__CPD_c",
     "M_5__45__PHOSPHORIBOSYL__45__N__45__FORMYLGLYCINEAMIDINE_c",
     "M_5__45__PHOSPHORIBOSYL__45__5__45__AMINOIMIDAZOLE_c",
-    "M_CPD__45__14021_c"
+    "M_CPD__45__14021_c", "M_MANNITOL_c"
 }
 
 NUMBER_BACT = 17
@@ -200,7 +200,7 @@ def test_m2m_metacom_call():
     reader = SBMLReader()
     document = reader.readSBML(target_file)
     new_targets = set([specie.getId() for specie in document.getModel().getListOfSpecies()])
-    assert new_targets == EXPECTED_TARGETS
+    assert new_targets == EXPECTED_TARGETS_ADVAL
     # MINCOM ANALYSIS
     with open(resfile, 'r') as json_data:
         d_mincom = json.load(json_data)
@@ -211,7 +211,7 @@ def test_m2m_metacom_call():
     # ensure the bacteria in intersection are ok
     assert set(d_mincom['inter_bacteria']) == INTERSECTION
     # ensure the newly producible targets are ok
-    assert set(d_mincom['newly_prod']) == NEWLYPROD_TARGETS
+    assert set(d_mincom['producible']) == EXPECTED_TARGETS_ADVAL
     # clean
     shutil.rmtree(respath)
 
@@ -264,11 +264,11 @@ def test_m2m_metacom_targets_import():
     # ensure the bacteria in intersection are ok
     assert set(d_mincom['inter_bacteria']) == INTERSECTION
     # ensure the newly producible targets are ok
-    assert set(d_mincom['newly_prod']) == NEWLYPROD_TARGETS
+    assert set(d_mincom['producible']) == PROD_TARGETS
     # ensure the bacteria in union are ok
     assert set(d_target['keystone_species']) == UNION
     # ensure the newly producible targets are ok
-    assert set(d_target['mincom_producible']) == NEWLYPROD_TARGETS
+    assert set(d_target['mincom_producible']) == PROD_TARGETS
 
     # Ensure the final producers in com_only_producers contains reactions producing the targets
     sbml_products = {}

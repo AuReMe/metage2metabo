@@ -84,7 +84,7 @@ NEWLYPROD_TARGETS = {
     "M_CPD__45__14378_c", "M_INDOLEYL__45__CPD_c",
     "M_5__45__PHOSPHORIBOSYL__45__N__45__FORMYLGLYCINEAMIDINE_c",
     "M_5__45__PHOSPHORIBOSYL__45__5__45__AMINOIMIDAZOLE_c",
-    "M_CPD__45__14021_c"
+    "M_CPD__45__14021_c", "M_MANNITOL_c"
 }
 
 
@@ -115,7 +115,9 @@ def test_m2m_mincom_call():
     # ensure the bacteria in intersection are ok
     assert set(d_mincom['inter_bacteria']) == INTERSECTION
     # ensure the newly producible targets are ok
-    assert set(d_mincom['newly_prod']) == NEWLYPROD_TARGETS
+    assert set(d_mincom['producible']) == NEWLYPROD_TARGETS
+    # one target is also a seed. It will be in "producible", not "newly_prod"
+    assert set(d_mincom['newly_prod']) == NEWLYPROD_TARGETS - {"M_MANNITOL_c"}
     # clean
     shutil.rmtree(respath)
 
