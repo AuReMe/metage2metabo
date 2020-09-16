@@ -95,7 +95,7 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
         newtargets = user_targets
         individually_producible_targets = user_targets.intersection(union_targets_iscope)
         if len(individually_producible_targets) > 0:
-            logger.info('\n The following ' + str(len(individually_producible_targets)) + " targets individually reachable by at least one organism: \n")
+            logger.info('\n The following ' + str(len(individually_producible_targets)) + " targets are individually reachable by at least one organism: \n")
             logger.info("\n".join(individually_producible_targets))
         commonly_producible_targets = user_targets.intersection(addedvalue_targets)
         if len(commonly_producible_targets) > 0:
@@ -277,7 +277,7 @@ def mincom(instance_w_targets, out_dir):
     for key in all_results:
         all_results[key] = list(all_results[key])
 
-    producible_targets = all_results['newly_prod']
+    producible_targets = all_results['producible']
     unproducible_targets = all_results['still_unprod']
     logger.info("\nIn the initial and minimal communities " + str(len(producible_targets)) + " targets are producible and " + str(len(unproducible_targets)) + " remain unproducible.")
     logger.info("\n" + str(len(producible_targets)) + " producible targets:") 
