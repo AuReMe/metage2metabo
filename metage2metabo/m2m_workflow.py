@@ -95,11 +95,11 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
         newtargets = user_targets
         individually_producible_targets = user_targets.intersection(union_targets_iscope)
         if len(individually_producible_targets) > 0:
-            logger.info('\n The following' + str(len(individually_producible_targets)) + " targets individually reachable by at least one organism: \n")
+            logger.info('\n The following ' + str(len(individually_producible_targets)) + " targets individually reachable by at least one organism: \n")
             logger.info("\n".join(individually_producible_targets))
         commonly_producible_targets = user_targets.intersection(targets_cscope)
         if len(commonly_producible_targets) > 0:
-            logger.info('\n The following' + str(len(commonly_producible_targets)) + " targets are additionally reachable through putative cooperation events: \n")
+            logger.info('\n The following ' + str(len(commonly_producible_targets)) + " targets are additionally reachable through putative cooperation events: \n")
             logger.info("\n".join(commonly_producible_targets))
         else:
             logger.info("Cooperation events do not enable the producibility of additional targets")
@@ -120,7 +120,7 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
         sbml_management.create_species_sbml(newtargets, out_dir + "/community_analysis/targets.sbml")
 
         # Add these targets to the instance
-        logger.info("Setting these " + str(len(newtargets)) + " as targets")
+        logger.info("Setting these " + str(len(newtargets)) + " as targets \n")
         if len(newtargets) != len(addedvalue_targets):
             logger.info("\n".join(newtargets))
 
@@ -282,7 +282,7 @@ def mincom(instance_w_targets, out_dir):
     logger.info("\nIn the initial and minimal communities " + str(len(producible_targets)) + " targets are producible and " + str(len(unproducible_targets)) + " remain unproducible.")
     logger.info("\n" + str(len(producible_targets)) + " producible targets:") 
     logger.info("\n".join(producible_targets))
-    logger.info("\n" + str(len(producible_targets)) + " still unproducible targets:") 
+    logger.info("\n" + str(len(unproducible_targets)) + " still unproducible targets:") 
     logger.info("\n".join(unproducible_targets))
 
     logger.info("Minimal communities are available in " + miscoto_dir + "/mincom.json")
