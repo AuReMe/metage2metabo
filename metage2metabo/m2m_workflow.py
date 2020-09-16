@@ -285,39 +285,39 @@ def mincom(instance_w_targets, out_dir):
     logger.info("\n" + str(len(unproducible_targets)) + " still unproducible targets:") 
     logger.info("\n".join(unproducible_targets))
 
-    logger.info("Minimal communities are available in " + miscoto_dir + "/mincom.json")
+    logger.info("\nMinimal communities are available in " + miscoto_dir + "/mincom.json \n")
     # Give one solution
     one_sol_bact = []
     for bact in all_results['bacteria']:
         one_sol_bact.append(bact)
     logger.info('######### One minimal community #########')
     logger.info("# One minimal community enabling the producibility of the target metabolites given as inputs")
-    logger.info("Minimal number of bacteria in communities = " +
-                str(len(one_sol_bact)))
+    logger.info("Minimal number of bacteria in communities => " +
+                str(len(one_sol_bact)) + "\n")
     logger.info("\n".join(one_sol_bact))
     # Give union of solutions
     union = all_results['union_bacteria']
     logger.info('######### Keystone species: Union of minimal communities #########')
     logger.info("# Bacteria occurring in at least one minimal community enabling the producibility of the target metabolites given as inputs")
-    logger.info("Keystone species = " +
+    logger.info("Number of keystone species => " +
                 str(len(union)))
     logger.info("\n".join(union))
     # Give intersection of solutions
     intersection = all_results['inter_bacteria']
     logger.info('######### Essential symbionts: Intersection of minimal communities #########')
     logger.info("# Bacteria occurring in ALL minimal communities enabling the producibility of the target metabolites given as inputs")
-    logger.info("Essential symbionts = " +
-                str(len(intersection)))
-    logger.info("\n".join(intersection))
+    logger.info("Number of essential symbionts => " +
+                str(len(intersection)) + "\n")
+    logger.info("\n".join(intersection)+ "\n")
     # Give keystones, essential and alternative symbionts
     alternative_symbionts = list(set(union) - set(intersection))
     logger.info('######### Alternative symbionts: Difference between Union and Intersection #########')
     logger.info("# Bacteria occurring in at least one minimal community but not all minimal communities enabling the producibility of the target metabolites given as inputs")
-    logger.info("Alternative symbionts = " +
-                str(len(alternative_symbionts)))
+    logger.info("Number of alternative symbionts => " +
+                str(len(alternative_symbionts)) + "\n")
     logger.info("\n".join(alternative_symbionts))
     logger.info(
-        "--- Mincom runtime %.2f seconds ---\n" % (time.time() - starttime))
+        "\n--- Mincom runtime %.2f seconds ---\n" % (time.time() - starttime))
 
 
 def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, addedvalue_targets, user_targets=None):
