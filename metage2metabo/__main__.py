@@ -291,7 +291,7 @@ def main():
     else:
         new_arg_modelhost = None
 
-    if args.cmd in ["metacom", "mincom", "workflow"]:
+    if args.cmd in ["metacom", "mincom", "cscope", "addedvalue", "workflow"]:
         if args.targets is not None:
             if not utils.is_valid_file(args.targets):
                 logger.critical(args.targets + " is not a correct filepath")
