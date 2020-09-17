@@ -224,7 +224,7 @@ def cscope(sbmldir, seeds, out_dir, targets_file=None, host=None):
     instance_com = instance_community(sbmldir, seeds, out_dir, targets_file, host)
     # Run community scope
     logger.info("Running whole-community metabolic scopes")
-    community_reachable_metabolites = comm_scope_run(instance_com, out_dir)
+    community_reachable_metabolites = comm_scope_run(instance_com, out_dir, host)
     logger.info("--- Community scope runtime %.2f seconds ---\n" %
                 (time.time() - starttime))
     return instance_com, community_reachable_metabolites
@@ -836,12 +836,13 @@ def instance_community(sbml_dir, seeds, output_dir, targets_file = None, host_mn
     return instance_filepath
 
 
-def comm_scope_run(instance, output_dir):
+def comm_scope_run(instance, output_dir, host_mn=None):
     """Run Miscoto_scope and analyse community metabolic capabilities
     
     Args:
         instance (str): instance filepath
         output_dir (str): directory for results
+        host_mn (str): metabolic network file for host
     
     Returns:
         set: microbiota scope
@@ -851,6 +852,14 @@ def comm_scope_run(instance, output_dir):
         logger.critical("Impossible to access/create output directory")
         sys.exit(1)
     microbiota_scope = run_scopes(lp_instance_file=instance)
+
+    # Remove keys "host_prodtargets", "host_scope", "comhost_scope" and "host_unprodtargets" if there is no host:
+    if host_mn is None:
+        del microbiota_scope['host_prodtargets']
+        del microbiota_scope['host_unprodtargets']
+        del microbiota_scope['host_scope']
+        del microbiota_scope['comhost_scope']
+
     with open(miscoto_dir + "/comm_scopes.json", 'w') as dumpfile:
         json.dump(microbiota_scope, dumpfile, indent=4)
     logger.info("Community scopes for all metabolic networks available in " +
