@@ -287,6 +287,7 @@ def main():
     #if modelhost is given as an arg: check the SBML level and turn it into 2 if needed
     if args.cmd in ["workflow", "metacom", "mincom", "cscope", "addedvalue"] and args.modelhost:
         new_arg_modelhost = args.modelhost
+        logger.warning(f"\n A metabolic model is given for an host. The metabolite producibility of the community will display metabolites that can be produced by the hsot or the microbiome, *not including* the metabolites that the host can produce by itself. If this is not what you want to do, you can consider placing the host in the same directory as the symbionts, which will lead to a complete community scope. \n")
     else:
         new_arg_modelhost = None
 
