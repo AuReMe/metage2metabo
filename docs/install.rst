@@ -191,7 +191,7 @@ You can download the container with the command:
 
     singularity pull shub://ArnaudBelcour/metage2metabo-metacom_singularity
 
- With this container, you can call m2m commands like ``m2m metacom``:
+With this container, you can call m2m commands like ``m2m metacom``:
 
 .. code:: sh
 
