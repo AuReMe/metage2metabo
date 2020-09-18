@@ -304,7 +304,7 @@ def main():
             logger.critical(args.networksdir + " is not a correct directory path")
             sys.exit(1)
         network_dir = args.networksdir
-        if args.targets is not None:
+        if "targets" in args and args.targets is not None:
             if not utils.is_valid_file(args.targets):
                 logger.critical(args.targets + " is not a correct filepath")
                 sys.exit(1)
