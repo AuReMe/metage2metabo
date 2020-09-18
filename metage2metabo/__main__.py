@@ -291,11 +291,9 @@ def main():
     else:
         new_arg_modelhost = None
 
-    if args.cmd in ["metacom", "mincom", "cscope", "addedvalue", "workflow"]:
-        if args.targets is not None:
-            if not utils.is_valid_file(args.targets):
-                logger.critical(args.targets + " is not a correct filepath")
-                sys.exit(1)
+    if args.seeds and not utils.is_valid_file(args.seeds):
+        logger.critical(args.seeds + " is not a correct filepath")
+        sys.exit(1)
 
     # deal with given subcommand
     if args.cmd == "workflow":
@@ -306,21 +304,25 @@ def main():
             logger.critical(args.networksdir + " is not a correct directory path")
             sys.exit(1)
         network_dir = args.networksdir
-        if not utils.is_valid_file(args.seeds):
-            logger.critical(args.seeds + " is not a correct filepath")
-            sys.exit(1)
-        else:
-            if args.cmd == "iscope":
-                main_iscope(network_dir, args.seeds, args.out)
-            elif args.cmd == "cscope":
-                main_cscope(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
-            elif args.cmd == "addedvalue":
-                main_added_value(network_dir, args.seeds, args.out,
-                                new_arg_modelhost)
-            elif args.cmd == "mincom":
-                main_mincom(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
-            elif args.cmd == "metacom":
-                main_metacom(network_dir, args.out, args.seeds, new_arg_modelhost, args.targets)
+        if args.targets is not None:
+            if not utils.is_valid_file(args.targets):
+                logger.critical(args.targets + " is not a correct filepath")
+                sys.exit(1)
+            # test if some targets are seeds
+            itsct_seeds_targets = sbml_management.compare_seeds_and_targets(args.seeds, args.targets)
+            if itsct_seeds_targets != None:
+                logger.warning(f"\nWARNING: compounds {*list(itsct_seeds_targets),} are both in seeds and targets. Since they are in seeds, they will be in each organism's individual producibility scope (iscope), but not appear in the community scope (cscope). To be certain that they are produced (through an activable reaction and not just because they are seeds), check the output file: producibility_targets.json.\n")
+        if args.cmd == "iscope":
+            main_iscope(network_dir, args.seeds, args.out)
+        elif args.cmd == "cscope":
+            main_cscope(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
+        elif args.cmd == "addedvalue":
+            main_added_value(network_dir, args.seeds, args.out,
+                            new_arg_modelhost)
+        elif args.cmd == "mincom":
+            main_mincom(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
+        elif args.cmd == "metacom":
+            main_metacom(network_dir, args.out, args.seeds, new_arg_modelhost, args.targets)
     elif args.cmd == "recon":
         main_recon(args.genomes, args.out, args.noorphan, args.padmet, args.level, args.cpu,
                    args.clean)

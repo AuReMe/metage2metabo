@@ -27,6 +27,21 @@ def get_compounds(sbml_file):
     targets = [target.id for target in model.getListOfSpecies()]
     return targets
 
+def compare_seeds_and_targets(seedfile, targetfile):
+    """Returns the intersection of the seeds and the targets
+
+    Args:
+        seedfile (str): path to seeds SBML file
+        targetfile (str): path to targets SBML file
+
+    Returns:
+        set: intersection of seeds and targets
+    """
+    seeds = set(get_compounds(seedfile))
+    targets = set(get_compounds(targetfile))
+
+    return seeds.intersection(targets)
+
 
 def create_species_sbml(metabolites, outputfile):
     """Create a SBML files with a list of species containing metabolites of the input set
