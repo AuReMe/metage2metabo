@@ -14,3 +14,8 @@
 * `t2d_m2m_size.R`: R script to generate figures comparing various metrics between statuses, either for MHD, SWE or all samples (change the focus variable)
 * `t2d_m2m_target_producers.tsv`: analyse butyrate target producers and produce pie plots showing taxonomic diversity of the full metagenomic dataset
 * `t2d_m2m_tax.R`: analyse taxonomic composition of different groups (keystone, essential etc). used in fig 4 and supp figs
+* `abundance.mat`: abundance matrix
+* `individual_scopes.tsv`: individual producers of all metabolites
+* `t2d_m2m`: R script to perform analyses on community scopes and cooperation potential compositions and generate figures of the paper
+* `community_scopes_long.tsv`: long version of community scopes for each sample
+* `addedvalue_long.tsv`: long version of cooperation potential for each sample
