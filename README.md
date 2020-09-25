@@ -16,20 +16,12 @@ m2m can be used as a whole workflow (``` m2m workflow ```, ``` m2m metacom ```) 
   - [Installation](#installation)
     - [Installation with pip](#installation-with-pip)
     - [Availability on Docker and Singularity](#availability-on-docker-and-singularity)
-  - [Features](#features)
-    - [m2m recon](#m2m-recon)
-    - [m2m iscope](#m2m-iscope)
-    - [m2m cscope](#m2m-cscope)
-    - [m2m addedvalue](#m2m-addedvalue)
-    - [m2m mincom](#m2m-mincom)
-    - [m2m workflow](#m2m-workflow)
-    - [m2m metacom](#m2m-metacom)
-    - [m2m seeds](#m2m-seeds)
-    - [m2m test](#m2m-test)
+  - [M2M commands](#m2m-commands)
   - [Analysis of the minimal solutions](#analysis-of-the-minimal-solutions)
   - [Release Notes](#release-notes)
   - [Additional features](#additional-features)
   - [Citation](#citation)
+  - [Article data](#article-data)
   - [Authors](#authors)
   - [Acknowledgement](#acknowledgement)
 
@@ -128,251 +120,17 @@ With these files, you can create container with Pathway-Tools and m2m.
 
 More informations in the [Docker and Singularity Documentation](https://metage2metabo.readthedocs.io/en/latest/install.html#installation-with-docker).
 
-## Features
+## M2M commands
 
-````
-Copyright (C) Dyliss
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-m2m is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-
-
-usage: m2m [-h] [-v]
-           {recon,iscope,cscope,addedvalue,mincom,seeds,workflow,metacom,test}
-           ...
-
-From metabolic network reconstruction with annotated genomes to metabolic
-capabilities screening to identify organisms of interest in a large
-microbiota. For specific help on each subcommand use: m2m {cmd} --help
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -v, --version         show program's version number and exit
-
-subcommands:
-  valid subcommands:
-
-  {recon,iscope,cscope,addedvalue,mincom,seeds,workflow,metacom,test}
-    recon               metabolic network reconstruction
-    iscope              individual scope computation
-    cscope              community scope computation
-    addedvalue          added value of microbiota's metabolism over
-                        individual's
-    mincom              minimal communtity selection
-    seeds               creation of seeds SBML file
-    workflow            whole workflow
-    metacom             whole metabolism community analysis
-    test                test on sample data from rumen experiments
-
-Requires: Pathway Tools installed and in $PATH, and NCBI Blast
-````
-
-### m2m recon
-
-````
-usage: m2m recon [-h] -g GENOMES -o OUPUT_DIR [-c CPU] [-q] [-l {2,3}]
-                 [--noorphan] [-p] [--clean]
-
-Run metabolic network reconstruction for each annotated genome of the input
-directory, using Pathway Tools
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -g GENOMES, --genomes GENOMES
-                        annotated genomes directory
-  -o OUPUT_DIR, --out OUPUT_DIR
-                        output directory path
-  -c CPU, --cpu CPU     cpu number for multi-process
-  -q, --quiet           quiet mode
-  -l {2,3}, --level {2,3}
-                        Level for SBML creation, 2 or 3
-  --noorphan            use this option to ignore reactions without gene or
-                        protein association
-  -p, --padmet          create padmet files
-  --clean               clean PGDBs if already present
-````
-
-### m2m iscope
-
-````
-usage: m2m iscope [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR [-q]
-
-Compute individual scopes (reachable metabolites from seeds) for each
-metabolic network of the input directory
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -n NETWORKS_DIR, --networksdir NETWORKS_DIR
-                        metabolic networks directory
-  -s SEEDS, --seeds SEEDS
-                        seeds (growth medium) for metabolic analysis
-  -o OUPUT_DIR, --out OUPUT_DIR
-                        output directory path
-  -q, --quiet           quiet mode
-````
-
-### m2m cscope
-
-````
-usage: m2m cscope [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR [-m MODELHOST]
-                  [-q] [-t TARGETS]
-
-Compute the community scope of all metabolic networks
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -n NETWORKS_DIR, --networksdir NETWORKS_DIR
-                        metabolic networks directory
-  -s SEEDS, --seeds SEEDS
-                        seeds (growth medium) for metabolic analysis
-  -o OUPUT_DIR, --out OUPUT_DIR
-                        output directory path
-  -m MODELHOST, --modelhost MODELHOST
-                        host metabolic model for community analysis
-  -q, --quiet           quiet mode
-  -t TARGETS, --targets TARGETS
-                        Optional targets for metabolic analysis, if not used
-                        metage2metabo will use the addedvalue of the community
-````
-
-### m2m addedvalue
-
-````
-usage: m2m addedvalue [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR
-                      [-m MODELHOST] [-q]
-
-Compute metabolites that are reachable by the community/microbiota and not by
-individual organisms
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -n NETWORKS_DIR, --networksdir NETWORKS_DIR
-                        metabolic networks directory
-  -s SEEDS, --seeds SEEDS
-                        seeds (growth medium) for metabolic analysis
-  -o OUPUT_DIR, --out OUPUT_DIR
-                        output directory path
-  -m MODELHOST, --modelhost MODELHOST
-                        host metabolic model for community analysis
-  -q, --quiet           quiet mode
-````
-
-### m2m mincom
-
-````
-usage: m2m mincom [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR [-m MODELHOST]
-                  [-q] -t TARGETS
-
-Select minimal-size community to make reachable a set of metabolites
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -n NETWORKS_DIR, --networksdir NETWORKS_DIR
-                        metabolic networks directory
-  -s SEEDS, --seeds SEEDS
-                        seeds (growth medium) for metabolic analysis
-  -o OUPUT_DIR, --out OUPUT_DIR
-                        output directory path
-  -m MODELHOST, --modelhost MODELHOST
-                        host metabolic model for community analysis
-  -q, --quiet           quiet mode
-  -t TARGETS, --targets TARGETS
-                        targets for metabolic analysis
-````
-
-### m2m workflow
-
-````
-usage: m2m workflow [-h] -g GENOMES -s SEEDS [-m MODELHOST] -o OUPUT_DIR
-                    [-c CPU] [-q] [--noorphan] [-p] [-t TARGETS] [--clean]
-
-Run the whole workflow: metabolic network reconstruction, individual and
-community scope analysis and community selection
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -g GENOMES, --genomes GENOMES
-                        annotated genomes directory
-  -s SEEDS, --seeds SEEDS
-                        seeds (growth medium) for metabolic analysis
-  -m MODELHOST, --modelhost MODELHOST
-                        host metabolic model for community analysis
-  -o OUPUT_DIR, --out OUPUT_DIR
-                        output directory path
-  -c CPU, --cpu CPU     cpu number for multi-process
-  -q, --quiet           quiet mode
-  --noorphan            use this option to ignore reactions without gene or
-                        protein association
-  -p, --padmet          create padmet files
-  -t TARGETS, --targets TARGETS
-                        Optional targets for metabolic analysis, if not used
-                        metage2metabo will use the addedvalue of the community
-  --clean               clean PGDBs if already present
-````
-
-### m2m metacom
-
-````
-usage: m2m metacom [-h] -n NETWORKS_DIR -s SEEDS [-m MODELHOST] -o OUPUT_DIR
-                   [-t TARGETS] [-q]
-
-Run the whole metabolism community analysis: individual and community scope
-analysis and community selection
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -n NETWORKS_DIR, --networksdir NETWORKS_DIR
-                        metabolic networks directory
-  -s SEEDS, --seeds SEEDS
-                        seeds (growth medium) for metabolic analysis
-  -m MODELHOST, --modelhost MODELHOST
-                        host metabolic model for community analysis
-  -o OUPUT_DIR, --out OUPUT_DIR
-                        output directory path
-  -t TARGETS, --targets TARGETS
-                        Optional targets for metabolic analysis, if not used
-                        metage2metabo will use the addedvalue of the community
-  -q, --quiet           quiet mode
-````
-
-### m2m seeds
-
-````
-usage: m2m seeds [-h] -o OUPUT_DIR [-q] --metabolites METABOLITES
-
-Create a SBML file starting for a simple text file with metabolic compounds
-identifiers
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -o OUPUT_DIR, --out OUPUT_DIR
-                        output directory path
-  -q, --quiet           quiet mode
-  --metabolites METABOLITES
-                        metabolites file: one per line, encoded (XXX as in
-                        <species id="XXXX" .../> of SBML files)
-````
-
-### m2m test
-
-````
-usage: m2m test [-h] [-q] [-c CPU] -o OUPUT_DIR
-
-Test the whole workflow on a data sample
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -q, --quiet           quiet mode
-  -c CPU, --cpu CPU     cpu number for multi-process
-  -o OUPUT_DIR, --out OUPUT_DIR
-                        output directory path
-````
+M2M commands are listed in the [Commands Documentation](https://metage2metabo.readthedocs.io/en/latest/command.html).
 
 ## Analysis of the minimal solutions
 
 M2M performs a community minimization to find the union and intersection of the minimal communities. But it is possible to analyze all the minimal communities.
 M2M has a second command-line, named m2m_analysis that performs this analysis. This method is slower than m2m as all sollutions are enumerated.
 Then it creates a solutions graph and compresses it in a powergraph.
+
+More information about this command in the [m2m_analysis Documentation](https://metage2metabo.readthedocs.io/en/latest/m2m_analysis.html).
 
 ````
 usage: m2m_analysis [-h] [-v] {enum,stats,graph,powergraph,workflow} ...
@@ -410,6 +168,13 @@ M2M relies on packages that can also be used independantly with more features:
 
 ## Citation
 Arnaud Belcour, Clémence Frioux, Meziane Aite, Anthony Bretaudeau, Anne Siegel (2019) Metage2Metabo: metabolic complementarity applied to genomes of large-scale microbiotas for the identification of keystone species. bioRxiv 803056; doi: [https://doi.org/10.1101/803056](https://doi.org/10.1101/803056)
+
+## Article data
+
+Data used to create figures and tables are listed in the [article_data](https://github.com/AuReMe/metage2metabo/tree/master/article_data) folder, it contains:
+
+- [gsmn_characteristics](https://github.com/AuReMe/metage2metabo/tree/master/article_data/gsmn_characteristics): scripts and tables to show the characteristics of draft metabolic networks created by M2M for gut, rumen and diabetes dataset.
+- [diabetes_study](https://github.com/AuReMe/metage2metabo/tree/master/article_data/diabetes_study): scripts and tables to create the figures of the diabetes analyses in the article.
 
 ## Authors
 [Clémence Frioux](https://cfrioux.github.io/) and [Arnaud Belcour](https://arnaudbelcour.github.io/blog/), Univ Rennes, Inria, CNRS, IRISA, Rennes, France.
