@@ -7,15 +7,19 @@ on:
   push:
     branches: [ master ]
     paths-ignore:
+      - 'article_data/**'
       - 'docs/**'
       - 'README.md'
       - '.readthedocs.yml'
+      - 'recipes/**'
   pull_request:
     branches: [ master ]
     paths-ignore:
+      - 'article_data/**'
       - 'docs/**'
       - 'README.md'
       - '.readthedocs.yml'
+      - 'recipes/**'
 
 jobs:
   build:
