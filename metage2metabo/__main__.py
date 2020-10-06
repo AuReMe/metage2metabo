@@ -291,9 +291,10 @@ def main():
     else:
         new_arg_modelhost = None
 
-    if args.seeds and not utils.is_valid_file(args.seeds):
-        logger.critical(args.seeds + " is not a correct filepath")
-        sys.exit(1)
+    if "seeds" in args and args.seeds is not None:
+        if not utils.is_valid_file(args.seeds):
+            logger.critical(args.seeds + " is not a correct filepath")
+            sys.exit(1)
 
     # deal with given subcommand
     if args.cmd == "workflow":
