@@ -242,3 +242,19 @@ m2m seeds
             --metabolites METABOLITES
                                     metabolites file: one per line, encoded (XXX as in
                                     <species id="XXXX" .../> of SBML files)
+
+m2m test
+=========
+
+    .. code::
+
+        usage: m2m test [-h] [-q] [-c CPU] -o OUPUT_DIR
+
+        Test the whole workflow on a data sample
+
+        optional arguments:
+        -h, --help            show this help message and exit
+        -q, --quiet           quiet mode
+        -c CPU, --cpu CPU     cpu number for multi-process
+        -o OUPUT_DIR, --out OUPUT_DIR
+                                output directory path

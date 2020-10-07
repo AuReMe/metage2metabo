@@ -669,8 +669,8 @@ Optional arguments:
         │   └── rev_iscope.json
         │   └── rev_iscope.tsv
 
-m2m workflow
-------------
+m2m workflow and m2m test
+-------------------------
 `m2m workflow` starts from metabolic network reconstruction and runs all analyses: individual scopes, community scopes, and minimal community selection based on the metabolic added-value of the microbiota.
 
 It uses the following mandatory inputs (run ``m2m workflow --help`` for optional arguments):
