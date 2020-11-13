@@ -10,7 +10,7 @@ m2m_analysis needs:
 
 * `Oog Power Graph Command line tool <http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-command-line-tool.html>`__: used to create a svg file of the powergraph. It is a jar file (compiled for Java 6), so you need at least Java 6.
 
-* Some python packages:
+* These python packages:
 
     * `networkx <https://github.com/networkx/networkx>`__: to create graph from miscoto results
     * `ete3 <https://github.com/etetoolkit/ete>`__: to add taxonomy information on the graph if you used mpwt taxon file
@@ -21,7 +21,7 @@ Presentation
 
 m2m_analysis goes deeper in the analysis compare to m2m. In m2m_analysis, the enumeration of all solution is computed, this step is far more time consuming than the others (union or intersection).
 
-This first step is done by ``m2m_analysis enum``. It will enumerate all the possible solutions, select the optimal ones and then create the json file containing all the optimal solutions.
+This first step is done by ``m2m_analysis enum``. It will enumerate all the possible solutions (minimal communities), select the optimal ones and then create the json file containing all the optimal solutions.
 
 In a second step (``m2m_analysis graph``), the optimal solutions from the enumeration are stored in a graph. The nodes of this graph are each organism present in at least one solution. An edge connects two nodes, only if the two organisms (represented by the node) co-occur in at least one of the enumerated communities.
 
