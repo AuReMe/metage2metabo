@@ -55,6 +55,8 @@ It uses the following mandatory inputs (run ``m2m_analysis enum --help`` for opt
     .. code::
 
         ######### Enumeration of solution for: targets_toy #########
+        ######### Enumeration of minimal communities #########
+        5 minimal communities to produce the target metabolites
         ######### Keystone species: Union of minimal communities #########
         # Bacteria occurring in at least one minimal community enabling the producibility of the target metabolites given as inputs
         Keystone species = 17
@@ -260,6 +262,8 @@ It uses the following mandatory inputs (run ``m2m_analysis workflow --help`` for
     .. code::
 
         ######### Enumeration of solution for: targets_toy #########
+        ######### Enumeration of minimal communities #########
+        5 minimal communities to produce the target metabolites
         ######### Keystone species: Union of minimal communities #########
         # Bacteria occurring in at least one minimal community enabling the producibility of the target metabolites given as inputs
         Keystone species = 17

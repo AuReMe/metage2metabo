@@ -102,6 +102,10 @@ def enumeration(sbml_folder, target_file, seed_file, output_json, host_file):
         enumeration=True, union=True,
         optsol=True, output_json=output_json)
 
+    # Give enumeration of solutions
+    enumeration = results['enum_bacteria']
+    logger.info('######### Enumeration of minimal communities #########')
+    logger.info(str(len(enumeration)) + ' minimal communities to produce the target metabolites')
     # Give union of solutions
     union = results['union_bacteria']
     logger.info('######### Keystone species: Union of minimal communities #########')
