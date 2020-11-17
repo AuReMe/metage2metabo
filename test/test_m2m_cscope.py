@@ -87,18 +87,23 @@ def test_m2m_cscope_call():
     Test m2m addedvalue when called in terminal.
     """
     # RUN THE COMMAND
-    inppath = 'metabolic_data/'
-    respath = 'addedvalue_output/'
+    inppath = 'metabolic_data'
+    respath = 'addedvalue_output'
+    toy_bact_tgz = os.path.join(inppath, 'toy_bact.tar.gz')
+    toy_bact_path = os.path.join(respath, 'toy_bact')
+    seeds_path = os.path.join(inppath, 'seeds_toy.sbml')
+    targets_path = os.path.join(inppath, 'targets_toy.sbml')
+
     if not os.path.exists(respath):
         os.makedirs(respath)
-    with tarfile.open(inppath + 'toy_bact.tar.gz') as tar:
+    with tarfile.open(toy_bact_tgz) as tar:
         tar.extractall(path=respath)
     subprocess.call([
-        'm2m', 'cscope', '-n', respath + '/toy_bact', '-o',
-        respath, '-s', inppath + '/seeds_toy.sbml',
-        '-t', inppath + '/targets_toy.sbml', '-q'
+        'm2m', 'cscope', '-n', toy_bact_path, '-o',
+        respath, '-s', seeds_path,
+        '-t', targets_path, '-q'
     ])
-    cscope_file = respath + 'community_analysis/comm_scopes.json'
+    cscope_file = os.path.join(*[respath, 'community_analysis', 'comm_scopes.json'])
     # CSCOPE ANALYSIS
     with open(cscope_file, 'r') as json_cdata:
         d_cscope = json.load(json_cdata)

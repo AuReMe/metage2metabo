@@ -89,19 +89,23 @@ def test_m2m_addedvalue_call():
     Test m2m addedvalue when called in terminal.
     """
     # RUN THE COMMAND
-    inppath = 'metabolic_data/'
-    respath = 'addedvalue_output/'
+    inppath = 'metabolic_data'
+    respath = 'addedvalue_output'
+    toy_tgz_bact = os.path.join(inppath, 'toy_bact.tar.gz')
+    toy_bact = os.path.join(respath, 'toy_bact')
+    seeds_path = os.path.join(inppath, 'seeds_toy.sbml')
+
     if not os.path.exists(respath):
         os.makedirs(respath)
-    with tarfile.open(inppath + 'toy_bact.tar.gz') as tar:
+    with tarfile.open(toy_tgz_bact) as tar:
         tar.extractall(path=respath)
     subprocess.call([
-        'm2m', 'addedvalue', '-n', respath + '/toy_bact', '-o',
-        respath, '-s', inppath + '/seeds_toy.sbml', '-q'
+        'm2m', 'addedvalue', '-n', toy_bact, '-o',
+        respath, '-s', seeds_path, '-q'
     ])
-    target_file = respath + 'community_analysis/targets.sbml'
-    iscope_file = respath + 'indiv_scopes/indiv_scopes.json'
-    cscope_file = respath + 'community_analysis/comm_scopes.json'
+    target_file = os.path.join(*[respath, 'community_analysis', 'targets.sbml'])
+    iscope_file = os.path.join(*[respath, 'indiv_scopes', 'indiv_scopes.json'])
+    cscope_file = os.path.join(*[respath, 'community_analysis', 'comm_scopes.json'])
     # ISCOPE ANALYSIS
     # ensure there is the right number of computed indiv scopes
     with open(iscope_file, 'r') as json_idata:

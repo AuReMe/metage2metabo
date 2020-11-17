@@ -165,20 +165,24 @@ def test_m2m_metacom_call():
     Test m2m metacom when called in terminal.
     """
     # RUN THE COMMAND
-    inppath = 'metabolic_data/'
-    respath = 'metacom_output/'
+    inppath = 'metabolic_data'
+    respath = 'metacom_output'
+    toy_bact_tgz_path = os.path.join(inppath, 'toy_bact.tar.gz')
+    toy_bact_path = os.path.join(respath, 'toy_bact')
+    seeds_path = os.path.join(inppath, 'seeds_toy.sbml')
+
     if not os.path.exists(respath):
         os.makedirs(respath)
-    with tarfile.open(inppath + 'toy_bact.tar.gz') as tar:
+    with tarfile.open(toy_bact_tgz_path) as tar:
         tar.extractall(path=respath)
     subprocess.call([
-        'm2m', 'metacom', '-n', respath + '/toy_bact', '-o',
-        respath, '-s', inppath + '/seeds_toy.sbml', '-q'
+        'm2m', 'metacom', '-n', toy_bact_path, '-o',
+        respath, '-s', seeds_path, '-q'
     ])
-    target_file = respath + 'community_analysis/targets.sbml'
-    iscope_file = respath + 'indiv_scopes/indiv_scopes.json'
-    cscope_file = respath + 'community_analysis/comm_scopes.json'
-    resfile = respath + 'community_analysis/mincom.json'
+    target_file = os.path.join(*[respath, 'community_analysis', 'targets.sbml'])
+    iscope_file = os.path.join(*[respath, 'indiv_scopes', 'indiv_scopes.json'])
+    cscope_file = os.path.join(*[respath, 'community_analysis', 'comm_scopes.json'])
+    resfile = os.path.join(*[respath, 'community_analysis', 'mincom.json'])
     # ISCOPE ANALYSIS
     # ensure there is the right number of computed indiv scopes
     with open(iscope_file, 'r') as json_idata:
@@ -223,17 +227,23 @@ def test_m2m_metacom_targets_import():
     # RUN THE COMMAND
     inppath = 'metabolic_data/'
     respath = 'metacom_output/'
+    toy_bact_tgz_path = os.path.join(inppath, 'toy_bact.tar.gz')
+    toy_bact_path = os.path.join(respath, 'toy_bact')
+    seeds_path = os.path.join(inppath, 'seeds_toy.sbml')
+    targets_path = os.path.join(inppath, 'targets_toy.sbml')
+
     if not os.path.exists(respath):
         os.makedirs(respath)
-    with tarfile.open(inppath + 'toy_bact.tar.gz') as tar:
+    with tarfile.open(toy_bact_tgz_path) as tar:
         tar.extractall(path=respath)
-    metage2metabo.m2m_workflow.metacom_analysis(sbml_dir=respath + '/toy_bact', out_dir=respath,
-                seeds=inppath + '/seeds_toy.sbml', host_mn=None, targets_file=inppath + '/targets_toy.sbml')
+    metage2metabo.m2m_workflow.metacom_analysis(sbml_dir=toy_bact_path, out_dir=respath,
+                seeds=seeds_path, host_mn=None, targets_file=targets_path)
 
-    iscope_file = respath + 'indiv_scopes/indiv_scopes.json'
-    cscope_file = respath + 'community_analysis/comm_scopes.json'
-    resfile = respath + 'community_analysis/mincom.json'
-    targetfile = respath + 'producibility_targets.json'
+    iscope_file = os.path.join(*[respath, 'indiv_scopes', 'indiv_scopes.json'])
+    cscope_file = os.path.join(*[respath, 'community_analysis', 'comm_scopes.json'])
+    resfile = os.path.join(*[respath, 'community_analysis', 'mincom.json'])
+    targetfile = os.path.join(*[respath, 'producibility_targets.json'])
+
     # ISCOPE ANALYSIS
     # ensure there is the right number of computed indiv scopes
     with open(iscope_file, 'r') as json_idata:
@@ -272,9 +282,10 @@ def test_m2m_metacom_targets_import():
 
     # Ensure the final producers in com_only_producers contains reactions producing the targets
     sbml_products = {}
-    for sbml_file in os.listdir(respath + '/toy_bact'):
+    for sbml_file in os.listdir(toy_bact_path):
         reader = SBMLReader()
-        document = reader.readSBML(respath + '/toy_bact/' + sbml_file)
+        sbml_path = os.path.join(toy_bact_path, sbml_file)
+        document = reader.readSBML(sbml_path)
         model = document.getModel()
         sbml_name, _ = os.path.splitext(sbml_file)
         sbml_products[sbml_name] = [product.getSpecies() for sbml_reaction in model.getListOfReactions() for product in sbml_reaction.getListOfProducts()]

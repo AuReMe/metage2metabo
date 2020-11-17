@@ -116,31 +116,35 @@ def pgdb_to_sbml(pgdb_dir, output_dir, noorphan_bool, padmet_bool, sbml_level, c
         sbml_dir (str): SBML directory if successful
     """
 
-    logger.info("######### Creating SBML files #########")
-    sbml_dir = output_dir + "/sbml"
+    logger.info('######### Creating SBML files #########')
+    sbml_dir = os.path.join(output_dir, 'sbml')
+
     if padmet_bool:
-        padmet_dir = output_dir + "/padmet"
+        padmet_dir = os.path.join(output_dir, 'padmet')
         if not utils.is_valid_dir(padmet_dir):
-            logger.critical("Impossible to access/create output directory")
+            logger.critical('Impossible to access/create output directory')
             sys.exit(1)
     if not utils.is_valid_dir(sbml_dir):
-        logger.critical("Impossible to access/create output directory")
+        logger.critical('Impossible to access/create output directory')
         sys.exit(1)
 
     pgdb_to_sbml_pool = Pool(processes=cpu)
 
     multiprocess_data = []
     for species in os.listdir(pgdb_dir):
+        pgdb_species_path = os.path.join(pgdb_dir, species)
+        sbml_species_path = os.path.join(sbml_dir, species + '.sbml')
+        padmet_species_path = os.path.join(padmet_dir, species + '.padmet')
         if padmet_bool:
             multiprocess_data.append(
-                [pgdb_dir + '/' + species,
-                sbml_dir + '/' + species + '.sbml',
+                [pgdb_species_path,
+                sbml_species_path,
                 sbml_level, noorphan_bool,
-                padmet_dir + '/' + species + '.padmet'])
+                padmet_species_path])
         else:
             multiprocess_data.append(
-                [pgdb_dir + '/' + species,
-                sbml_dir + '/' + species + '.sbml',
+                [pgdb_species_path,
+                sbml_species_path,
                 sbml_level, noorphan_bool,
                 padmet_bool])
 
@@ -152,5 +156,5 @@ def pgdb_to_sbml(pgdb_dir, output_dir, noorphan_bool, padmet_bool, sbml_level, c
     if all(sbml_checks):
         return sbml_dir
     else:
-        logger.critical("Error during padmet/sbml creation.")
+        logger.critical('Error during padmet/sbml creation.')
         sys.exit(1)

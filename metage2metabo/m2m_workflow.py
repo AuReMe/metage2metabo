@@ -108,16 +108,17 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
         newtargets = addedvalue_targets
 
     if len(newtargets) > 0:
+        target_file_path = os.path.join(*[out_dir, 'community_analysis', 'targets.sbml'])
         if targets_file is not None:
             logger.info("\nTarget file created with the targets provided by the user in: " +
-                        out_dir + "/community_analysis/targets.sbml")
+                        target_file_path)
 
         else:
-            sbml_management.create_species_sbml(newtargets, out_dir + "/community_analysis/targets.sbml")
+            sbml_management.create_species_sbml(newtargets, target_file_path)
             logger.info("\nTarget file created with the addedvalue targets in: " +
-                        out_dir + "/community_analysis/targets.sbml")
+                        target_file_path)
 
-        sbml_management.create_species_sbml(newtargets, out_dir + "/community_analysis/targets.sbml")
+        sbml_management.create_species_sbml(newtargets, target_file_path)
 
         # Add these targets to the instance
         logger.info("Setting " + str(len(newtargets)) + " compounds as targets \n")
@@ -165,8 +166,8 @@ def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clea
     sbml_dir = sbml_management.pgdb_to_sbml(pgdb_dir, out_dir, noorphan_bool,
                                             padmet_bool, sbml_level, nb_cpu)
 
-    output_stat_file = out_dir + '/' + 'recon_stats.tsv'
-    padmet_folder = out_dir + '/padmet/'
+    output_stat_file = os.path.join(out_dir, 'recon_stats.tsv')
+    padmet_folder = os.path.join(out_dir, 'padmet')
     analyze_recon(sbml_dir, output_stat_file, padmet_folder, padmet_bool, nb_cpu)
 
     logger.info(
@@ -187,9 +188,10 @@ def iscope(sbmldir, seeds, out_dir):
     """
     # Run individual scopes of metabolic networks if any
     starttime = time.time()
+
     if len([
-            name for name in os.listdir(sbmldir) if os.path.isfile(sbmldir + '/' + name)
-            and utils.get_extension(sbmldir + '/' + name).lower() in ["xml", "sbml"]
+            name for name in os.listdir(sbmldir) if os.path.isfile(os.path.join(sbmldir, name))
+            and utils.get_extension(os.path.join(sbmldir, name)).lower() in ["xml", "sbml"]
     ]) > 1:
         scope_json = indiv_scope_run(sbmldir, seeds, out_dir)
         logger.info("Individual scopes for all metabolic networks available in " + scope_json)
@@ -247,14 +249,18 @@ def addedvalue(iscope_rm, cscope_rm, out_dir):
                 str(len(newtargets)) + " newly reachable metabolites: \n")
     logger.info('\n'.join(newtargets))
     logger.info("\n")
-    miscoto_dir = out_dir + "/community_analysis"
+
+    miscoto_dir = os.path.join(out_dir, 'community_analysis')
+    addedvalue_json_path = os.path.join(miscoto_dir, 'addedvalue.json')
+
     if not utils.is_valid_dir(miscoto_dir):
-        logger.critical("Impossible to access/create output directory")
+        logger.critical('Impossible to access/create output directory')
         sys.exit(1)
-    dict_av = {"addedvalue": list(newtargets)}
-    with open(miscoto_dir + "/addedvalue.json", 'w') as dumpfile:
+    dict_av = {'addedvalue': list(newtargets)}
+    with open(addedvalue_json_path, 'w') as dumpfile:
         json.dump(dict_av, dumpfile, indent=4, default=lambda x: x.__dict__)
-    logger.info(f"Added-value of cooperation written in {miscoto_dir}/addedvalue.json")
+    logger.info(f'Added-value of cooperation written in {addedvalue_json_path}')
+
     return newtargets
 
 
@@ -266,12 +272,13 @@ def mincom(instance_w_targets, out_dir):
         out_dir (str): results directory
     """
     starttime = time.time()
-    miscoto_dir = out_dir + "/community_analysis"
+    miscoto_dir = os.path.join(out_dir, 'community_analysis')
+    miscoto_mincom_path = os.path.join(miscoto_dir, 'mincom.json')
     if not utils.is_valid_dir(miscoto_dir):
-        logger.critical("Impossible to access/create output directory")
+        logger.critical('Impossible to access/create output directory')
         sys.exit(1)
     # Compute community selection
-    logger.info("Running minimal community selection")
+    logger.info('Running minimal community selection')
     all_results = compute_mincom(instance_w_targets, miscoto_dir)
 
     for key in all_results:
@@ -279,45 +286,45 @@ def mincom(instance_w_targets, out_dir):
 
     producible_targets = all_results['producible']
     unproducible_targets = all_results['still_unprod']
-    logger.info("\nIn the initial and minimal communities " + str(len(producible_targets)) + " targets are producible and " + str(len(unproducible_targets)) + " remain unproducible.")
-    logger.info("\n" + str(len(producible_targets)) + " producible targets:") 
-    logger.info("\n".join(producible_targets))
-    logger.info("\n" + str(len(unproducible_targets)) + " still unproducible targets:") 
-    logger.info("\n".join(unproducible_targets))
+    logger.info('\nIn the initial and minimal communities ' + str(len(producible_targets)) + ' targets are producible and ' + str(len(unproducible_targets)) + ' remain unproducible.')
+    logger.info('\n' + str(len(producible_targets)) + ' producible targets:') 
+    logger.info('\n'.join(producible_targets))
+    logger.info('\n' + str(len(unproducible_targets)) + ' still unproducible targets:') 
+    logger.info('\n'.join(unproducible_targets))
 
-    logger.info("\nMinimal communities are available in " + miscoto_dir + "/mincom.json \n")
+    logger.info(f'\nMinimal communities are available in {miscoto_mincom_path} \n')
     # Give one solution
     one_sol_bact = []
     for bact in all_results['bacteria']:
         one_sol_bact.append(bact)
     logger.info('######### One minimal community #########')
-    logger.info("# One minimal community enabling the producibility of the target metabolites given as inputs")
-    logger.info("Minimal number of bacteria in communities => " +
-                str(len(one_sol_bact)) + "\n")
+    logger.info('# One minimal community enabling the producibility of the target metabolites given as inputs')
+    logger.info('Minimal number of bacteria in communities => ' +
+                str(len(one_sol_bact)) + '\n')
     logger.info("\n".join(one_sol_bact))
     # Give union of solutions
     union = all_results['union_bacteria']
     logger.info('######### Keystone species: Union of minimal communities #########')
-    logger.info("# Bacteria occurring in at least one minimal community enabling the producibility of the target metabolites given as inputs")
-    logger.info("Number of keystone species => " +
+    logger.info('# Bacteria occurring in at least one minimal community enabling the producibility of the target metabolites given as inputs')
+    logger.info('Number of keystone species => ' +
                 str(len(union)) + "\n")
     logger.info("\n".join(union))
     # Give intersection of solutions
     intersection = all_results['inter_bacteria']
     logger.info('######### Essential symbionts: Intersection of minimal communities #########')
-    logger.info("# Bacteria occurring in ALL minimal communities enabling the producibility of the target metabolites given as inputs")
-    logger.info("Number of essential symbionts => " +
+    logger.info('# Bacteria occurring in ALL minimal communities enabling the producibility of the target metabolites given as inputs')
+    logger.info('Number of essential symbionts => ' +
                 str(len(intersection)) + "\n")
     logger.info("\n".join(intersection))
     # Give keystones, essential and alternative symbionts
     alternative_symbionts = list(set(union) - set(intersection))
     logger.info('######### Alternative symbionts: Difference between Union and Intersection #########')
-    logger.info("# Bacteria occurring in at least one minimal community but not all minimal communities enabling the producibility of the target metabolites given as inputs")
-    logger.info("Number of alternative symbionts => " +
-                str(len(alternative_symbionts)) + "\n")
-    logger.info("\n".join(alternative_symbionts))
+    logger.info('# Bacteria occurring in at least one minimal community but not all minimal communities enabling the producibility of the target metabolites given as inputs')
+    logger.info('Number of alternative symbionts => ' +
+                str(len(alternative_symbionts)) + '\n')
+    logger.info('\n'.join(alternative_symbionts))
     logger.info(
-        "\n--- Mincom runtime %.2f seconds ---\n" % (time.time() - starttime))
+        '\n--- Mincom runtime %.2f seconds ---\n' % (time.time() - starttime))
 
 
 def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, addedvalue_targets, user_targets=None):
@@ -343,51 +350,56 @@ def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, add
         producible_targets = addedvalue_targets
         indiv_producible = []
 
-    prod_targets["unproducible"] = list(unproducible_targets)
-    prod_targets["producible"] = list(producible_targets)
-    prod_targets["indiv_producible"] = list(indiv_producible)
+    prod_targets['unproducible'] = list(unproducible_targets)
+    prod_targets['producible'] = list(producible_targets)
+    prod_targets['indiv_producible'] = list(indiv_producible)
 
-    if os.path.exists(m2m_out_dir + '/indiv_scopes/indiv_scopes.json'):
-        prod_targets["individual_producers"] = {}
-        with open(m2m_out_dir + '/indiv_scopes/indiv_scopes.json') as json_data:
+    indiv_scopes_path = os.path.join(*[m2m_out_dir, 'indiv_scopes', 'indiv_scopes.json'])
+    comm_scopes_path = os.path.join(*[m2m_out_dir, 'community_analysis', 'comm_scopes.json'])
+    mincom_path = os.path.join(*[m2m_out_dir, 'community_analysis', 'mincom.json'])
+    producibility_targets_path = os.path.join(m2m_out_dir, 'producibility_targets.json')
+
+    if os.path.exists(indiv_scopes_path):
+        prod_targets['individual_producers'] = {}
+        with open(indiv_scopes_path) as json_data:
             producible_compounds = json.load(json_data)
         for target in selected_targets:
             species_producing_target = [species for species in producible_compounds if target in producible_compounds[species]]
             if species_producing_target != []:
-                prod_targets["individual_producers"][target] = species_producing_target
+                prod_targets['individual_producers'][target] = species_producing_target
 
-    if os.path.exists(m2m_out_dir + '/community_analysis/comm_scopes.json'):
-        prod_targets["com_only_producers"] = {}
-        with open(m2m_out_dir + '/community_analysis/comm_scopes.json') as json_data:
+    if os.path.exists(comm_scopes_path):
+        prod_targets['com_only_producers'] = {}
+        with open(comm_scopes_path) as json_data:
             com_producible_compounds = json.load(json_data)
         for target in selected_targets:
             if target in com_producible_compounds['targets_producers']:
-                if target in prod_targets["individual_producers"]:
-                    only_com_producing_species = list(set(com_producible_compounds['targets_producers'][target]) - set(prod_targets["individual_producers"][target]))
+                if target in prod_targets['individual_producers']:
+                    only_com_producing_species = list(set(com_producible_compounds['targets_producers'][target]) - set(prod_targets['individual_producers'][target]))
                 else:
                     only_com_producing_species = com_producible_compounds['targets_producers'][target]
-                prod_targets["com_only_producers"][target] = only_com_producing_species
+                prod_targets['com_only_producers'][target] = only_com_producing_species
 
-    if os.path.exists(m2m_out_dir + '/community_analysis/mincom.json'):
-        with open(m2m_out_dir + '/community_analysis/mincom.json') as json_data:
+    if os.path.exists(mincom_path):
+        with open(mincom_path) as json_data:
             mincom_producible_compounds = json.load(json_data)
-        prod_targets["mincom_producible"] = mincom_producible_compounds['producible']
-        prod_targets["keystone_species"] = mincom_producible_compounds['union_bacteria']
-        prod_targets["mincom_optsol_producers"] = {}
-        prod_targets["mincom_union_producers"] = {}
-        prod_targets["mincom_inter_producers"] = {}
+        prod_targets['mincom_producible'] = mincom_producible_compounds['producible']
+        prod_targets['keystone_species'] = mincom_producible_compounds['union_bacteria']
+        prod_targets['mincom_optsol_producers'] = {}
+        prod_targets['mincom_union_producers'] = {}
+        prod_targets['mincom_inter_producers'] = {}
         for target in selected_targets:
             if target in mincom_producible_compounds['one_model_targetsproducers']:
-                prod_targets["mincom_optsol_producers"][target] = mincom_producible_compounds['one_model_targetsproducers'][target]
+                prod_targets['mincom_optsol_producers'][target] = mincom_producible_compounds['one_model_targetsproducers'][target]
             if target in mincom_producible_compounds['union_targetsproducers']:
-                prod_targets["mincom_union_producers"][target] = mincom_producible_compounds['union_targetsproducers'][target]
+                prod_targets['mincom_union_producers'][target] = mincom_producible_compounds['union_targetsproducers'][target]
             if target in mincom_producible_compounds['inter_targetsproducers']:
-                prod_targets["mincom_inter_producers"][target] = mincom_producible_compounds['inter_targetsproducers'][target]
+                prod_targets['mincom_inter_producers'][target] = mincom_producible_compounds['inter_targetsproducers'][target]
 
-    with open(m2m_out_dir + "/producibility_targets.json", 'w') as dumpfile:
+    with open(producibility_targets_path, 'w') as dumpfile:
         json.dump(prod_targets, dumpfile, indent=4)
 
-    logger.info("Targets producibility are available at " + m2m_out_dir + "/producibility_targets.json")
+    logger.info('Targets producibility are available at ' + producibility_targets_path)
 
 
 def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
@@ -409,27 +421,30 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
         logger.critical("Genomes directory path does not exist.")
         sys.exit(1)
 
-    pgdb_dir = output_dir + "/pgdb"
-    log_dir = output_dir + "/pgdb_log"
+    pgdb_dir = os.path.join(output_dir, 'pgdb')
+    log_dir = os.path.join(output_dir,  'pgdb_log')
+    ncbirc_path = os.path.join(os.path.expanduser('~'), '.ncbirc')
+    log_path = os.path.join(log_dir, 'log_error.txt')
+
     if not utils.is_valid_dir(pgdb_dir):
-        logger.critical("Impossible to access/create output directory")
+        logger.critical('Impossible to access/create output directory')
         sys.exit(1)
 
-    if not utils.check_program("pathway-tools"):
+    if not utils.check_program('pathway-tools'):
         logger.critical(
-            "Pathway Tools is not in the PATH, please fix it before using the program"
+            'Pathway Tools is not in the PATH, please fix it before using the program'
         )
         sys.exit(1)
 
     if not utils.check_program("blastp"):
         logger.critical(
-            "blastp is not in the PATH, please fix it before using the program"
+            'blastp is not in the PATH, please fix it before using the program'
         )
         sys.exit(1)
 
-    if not utils.is_valid_file(os.path.expanduser("~") + "/.ncbirc"):
+    if not utils.is_valid_file(ncbirc_path):
         logger.critical(
-            "No ~/.ncbirc file, please fix it before using the program"
+            f'No {ncbirc_path} file, please fix it before using the program'
         )
         sys.exit(1)
 
@@ -461,11 +476,11 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
                         patho_log=log_dir,
                         verbose=False)
 
-    nb_genomes_dir = len([folder for folder in os.listdir(genomes_dir) if os.path.isdir(genomes_dir+'/'+folder)])
-    nb_pgdb_dir = len([folder for folder in os.listdir(pgdb_dir) if os.path.isdir(pgdb_dir+'/'+folder)])
+    nb_genomes_dir = len([folder for folder in os.listdir(genomes_dir) if os.path.isdir(os.path.join(genomes_dir, folder))])
+    nb_pgdb_dir = len([folder for folder in os.listdir(pgdb_dir) if os.path.isdir(os.path.join(pgdb_dir, folder))])
     if nb_pgdb_dir != nb_genomes_dir:
-        if os.path.exists(log_dir + "/log_error.txt"):
-            logger.critical("Something went wrong running Pathway Tools. See the log file in " + log_dir + "/log_error.txt")
+        if os.path.exists(log_path):
+            logger.critical("Something went wrong running Pathway Tools. See the log file in " + log_path)
         else:
             logger.critical("Something went wrong running Pathway Tools.")
         sys.exit(1)
@@ -597,7 +612,7 @@ def analyze_recon(sbml_folder, output_stat_file, padmet_folder, padmet_bool=None
             sys.exit(1)
 
         for padmet in os.listdir(padmet_folder):
-            padmet_file = padmet_folder + '/' + padmet
+            padmet_file = os.path.join(padmet_folder, padmet)
             species_name = padmet.replace('.padmet', '')
             multiprocessing_data.append((species_name, padmet_file))
         recon_stats = analyze_pool.starmap(create_padmet_stat, multiprocessing_data)
@@ -629,7 +644,7 @@ def analyze_recon(sbml_folder, output_stat_file, padmet_folder, padmet_bool=None
 
         for sbml in os.listdir(sbml_folder):
             species_name = sbml.replace('.sbml','')
-            sbml_file = sbml_folder + '/' + sbml
+            sbml_file = os.path.join(sbml_folder, sbml)
             multiprocessing_data.append((species_name, sbml_file))
         sbml_stats = analyze_pool.starmap(create_sbml_stat, multiprocessing_data)
 
@@ -717,16 +732,19 @@ def indiv_scope_run(sbml_dir, seeds, output_dir):
     Returns:
         str: output file for Menetools analysis
     """
-    logger.info("######### Running individual metabolic scopes #########")
-    menetools_dir = output_dir + "/indiv_scopes"
+    logger.info('######### Running individual metabolic scopes #########')
+
+    menetools_dir = os.path.join(output_dir, 'indiv_scopes')
+    indiv_scopes_path = os.path.join(menetools_dir, 'indiv_scopes.json')
+
     if not utils.is_valid_dir(menetools_dir):
-        logger.critical("Impossible to access/create output directory")
+        logger.critical('Impossible to access/create output directory')
         sys.exit(1)
 
     all_files = [
         f for f in os.listdir(sbml_dir)
         if os.path.isfile(os.path.join(sbml_dir, f)) and utils.get_extension(
-            os.path.join(sbml_dir, f)).lower() in ["xml", "sbml"]
+            os.path.join(sbml_dir, f)).lower() in ['xml', 'sbml']
     ]
     all_scopes = {}
     for f in all_files:
@@ -739,12 +757,13 @@ def indiv_scope_run(sbml_dir, seeds, output_dir):
             # Don't print the traceback if the error is linked to SystemExit as the error has been hanled by menetools.
             if 'SystemExit: 1' not in traceback_str:
                 logger.critical(traceback_str)
-            logger.critical("---------------Something went wrong running Menetools on " + f + "---------------")
+            logger.critical('---------------Something went wrong running Menetools on " + f + "---------------')
             sys.exit(1)
 
-    with open(menetools_dir + "/indiv_scopes.json", 'w') as dumpfile:
+    with open(indiv_scopes_path, 'w') as dumpfile:
         json.dump(all_scopes, dumpfile, indent=4)
-    return menetools_dir + "/indiv_scopes.json"
+
+    return indiv_scopes_path
 
 
 def analyze_indiv_scope(jsonfile, seeds):
@@ -817,7 +836,7 @@ def instance_community(sbml_dir, seeds, output_dir, targets_file = None, host_mn
     logger.info(
             "######### Creating metabolic instance for the whole community #########"
         )
-    miscoto_dir = output_dir + "/community_analysis"
+    miscoto_dir = os.path.join(output_dir, 'community_analysis')
     if not utils.is_valid_dir(miscoto_dir):
         logger.critical("Impossible to access/create output directory")
         sys.exit(1)
@@ -847,9 +866,11 @@ def comm_scope_run(instance, output_dir, host_mn=None):
     Returns:
         set: microbiota scope
     """
-    miscoto_dir = output_dir + "/community_analysis"
+    miscoto_dir = os.path.join(output_dir, 'community_analysis')
+    com_scopes_path = os.path.join(miscoto_dir, 'comm_scopes.json')
+
     if not utils.is_valid_dir(miscoto_dir):
-        logger.critical("Impossible to access/create output directory")
+        logger.critical('Impossible to access/create output directory')
         sys.exit(1)
     microbiota_scope = run_scopes(lp_instance_file=instance)
 
@@ -860,10 +881,11 @@ def comm_scope_run(instance, output_dir, host_mn=None):
         del microbiota_scope['host_scope']
         del microbiota_scope['comhost_scope']
 
-    with open(miscoto_dir + "/comm_scopes.json", 'w') as dumpfile:
+    with open(com_scopes_path, 'w') as dumpfile:
         json.dump(microbiota_scope, dumpfile, indent=4)
-    logger.info("Community scopes for all metabolic networks available in " +
-                miscoto_dir + "/comm_scopes.json")
+    logger.info('Community scopes for all metabolic networks available in ' +
+                com_scopes_path)
+
     return set(microbiota_scope['com_scope'])
 
 
@@ -878,7 +900,7 @@ def add_targets_to_instance(instancefile, output_dir, target_set):
     Returns:
         str: new instance filepath
     """
-    new_instance_file = output_dir + "/community_analysis/" + utils.get_basename(instancefile) + '__tgts.lp'
+    new_instance_file = os.path.join(*[output_dir, 'community_analysis', utils.get_basename(instancefile) + '__tgts.lp'])
     copyfile(instancefile, new_instance_file)
 
     with open(new_instance_file, 'a') as f:
@@ -898,7 +920,7 @@ def compute_mincom(instancefile, miscoto_dir):
     Returns:
         dict: results of miscoto_mincom analysis
     """
-    mincom_json_file = miscoto_dir + "/mincom.json"
+    mincom_json_file = os.path.join(miscoto_dir, 'mincom.json')
     if not utils.is_valid_dir(miscoto_dir):
         logger.critical("Impossible to access/create output directory")
         sys.exit(1)
@@ -922,6 +944,9 @@ def reverse_scope(json_scope, output_dir):
     Returns:
         (txt, txt): paths to the JSON and TSV outputs
     """
+    rev_indiv_scopes_json_path = os.path.join(*[output_dir, 'indiv_scopes', 'rev_iscope.json'])
+    rev_indiv_scopes_tsv_path = os.path.join(*[output_dir, 'indiv_scopes', 'rev_iscope.tsv'])
+
     with open(json_scope, 'r') as f:
         initial_dict = json.load(f)
 
@@ -930,17 +955,17 @@ def reverse_scope(json_scope, output_dir):
         for x in v:
             new_dic.setdefault(x,[]).append(k)
 
-    with open(f"{output_dir}/indiv_scopes/rev_iscope.json", "w") as g:
+    with open(rev_indiv_scopes_json_path, 'w') as g:
         json.dump(new_dic, g, indent=True, sort_keys=True)
 
     all_compounds = [compound for compound in new_dic]
     all_species = [species for species in initial_dict]
 
     # For each species get the possibility of production of each compounds.
-    with open(f"{output_dir}/indiv_scopes/rev_iscope.tsv", "w") as output_file:
-        csvwriter = csv.writer(output_file, delimiter="\t")
-        csvwriter.writerow(["", *all_compounds])
+    with open(rev_indiv_scopes_tsv_path, 'w') as output_file:
+        csvwriter = csv.writer(output_file, delimiter='\t')
+        csvwriter.writerow(['', *all_compounds])
         for species in all_species:
              csvwriter.writerow([species, *[1 if species in new_dic[compound] else 0 for compound in all_compounds]])
 
-    return(f"{output_dir}/indiv_scopes/rev_iscope.json", f"{output_dir}/indiv_scopes/rev_iscope.tsv")
+    return(rev_indiv_scopes_json_path, rev_indiv_scopes_tsv_path)

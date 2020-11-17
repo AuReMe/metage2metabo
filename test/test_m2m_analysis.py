@@ -67,18 +67,25 @@ def test_m2m_analysis_call():
     Test m2m analysis when called in terminal.
     """
     # RUN THE COMMAND
-    inppath = 'metabolic_data/'
-    respath = 'm2m_analysis_output/'
+    inppath = 'metabolic_data'
+    respath = 'm2m_analysis_output'
+    draft_path = os.path.join(respath, 'toy_bact')
+    draft_tgz_path = os.path.join(inppath, 'toy_bact.tar.gz')
+    seeds_path = os.path.join(inppath, 'seeds_toy.sbml')
+    targets_path = os.path.join(inppath, 'targets_toy.sbml')
+    json_folder = os.path.join(respath, 'json')
+    json_file = os.path.join(json_folder, 'targets_toy.json')
+    gml_file_path = os.path.join(*[respath, 'gml', 'targets_toy.gml'])
+
     if not os.path.exists(respath):
         os.makedirs(respath)
-    with tarfile.open(inppath + 'toy_bact.tar.gz') as tar:
+    with tarfile.open(draft_tgz_path) as tar:
         tar.extractall(path=respath)
     subprocess.call([
-        'm2m_analysis', 'enum', '-n', respath + '/toy_bact', '-o',
-        respath, '-t', inppath + '/targets_toy.sbml', '-s', inppath + '/seeds_toy.sbml',
+        'm2m_analysis', 'enum', '-n', draft_path, '-o',
+        respath, '-t', targets_path, '-s', seeds_path,
         '-q'])
 
-    json_file = respath +'json' + '/' + 'targets_toy.json'
 
     # KEYSTONE SPECIES ANALYSIS
     with open(json_file, 'r') as json_data:
@@ -91,12 +98,11 @@ def test_m2m_analysis_call():
     assert found_solutions == expected_solutions
 
     subprocess.call([
-        'm2m_analysis', 'graph', '-j', respath + '/json',
-        '-o', respath, '-t', inppath + '/targets_toy.sbml', '-q'])
-    gml_file = respath +'gml' + '/' + 'targets_toy.gml'
+        'm2m_analysis', 'graph', '-j', json_folder,
+        '-o', respath, '-t', targets_path, '-q'])
 
     # Graph analysis
-    G = nx.read_gml(gml_file)
+    G = nx.read_gml(gml_file_path)
     assert sorted(G.nodes) == sorted(GML_NODES)
     assert len(G.edges()) == 126
     # clean

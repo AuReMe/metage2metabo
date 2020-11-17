@@ -55,7 +55,7 @@ def file_or_folder(variable_folder_file):
     elif os.path.isdir(variable_folder_file):
         for file_from_folder in os.listdir(variable_folder_file):
             filename = os.path.splitext(os.path.basename(file_from_folder))[0]
-            file_folder_paths[filename] = variable_folder_file + "/" + file_from_folder
+            file_folder_paths[filename] = os.path.join(variable_folder_file, file_from_folder)
 
     return file_folder_paths
 
@@ -148,7 +148,7 @@ def enumeration_analysis(sbml_folder, target_folder_file, seed_file, output_dir,
 
     target_paths = file_or_folder(target_folder_file)
 
-    output_jsons = output_dir + "/" + "json" + "/"
+    output_jsons = os.path.join(output_dir, 'json')
     if not utils.is_valid_dir(output_jsons):
         logger.critical("Impossible to access/create output directory")
         sys.exit(1)
@@ -157,7 +157,7 @@ def enumeration_analysis(sbml_folder, target_folder_file, seed_file, output_dir,
     for target_path in target_paths:
         logger.info('######### Enumeration of solution for: '+ target_path + ' #########')
         target_pathname = target_paths[target_path]
-        output_json = output_jsons + target_path + ".json"
+        output_json = os.path.join(output_jsons, target_path + '.json')
         miscoto_json = enumeration(sbml_folder, target_pathname, seed_file, output_json, host_file)
         miscoto_jsons[target_path] = miscoto_json
 
@@ -177,14 +177,14 @@ def stat_analysis(json_file_folder, output_dir, taxon_file=None):
     """
     starttime = time.time()
 
-    miscoto_stat_output = output_dir + "/" + "miscoto_stats.txt"
-    key_species_stats_output = output_dir + "/" + "keystone_species_stats.tsv"
-    key_species_supdata_output = output_dir + "/" + "keystone_species_supdata.tsv"
+    miscoto_stat_output = os.path.join(output_dir, 'miscoto_stats.txt')
+    key_species_stats_output = os.path.join(output_dir, 'keystone_species_stats.tsv')
+    key_species_supdata_output = os.path.join(output_dir, 'keystone_species_supdata.tsv')
     json_paths = file_or_folder(json_file_folder)
 
     if taxon_file:
-        phylum_output_file = output_dir + "/taxon_phylum.tsv"
-        tree_output_file = output_dir + "/taxon_tree.txt"
+        phylum_output_file = os.path.join(output_dir, 'taxon_phylum.tsv')
+        tree_output_file = os.path.join(output_dir, 'taxon_tree.txt')
         extract_taxa(taxon_file, phylum_output_file, tree_output_file)
         phylum_species, all_phylums = get_phylum(phylum_output_file)
     else:
@@ -231,11 +231,11 @@ def graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file)
     target_paths = file_or_folder(target_folder_file)
     json_paths = file_or_folder(json_file_folder)
 
-    gml_output = output_dir + "/" + "gml" + "/"
+    gml_output = os.path.join(output_dir, 'gml')
 
     if taxon_file:
-        phylum_output_file = output_dir + "/taxon_phylum.tsv"
-        tree_output_file = output_dir + "/taxon_tree.txt"
+        phylum_output_file = os.path.join(output_dir, 'taxon_phylum.tsv')
+        tree_output_file = os.path.join(output_dir, 'taxon_tree.txt')
         if not os.path.exists(phylum_output_file):
             extract_taxa(taxon_file, phylum_output_file, tree_output_file)
     else:
@@ -261,8 +261,8 @@ def powergraph_analysis(gml_file_folder, output_dir, oog_jar):
 
     gml_paths = file_or_folder(gml_file_folder)
 
-    bbl_path = output_dir + "/" + "bbl" + "/"
-    svg_path = output_dir + "/" + "svg" + "/"
+    bbl_path = os.path.join(output_dir, 'bbl')
+    svg_path = os.path.join(output_dir, 'svg')
 
     if not utils.is_valid_dir(bbl_path):
         logger.critical("Impossible to access/create output directory")
@@ -273,8 +273,7 @@ def powergraph_analysis(gml_file_folder, output_dir, oog_jar):
         sys.exit(1)
 
     for gml_path in gml_paths:
-        bbl_output = bbl_path + gml_path + ".bbl"
-        svg_output = svg_path + gml_path + ".svg"
+        bbl_output = os.path.join(bbl_path, gml_path + '.bbl')
         gml_input = gml_paths[gml_path]
         logger.info('######### Graph compression: ' + gml_path + ' #########')
         compression(gml_input, bbl_output)
@@ -458,14 +457,14 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
         output_dir (str): results directory
         taxon_file (str): mpwt taxon file for species in sbml folder
     """
-    miscoto_stat_output = output_dir + "/" + "miscoto_stats.txt"
-    key_species_stats_output = output_dir + "/" + "keystone_species_stats.tsv"
-    key_species_supdata_output = output_dir + "/" + "keystone_species_supdata.tsv"
+    miscoto_stat_output = os.path.join(output_dir, 'miscoto_stats.txt')
+    key_species_stats_output = os.path.join(output_dir,'keystone_species_stats.tsv')
+    key_species_supdata_output = os.path.join(output_dir, 'keystone_species_supdata.tsv')
 
-    gml_output = output_dir + "/" + "gml" + "/"
+    gml_output = os.path.join(output_dir, 'gml')
 
     if not utils.is_valid_dir(gml_output):
-        logger.critical("Impossible to access/create output directory")
+        logger.critical('Impossible to access/create output directory')
         sys.exit(1)
 
     len_min_sol = {}
@@ -484,30 +483,31 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
         phylum_named_species = None
         all_phylums = None
 
-    with open(key_species_stats_output, "w") as key_stats_file, open(key_species_supdata_output, "w") as key_sup_file, open(miscoto_stat_output, "w") as stats_output:
-        keystone_stats_writer = csv.writer(key_stats_file, delimiter="\t")
+    with open(key_species_stats_output, 'w') as key_stats_file, open(key_species_supdata_output, 'w') as key_sup_file, open(miscoto_stat_output, 'w') as stats_output:
+        keystone_stats_writer = csv.writer(key_stats_file, delimiter='\t')
         if all_phylums:
-            keystone_stats_writer.writerow(["target_categories", "keystones_group", *sorted(all_phylums), "Sum"])
+            keystone_stats_writer.writerow(['target_categories', 'keystones_group', *sorted(all_phylums), 'Sum'])
         else:
-            keystone_stats_writer.writerow(["target_categories", "keystones_group", "data", "Sum"])
-        keystone_sup_writer = csv.writer(key_sup_file, delimiter="\t")
+            keystone_stats_writer.writerow(['target_categories', 'keystones_group', 'data', 'Sum'])
+        keystone_sup_writer = csv.writer(key_sup_file, delimiter='\t')
         for target_category in target_categories:
+            target_output_gml_path = os.path.join(gml_output, target_category + '.gml')
             with open(json_paths[target_category]) as json_data:
                 dicti = json.load(json_data)
             create_stat_species(target_category, dicti, keystone_stats_writer, keystone_sup_writer, phylum_named_species, all_phylums)
             G = nx.Graph()
             added_node = []
             species_weight = {}
-            if dicti["still_unprod"] != []:
-                print("ERROR ", dicti["still_unprod"], " is unproducible")
-            len_target[target_category] = len(dicti["newly_prod"]) + len(dicti["still_unprod"])
-            len_min_sol[target_category] = len(dicti["bacteria"])
-            len_union[target_category] = len(dicti["union_bacteria"])
-            len_intersection[target_category] = len(dicti["inter_bacteria"])
-            len_solution[target_category] = len(dicti["enum_bacteria"])
-            for sol in dicti["enum_bacteria"]:
+            if dicti['still_unprod'] != []:
+                print('ERROR ', dicti["still_unprod"], ' is unproducible')
+            len_target[target_category] = len(dicti['newly_prod']) + len(dicti['still_unprod'])
+            len_min_sol[target_category] = len(dicti['bacteria'])
+            len_union[target_category] = len(dicti['union_bacteria'])
+            len_intersection[target_category] = len(dicti['inter_bacteria'])
+            len_solution[target_category] = len(dicti['enum_bacteria'])
+            for sol in dicti['enum_bacteria']:
                 for species_1, species_2 in combinations(
-                    dicti["enum_bacteria"][sol], 2
+                    dicti['enum_bacteria'][sol], 2
                 ):
                     if species_1 not in added_node:
                         if taxon_file:
@@ -521,7 +521,7 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
                         else:
                             G.add_node(species_2)
                         added_node.append(species_2)
-                    combination_species = "_".join(sorted([species_1, species_2]))
+                    combination_species = '_'.join(sorted([species_1, species_2]))
                     if combination_species not in species_weight:
                         species_weight[combination_species] = 1
                     else:
@@ -532,14 +532,14 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
                         G.add_edge(species_1, species_2, weight=species_weight[combination_species])
 
             statswriter = csv.writer(stats_output, delimiter="\t")
-            statswriter.writerow(["categories", "nb_target", "size_min_sol", "size_union", "size_intersection", "size_enum"])
+            statswriter.writerow(['categories', 'nb_target', 'size_min_sol', 'size_union', 'size_intersection', 'size_enum'])
             statswriter.writerow([target_category, str(len_target[target_category]), str(len_min_sol[target_category]),
                                     str(len_union[target_category]), str(len_intersection[target_category]),
                                     str(len_solution[target_category])])
             logger.info('######### Graph of ' + target_category + ' #########')
             logger.info('Number of nodes: ' + str(G.number_of_nodes()))
             logger.info('Number of edges: ' + str(G.number_of_edges()))
-            nx.write_gml(G, gml_output + "/" + target_category + ".gml")
+            nx.write_gml(G, target_output_gml_path)
 
 
 def compression(gml_input, bbl_output):
@@ -551,15 +551,15 @@ def compression(gml_input, bbl_output):
     """
     starttime = time.time()
     with open('powergrasp.cfg', 'w') as config_file:
-        config_file.write("[powergrasp options]\n")
-        config_file.write("SHOW_STORY = no\n")
+        config_file.write('[powergrasp options]\n')
+        config_file.write('SHOW_STORY = no\n')
 
     import powergrasp
     from bubbletools import BubbleTree
 
-    with open(bbl_output, "w") as fd:
+    with open(bbl_output, 'w') as fd:
         for line in powergrasp.compress_by_cc(gml_input):
-            fd.write(line + "\n")
+            fd.write(line + '\n')
 
     tree = BubbleTree.from_bubble_file(bbl_output)
     logger.info('Number of powernodes: ' + str(len([powernode for powernode in tree.powernodes()])))
@@ -568,7 +568,7 @@ def compression(gml_input, bbl_output):
     os.remove('powergrasp.cfg')
 
     logger.info(
-        "Compression runtime %.2f seconds ---\n" % (time.time() - starttime))
+        'Compression runtime %.2f seconds ---\n' % (time.time() - starttime))
 
 
 def check_oog_jar_file(oog_jar):
@@ -589,9 +589,9 @@ def check_oog_jar_file(oog_jar):
     manifest_jar = None
 
     for filename in jarfile.namelist():
-        if filename.startswith("org/mattlab/eaglevista/Oog.class".rstrip("/")):
+        if filename.endswith('Oog.class'):
             oog_class = True
-        if filename.startswith("META-INF/MANIFEST.MF".rstrip("/")):
+        if filename.endswith('MANIFEST.MF'):
             manifest_jar = True
 
     jarfile.close()

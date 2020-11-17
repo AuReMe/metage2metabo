@@ -272,7 +272,8 @@ def main():
     # logger.setLevel(logging.DEBUG)  #TODO: get rid of it once mpwt's logger is fixed
     # add logger in file
     formatter = logging.Formatter('%(message)s')
-    file_handler = logging.FileHandler(f'{args.out}/m2m_{args.cmd}.log', 'w+')
+    log_file_path = os.path.join(args.out, f'm2m_{args.cmd}.log')
+    file_handler = logging.FileHandler(log_file_path, 'w+')
     file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
@@ -337,7 +338,7 @@ def main():
         main_test(args.out, args.cpu)
 
     logger.info("--- Total runtime %.2f seconds ---" % (time.time() - start_time))
-    logger.warning(f'--- Logs written in {args.out}/m2m_{args.cmd}.log ---')
+    logger.warning(f'--- Logs written in {log_file_path} ---')
 
 
 def main_workflow(*allargs):
@@ -394,9 +395,10 @@ def main_added_value(sbmldir, seeds, outdir, host):
     cscope_metabolites = main_cscope(sbmldir, seeds, outdir, host)
     newtargets = addedvalue(iscope_metabolites, cscope_metabolites, outdir)
     if len(newtargets) > 0:
-        sbml_management.create_species_sbml(newtargets, outdir + "/community_analysis/targets.sbml")
+        targets_file_path = os.path.join(*[outdir, 'community_analysis', 'targets.sbml'])
+        sbml_management.create_species_sbml(newtargets, targets_file_path)
         logger.info("Target file created with the addedvalue targets in: " +
-                    outdir + "/community_analysis/targets.sbml")
+                    targets_file_path)
 
 
 def main_mincom(sbmldir, seedsfiles, outdir, targets, host):
@@ -424,7 +426,7 @@ def main_seeds(metabolites_file, outdir):
         metabolites_file (str): text file with metabolites IDs, one per line
         outdir (str): Results directory
     """
-    outfile = outdir + "/seeds.sbml"
+    outfile = os.path.join(outdir, 'seeds.sbml')
     with open(metabolites_file, "r") as f:
         rawdata = f.readlines()
     metabolites_set = set()
@@ -447,10 +449,11 @@ def main_test(outdir, cpu):
         cpu (int): number of cpu to use (recommended: 2)
     """
     # Retrieve package path and path to test data.
-    package_path = '/'.join(os.path.realpath(__file__).split('/')[:-1])+ '/workflow_data/'
+    package_path = os.path.dirname(os.path.realpath(__file__))
+    workflow_data_path = os.path.join(package_path, 'workflow_data')
 
-    genome_file = package_path + 'workflow_genomes.tar.gz'
-    seeds_sbml_file = package_path + 'seeds_workflow.sbml'
+    genome_file = os.path.join(workflow_data_path, 'workflow_genomes.tar.gz')
+    seeds_sbml_file = os.path.join(workflow_data_path, 'seeds_workflow.sbml')
 
     logger.info("Uncompressing test data to " + outdir)
     tar = tarfile.open(genome_file, "r:gz")
@@ -458,7 +461,7 @@ def main_test(outdir, cpu):
     tar.close()
 
     logger.info("Launching workflow on test data")
-    input_genome = outdir + '/workflow_genomes'
+    input_genome = os.path.join(outdir, 'workflow_genomes')
     inp_dir=input_genome
     out_dir=outdir
     nb_cpu=cpu

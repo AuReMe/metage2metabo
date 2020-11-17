@@ -93,18 +93,23 @@ def test_m2m_mincom_call():
     Test m2m mincom when called in terminal.
     """
     # RUN THE COMMAND
-    inppath = 'metabolic_data/'
-    respath = 'mincom_output/'
+    inppath = 'metabolic_data'
+    respath = 'mincom_output'
+    toy_bact_tgz_path = os.path.join(inppath, 'toy_bact.tar.gz')
+    toy_bact_path = os.path.join(respath, 'toy_bact')
+    seeds_path = os.path.join(inppath, 'seeds_toy.sbml')
+    targets_path = os.path.join(inppath, 'targets_toy.sbml')
+
     if not os.path.exists(respath):
         os.makedirs(respath)
-    with tarfile.open(inppath + 'toy_bact.tar.gz') as tar:
+    with tarfile.open(toy_bact_tgz_path) as tar:
         tar.extractall(path=respath)
     subprocess.call([
-        'm2m', 'mincom', '-n', respath + '/toy_bact', '-o', respath,
-        '-s', inppath + '/seeds_toy.sbml', '-t', inppath + '/targets_toy.sbml',
+        'm2m', 'mincom', '-n', toy_bact_path, '-o', respath,
+        '-s', seeds_path, '-t', targets_path,
         '-q'
     ])
-    resfile = respath + 'community_analysis/mincom.json'
+    resfile = os.path.join(*[respath, 'community_analysis', 'mincom.json'])
     # MINCOM ANALYSIS
     with open(resfile, 'r') as json_data:
         d_mincom = json.load(json_data)
