@@ -11,7 +11,7 @@ library(RColorBrewer)
 
 ######### CONFIG ###########
 analysis = "comscope" # can be "addedvalue" to study the cooperation potential or "comscope" for the full community scope
-focus = "mhd" # can be "mdh" or "swe" or "all"
+focus = "mhd" # can be "mhd" or "swe" or "all"
 ############################
 
 if (analysis=="addedvalue"){
