@@ -586,7 +586,7 @@ def mean_sd_data(datas):
     return mean_data, sd_data
 
 
-def analyze_recon(sbml_folder, output_stat_file, padmet_folder, padmet_bool=None, nb_cpu=1):
+def analyze_recon(sbml_folder, output_stat_file, padmet_folder=None, padmet_bool=None, nb_cpu=1):
     """Analyze the sbml and/or the padmet files after metabolic network reconstruction.
     And write the result in a file.
 
@@ -598,7 +598,7 @@ def analyze_recon(sbml_folder, output_stat_file, padmet_folder, padmet_bool=None
         nb_cpu (int): number of CPU to use
     """
     analyze_pool = Pool(processes=nb_cpu)
-    if padmet_bool:
+    if padmet_bool and padmet_folder:
         genes = {}
         reactions = {}
         gene_associated_reactions = {}
@@ -650,14 +650,15 @@ def analyze_recon(sbml_folder, output_stat_file, padmet_folder, padmet_bool=None
 
         with open(output_stat_file, 'w') as micro_file:
             csvwriter = csv.writer(micro_file, delimiter='\t')
-            csvwriter.writerow(['species', 'nb_reactions', 'nb_genes', 'nb_compounds'])
+            csvwriter.writerow(['species', 'nb_reactions', 'nb_reactions_with_genes', 'nb_genes', 'nb_compounds'])
             for sbml_stat in sbml_stats:
                 species_name = sbml_stat[0]
                 genes[species_name] = set(sbml_stat[1])
                 reactions[species_name] = set(sbml_stat[2])
                 gene_associated_reactions[species_name] = set(sbml_stat[3])
                 compounds[species_name] = set(sbml_stat[4])
-                csvwriter.writerow([species_name, len(reactions[species_name]), len(genes[species_name]), len(compounds[species_name])])
+                csvwriter.writerow([species_name, len(reactions[species_name]), len(gene_associated_reactions[species_name]),
+                                    len(genes[species_name]), len(compounds[species_name])])
 
     analyze_pool.close()
     analyze_pool.join()
