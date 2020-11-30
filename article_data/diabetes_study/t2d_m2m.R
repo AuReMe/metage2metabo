@@ -8,6 +8,7 @@ library(Rtsne)
 library(ggplot2)
 library(ggpubr)
 library(RColorBrewer)
+library(lsr)
 
 ######### CONFIG ###########
 analysis = "comscope" # can be "addedvalue" to study the cooperation potential or "comscope" for the full community scope
@@ -235,16 +236,17 @@ names(compo_l3_long) = c("compound", "status", "mean_occurrence")
 
 ############ TESTS ##############
 # AOV tests init comm size  and commscope size
-init_size_aov_l1 = aov(comsize ~ status_l1, cscope_size)
+# init_size_aov_l1 = aov(comsize ~ status_l1, cscope_size)
 init_size_aov_l2 = aov(comsize ~ status_l2, cscope_size)
-init_size_aov_l3 = aov(comsize ~ status_l3, cscope_size)
+# init_size_aov_l3 = aov(comsize ~ status_l3, cscope_size)
 
-summary(init_size_aov_l1)
-TukeyHSD(init_size_aov_l1)
+# summary(init_size_aov_l1)
+# TukeyHSD(init_size_aov_l1)
 summary(init_size_aov_l2)
 TukeyHSD(init_size_aov_l2)
-summary(init_size_aov_l3)
-TukeyHSD(init_size_aov_l3)
+etaSquared(init_size_aov_l2)
+# summary(init_size_aov_l3)
+# TukeyHSD(init_size_aov_l3)
 
 group_by(cscope_size, status_l2) %>%
   summarise(
@@ -253,16 +255,19 @@ group_by(cscope_size, status_l2) %>%
     sd = sd(comsize, na.rm = TRUE),
   )
 
-cscope_size_aov_l1 = aov(cscope_sz ~ status_l1, cscope_size)
+# cscope_size_aov_l1 = aov(cscope_sz ~ status_l1, cscope_size)
 cscope_size_aov_l2 = aov(cscope_sz ~ status_l2, cscope_size)
-cscope_size_aov_l3 = aov(cscope_sz ~ status_l3, cscope_size)
+# cscope_size_aov_l3 = aov(cscope_sz ~ status_l3, cscope_size)
 
-summary(cscope_size_aov_l1)
-TukeyHSD(cscope_size_aov_l1)
+# summary(cscope_size_aov_l1)
+# TukeyHSD(cscope_size_aov_l1)
 summary(cscope_size_aov_l2)
 TukeyHSD(cscope_size_aov_l2)
-summary(cscope_size_aov_l3)
-TukeyHSD(cscope_size_aov_l3)
+etaSquared(cscope_size_aov_l2)
+# summary(cscope_size_aov_l3)
+# TukeyHSD(cscope_size_aov_l3)
+
+
 
 group_by(cscope_size, status_l2) %>%
   summarise(

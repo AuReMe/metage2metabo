@@ -9,7 +9,7 @@ library(RColorBrewer)
 
 ######### CONFIG ###########
 focus = "mhd" # can be "mhd" or "swe" or "all"
-study = "agora" # can be "mgs" or "agora"
+study = "mgs" # can be "mgs" or "agora"
 ############################
 
 metadata_file = 'metadata.csv'
@@ -201,6 +201,7 @@ fit3 = aov(number ~ status_l3, but_producers_by_sample)
 # TukeyHSD(fit1)
 summary(fit2)
 TukeyHSD(fit2)
+etaSquared(fit2)
 # summary(fit3)
 # TukeyHSD(fit3)
 

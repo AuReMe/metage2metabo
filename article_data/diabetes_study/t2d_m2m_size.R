@@ -102,35 +102,35 @@ names(col_by_ds) = metadata$sample
 
 ##################################################################################
 # Stats on KS, ES, AS sizes for addedvalue targets and full targets (addedvalue + community scope)
-ksafit1 = aov(ks ~ status_l1, metrics)
-ksafit2 = aov(ks ~ status_l2, metrics)
-ksafit3 = aov(ks ~ status_l3, metrics)
-esafit1 = aov(es ~ status_l1, metrics)
-esafit2 = aov(es ~ status_l2, metrics)
-esafit3 = aov(es ~ status_l3, metrics)
-asafit1 = aov(as ~ status_l1, metrics)
-asafit2 = aov(as ~ status_l2, metrics)
-asafit3 = aov(as ~ status_l3, metrics)
+# ksafit1 = aov(ks ~ status_l1, metrics)
+# ksafit2 = aov(ks ~ status_l2, metrics)
+# ksafit3 = aov(ks ~ status_l3, metrics)
+# esafit1 = aov(es ~ status_l1, metrics)
+# esafit2 = aov(es ~ status_l2, metrics)
+# esafit3 = aov(es ~ status_l3, metrics)
+# asafit1 = aov(as ~ status_l1, metrics)
+# asafit2 = aov(as ~ status_l2, metrics)
+# asafit3 = aov(as ~ status_l3, metrics)
 
-summary(ksafit1) # *
-summary(ksafit2)
-summary(ksafit3)
-summary(esafit1)
-summary(esafit2)
-summary(esafit3)
-summary(asafit1) # *
-summary(asafit2)
-summary(asafit3)
-# if yes, Tukey multiple pairwise-comparisons
-TukeyHSD(ksafit1) # *
-TukeyHSD(ksafit2)
-TukeyHSD(ksafit3)
-TukeyHSD(esafit1)
-TukeyHSD(esafit2)
-TukeyHSD(esafit3)
-TukeyHSD(asafit1) # *
-TukeyHSD(asafit2)
-TukeyHSD(asafit3)
+# summary(ksafit1) # *
+# summary(ksafit2)
+# summary(ksafit3)
+# summary(esafit1)
+# summary(esafit2)
+# summary(esafit3)
+# summary(asafit1) # *
+# summary(asafit2)
+# summary(asafit3)
+# # if yes, Tukey multiple pairwise-comparisons
+# TukeyHSD(ksafit1) # *
+# TukeyHSD(ksafit2)
+# TukeyHSD(ksafit3)
+# TukeyHSD(esafit1)
+# TukeyHSD(esafit2)
+# TukeyHSD(esafit3)
+# TukeyHSD(asafit1) # *
+# TukeyHSD(asafit2)
+# TukeyHSD(asafit3)
 
 
 # Plots
