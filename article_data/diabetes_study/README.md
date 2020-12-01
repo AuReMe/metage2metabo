@@ -18,4 +18,7 @@
 * `individual_scopes.tsv`: individual producers of all metabolites
 * `t2d_m2m`: R script to perform analyses on community scopes and cooperation potential compositions and generate figures of the paper
 * `community_scopes_long.tsv`: long version of community scopes for each sample
+* `community_scopes_by_family.tsv`: community scopes for each sample, summarised by families of metabolites
 * `addedvalue_long.tsv`: long version of cooperation potential for each sample
+* `ko_by_genome.tsv`: matrix describing the KO content of each genome according to the Eggnog-mapper annotation
+* `t2d_m2m_div.R`: R script that analyses the diversity/richness of samples as well as their metabolic distance
