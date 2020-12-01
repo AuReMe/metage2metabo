@@ -297,6 +297,45 @@ def test_m2m_metacom_targets_import():
     shutil.rmtree(respath)
 
 
+def test_metacom_produced_seed():
+    inppath = 'metabolic_data/'
+    respath = 'metacom_output/'
+    toy_bact_tgz_path = os.path.join(inppath, 'toy_bact.tar.gz')
+    toy_bact_path = os.path.join(respath, 'toy_bact')
+    seeds_path = os.path.join(inppath, 'seeds_toy.sbml')
+    target_txt_path = 'seed_butyrate.txt'
+    targets_path = os.path.join(respath, 'seeds.sbml')
+    targets_producibility = os.path.join(respath, 'producibility_targets.json')
+
+    expected_producers = ['GCA_003437905', 'GCA_003438055', 'GCA_003437885', 'GCA_003437815', 'GCA_003437595', 'GCA_003437375']
+    if not os.path.exists(respath):
+        os.makedirs(respath)
+    with tarfile.open(toy_bact_tgz_path) as tar:
+        tar.extractall(path=respath)
+
+    with open(target_txt_path, 'w') as butyrate_output:
+        butyrate_output.write('M_BUTYRIC_ACID_c')
+    subprocess.call([
+        'm2m', 'seeds', '--metabolites', target_txt_path, '-o', respath
+    ])
+
+    subprocess.call([
+        'm2m', 'metacom', '-n', toy_bact_path, '-o',
+        respath, '-s', seeds_path, '-t', targets_path,
+        '-q'
+    ])
+
+    with open(targets_producibility, 'r') as json_output:
+        d_producibility = json.load(json_output)
+
+    assert set(d_producibility['individual_producers']['M_BUTYRIC_ACID_c']) == set(expected_producers)
+
+    # clean
+    os.remove(target_txt_path)
+    shutil.rmtree(respath)
+
+
 if __name__ == "__main__":
     test_m2m_metacom_call()
     test_m2m_metacom_targets_import()
+    test_metacom_produced_seed()

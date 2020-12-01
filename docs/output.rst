@@ -42,6 +42,7 @@ m2m Outputs
         │   └── ...
         └── recon_stats.tsv
         ├── indiv_scopes
+        │   └── indiv_produced_seeds.json
         │   └── indiv_scopes.json
         │   └── rev_iscope.json
         │   └── rev_iscope.tsv
@@ -94,6 +95,8 @@ indiv_scopes
 The indiv_scopes folder is created after the individual scopes step (in ``m2m worfklow``, ``m2m metacom`` or ``m2m iscope``). This step uses a folder containing multiples metabolic network in SBMLs and a seed file (also in SBML).
 
 The results are stored in a json file named ``indiv_scopes.json``. The keys in this file are each metabolic network and the values are the compounds that can be produced individually by the metabolic network.
+
+Also it occur that seeds are produbile by individual organisms, they will be listed in ``indiv_produced_seeds.json``. The keys in this file are each metabolic network and the values are the seeds that can be produced individually by the metabolic network.
 
 The reverse of the previous iscope dictionary is stored in two files ``rev_iscope.json`` and ``rev_iscope.tsv``. The latter file is a matrix with compounds as column header and species in row. For each compounds, we have the producibility of the compounds by the species (0 not producible and 1 producible).
 

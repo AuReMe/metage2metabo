@@ -355,6 +355,7 @@ def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, add
     prod_targets['indiv_producible'] = list(indiv_producible)
 
     indiv_scopes_path = os.path.join(*[m2m_out_dir, 'indiv_scopes', 'indiv_scopes.json'])
+    produced_seeds_path = os.path.join(*[m2m_out_dir, 'indiv_scopes', 'indiv_produced_seeds.json'])
     comm_scopes_path = os.path.join(*[m2m_out_dir, 'community_analysis', 'comm_scopes.json'])
     mincom_path = os.path.join(*[m2m_out_dir, 'community_analysis', 'mincom.json'])
     producibility_targets_path = os.path.join(m2m_out_dir, 'producibility_targets.json')
@@ -363,10 +364,23 @@ def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, add
         prod_targets['individual_producers'] = {}
         with open(indiv_scopes_path) as json_data:
             producible_compounds = json.load(json_data)
+        with open(produced_seeds_path) as json_data:
+            producible_seeds = json.load(json_data)
+
+        all_produced_seeds = []
+        for species in producible_seeds:
+            all_produced_seeds.extend(producible_seeds[species])
+        all_produced_seeds = set(all_produced_seeds)
+
         for target in selected_targets:
-            species_producing_target = [species for species in producible_compounds if target in producible_compounds[species]]
-            if species_producing_target != []:
-                prod_targets['individual_producers'][target] = species_producing_target
+            if target not in all_produced_seeds:
+                species_producing_target = [species for species in producible_compounds if target in producible_compounds[species]]
+                if species_producing_target != []:
+                    prod_targets['individual_producers'][target] = species_producing_target
+            else:
+                species_producing_target = [species for species in producible_compounds if target in producible_seeds[species]]
+                if species_producing_target != []:
+                    prod_targets['individual_producers'][target] = species_producing_target
 
     if os.path.exists(comm_scopes_path):
         prod_targets['com_only_producers'] = {}
@@ -731,12 +745,13 @@ def indiv_scope_run(sbml_dir, seeds, output_dir):
         output_dir (str): directory for results
     
     Returns:
-        str: output file for Menetools analysis
+        str: path to output file for scope from Menetools analysis
     """
     logger.info('######### Running individual metabolic scopes #########')
 
     menetools_dir = os.path.join(output_dir, 'indiv_scopes')
     indiv_scopes_path = os.path.join(menetools_dir, 'indiv_scopes.json')
+    produced_seeds_path = os.path.join(menetools_dir, 'indiv_produced_seeds.json')
 
     if not utils.is_valid_dir(menetools_dir):
         logger.critical('Impossible to access/create output directory')
@@ -748,10 +763,11 @@ def indiv_scope_run(sbml_dir, seeds, output_dir):
             os.path.join(sbml_dir, f)).lower() in ['xml', 'sbml']
     ]
     all_scopes = {}
+    all_produced_seeds = {}
     for f in all_files:
         bname = utils.get_basename(f)
         try:
-            all_scopes[bname] = run_menescope(
+            menescope_results = run_menescope(
                 draft_sbml=os.path.join(sbml_dir, f), seeds_sbml=seeds)
         except:
             traceback_str = traceback.format_exc()
@@ -761,8 +777,14 @@ def indiv_scope_run(sbml_dir, seeds, output_dir):
             logger.critical('---------------Something went wrong running Menetools on " + f + "---------------')
             sys.exit(1)
 
+        all_scopes[bname] = menescope_results['scope']
+        all_produced_seeds[bname] = menescope_results['produced_seeds']
+
     with open(indiv_scopes_path, 'w') as dumpfile:
         json.dump(all_scopes, dumpfile, indent=4)
+
+    with open(produced_seeds_path, 'w') as dumpfile:
+        json.dump(all_produced_seeds, dumpfile, indent=4)
 
     return indiv_scopes_path
 
@@ -780,7 +802,7 @@ def analyze_indiv_scope(jsonfile, seeds):
     with open(jsonfile) as json_data:
         d = json.load(json_data)
         if not d:
-            logger.critical("Json file is empty. Individual scopes calculation failed. Please fill an issue on Github")
+            logger.critical('Json file is empty. Individual scopes calculation failed. Please fill an issue on Github')
             sys.exit(1)
     d_set = {}
 
@@ -788,35 +810,35 @@ def analyze_indiv_scope(jsonfile, seeds):
         d_set[elem] = set(d[elem])
 
     try:
-        seed_metabolites = readSBMLspecies_clyngor(seeds, "seeds")
+        seed_metabolites = readSBMLspecies_clyngor(seeds, 'seeds')
     except FileNotFoundError:
-        logger.critical("File not found: "+seeds)
+        logger.critical('File not found: '+seeds)
         sys.exit(1)
     except etree.ParseError:
-        logger.critical("Invalid syntax in SBML file: "+seeds)
+        logger.critical('Invalid syntax in SBML file: '+seeds)
         sys.exit(1)
     except:
         traceback_str = traceback.format_exc()
         # Don't print the traceback if the error is linked to SystemExit as the error has been handled by menetools.
         if 'SystemExit: 1' not in traceback_str:
             logger.critical(traceback_str)
-        logger.critical("---------------Something went wrong running Menetools on " + seeds + "---------------")
+        logger.critical('---------------Something went wrong running Menetools on " + seeds + "---------------')
         sys.exit(1)
 
-    logger.info("%i metabolic models considered." %(len(d_set)))
+    logger.info('%i metabolic models considered.' %(len(d_set)))
     intersection_scope = set.intersection(*list(d_set.values()))
-    logger.info('\n' + str(len(intersection_scope)) + " metabolites in core reachable by all organisms (intersection) \n")
+    logger.info('\n' + str(len(intersection_scope)) + ' metabolites in core reachable by all organisms (intersection) \n')
     logger.info("\n".join(intersection_scope))
 
     union_scope = set.union(*list(d_set.values()))
-    logger.info('\n' + str(len(union_scope)) + " metabolites reachable by individual organisms altogether (union), among which " + str(len(seed_metabolites)) + " seeds (growth medium) \n")
+    logger.info('\n' + str(len(union_scope)) + ' metabolites reachable by individual organisms altogether (union), among which ' + str(len(seed_metabolites)) + ' seeds (growth medium) \n')
     logger.info("\n".join(union_scope))
     len_scope = [len(d[elem]) for elem in d]
-    logger.info("\nintersection of scope " + str(len(intersection_scope)))
-    logger.info("union of scope " + str(len(union_scope)))
-    logger.info("max metabolites in scope " + str(max(len_scope)))
-    logger.info("min metabolites in scope " + str(min(len_scope)))
-    logger.info("average number of metabolites in scope %.2f (+/- %.2f)" %
+    logger.info('\nintersection of scope ' + str(len(intersection_scope)))
+    logger.info('union of scope ' + str(len(union_scope)))
+    logger.info('max metabolites in scope ' + str(max(len_scope)))
+    logger.info('min metabolites in scope ' + str(min(len_scope)))
+    logger.info('average number of metabolites in scope %.2f (+/- %.2f)' %
                 (statistics.mean(len_scope), statistics.stdev(len_scope)))
     return union_scope
 
@@ -939,11 +961,11 @@ def reverse_scope(json_scope, output_dir):
     """Reverse a scope dictionary by focusing on metabolite producers.
 
     Args:
-        json_scope (txt): path to JSON dict of scope
-        output_dir (txt): path to output directory
+        json_scope (str): path to JSON dict of scope
+        output_dir (str): path to output directory
     
     Returns:
-        (txt, txt): paths to the JSON and TSV outputs
+        (str, str): paths to the JSON and TSV outputs
     """
     rev_indiv_scopes_json_path = os.path.join(*[output_dir, 'indiv_scopes', 'rev_iscope.json'])
     rev_indiv_scopes_tsv_path = os.path.join(*[output_dir, 'indiv_scopes', 'rev_iscope.tsv'])
