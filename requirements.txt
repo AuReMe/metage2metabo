@@ -1,7 +1,9 @@
 biopython==1.74
 clyngor>=0.3.31
 clyngor-with-clingo>=5.3.post1
+ete3==3.1.1
 MeneTools>=3.0.2
 Miscoto>=3.0.2
 mpwt>=0.5.4
 padmet>=4.0
+powergrasp==0.8.18
