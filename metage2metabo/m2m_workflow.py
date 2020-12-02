@@ -21,6 +21,7 @@ import csv
 import json
 import logging
 import os
+import shutil
 import statistics
 import sys
 import tempfile
@@ -51,7 +52,7 @@ logging.getLogger("miscoto").setLevel(logging.CRITICAL)
 logging.getLogger("mpwt").setLevel(logging.INFO)
 
 
-def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_bool, host_mn, targets_file):
+def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_bool, host_mn, targets_file, use_pwt_xml):
     """Run the whole m2m workflow.
     
     Args:
@@ -64,9 +65,10 @@ def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_b
         padmet_bool (bool): creates padmet files if True
         host_mn (str): metabolic network file for host
         targets_file (str): targets file
+        use_pwt_xml (bool): use Pathway Tools XML instead of creating them with padmet
     """
     # METABOLIC NETWORK RECONSTRUCTION
-    sbml_dir = recon(inp_dir, out_dir, noorphan_bool, padmet_bool, 2, nb_cpu, clean)[1]
+    sbml_dir = recon(inp_dir, out_dir, noorphan_bool, padmet_bool, 2, nb_cpu, clean, use_pwt_xml)[1]
 
     # METABOLISM COMMUNITY ANALYSIS
     metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file)
@@ -141,7 +143,7 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
     targets_producibility(out_dir, union_targets_iscope, targets_cscope, addedvalue_targets, user_targets)
 
 
-def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clean):
+def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clean, use_pwt_xml):
     """Run metabolic network reconstruction with Pathway Tools and get SBMLs.
     
     Args:
@@ -152,6 +154,7 @@ def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clea
         sbml_level (str): SBML level (2 or 3)
         nb_cpu (int): number of CPU for multiprocessing
         clean (bool): re-run metabolic reconstructions that are already available if found
+        use_pwt_xml (bool): use Pathway Tools XML instead of creating them with padmet
 
     Returns:
         tuple: PGDB directory (str), SBML directory (str)
@@ -160,14 +163,26 @@ def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clea
 
     # Create PGDBs
     pgdb_dir = genomes_to_pgdb(inp_dir, out_dir, nb_cpu,
-                                   clean)
+                                   clean, use_pwt_xml)
 
-    # Create SBMLs from PGDBs
-    sbml_dir = sbml_management.pgdb_to_sbml(pgdb_dir, out_dir, noorphan_bool,
-                                            padmet_bool, sbml_level, nb_cpu)
+    if use_pwt_xml:
+        sbml_dir = os.path.join(out_dir, 'sbml')
+        if not os.path.exists(sbml_dir):
+            os.mkdir(sbml_dir)
+        for xml_file in os.listdir(pgdb_dir):
+            input_xml_path = os.path.join(pgdb_dir, xml_file)
+            output_xml_path = os.path.join(sbml_dir, xml_file.replace('.xml', '.sbml'))
+            shutil.copyfile(input_xml_path, output_xml_path)
+        padmet_folder = None
+
+    else:
+        # Create SBMLs from PGDBs
+        sbml_dir = sbml_management.pgdb_to_sbml(pgdb_dir, out_dir, noorphan_bool,
+                                                padmet_bool, sbml_level, nb_cpu)
+        padmet_folder = os.path.join(out_dir, 'padmet')
 
     output_stat_file = os.path.join(out_dir, 'recon_stats.tsv')
-    padmet_folder = os.path.join(out_dir, 'padmet')
+
     analyze_recon(sbml_dir, output_stat_file, padmet_folder, padmet_bool, nb_cpu)
 
     logger.info(
@@ -416,7 +431,7 @@ def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, add
     logger.info('Targets producibility are available at ' + producibility_targets_path)
 
 
-def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
+def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean, use_pwt_xml):
     """Run Pathway Tools on each genome of the repository
     
     Args:
@@ -424,6 +439,7 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
         output_dir (str): output repository
         cpu (int): number of CPUs to use
         clean (bool): delete PGDBs in ptools-local coresponding to the input data
+        user_targets (list): targets provided by the user
 
     Returns:
         pgdb_dir (str): pgdb repository
@@ -477,13 +493,23 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
     if 'taxon_id.tsv' in set(next(os.walk(genomes_dir))[2]):
         taxon_file = True
 
+    if use_pwt_xml:
+        move_dat = False
+        move_xml = True
+    else:
+        move_dat = True
+        move_xml = False
+
     multiprocess_pwt(genomes_dir, pgdb_dir,
                         patho_inference=True,
                         patho_hole_filler=False,
                         patho_operon_predictor=False,
                         no_download_articles=False,
-                        dat_creation=True,
-                        dat_extraction=True,
+                        flat_creation=True,
+                        dat_extraction=move_dat,
+                        xml_extraction=move_xml,
+                        owl_extraction=False,
+                        col_extraction=False,
                         size_reduction=False,
                         number_cpu=cpu,
                         taxon_file=taxon_file,
@@ -491,7 +517,11 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean):
                         verbose=False)
 
     nb_genomes_dir = len([folder for folder in os.listdir(genomes_dir) if os.path.isdir(os.path.join(genomes_dir, folder))])
-    nb_pgdb_dir = len([folder for folder in os.listdir(pgdb_dir) if os.path.isdir(os.path.join(pgdb_dir, folder))])
+    if use_pwt_xml:
+        nb_pgdb_dir = len([folder for folder in os.listdir(pgdb_dir) if os.path.isfile(os.path.join(pgdb_dir, folder))])
+    else:
+        nb_pgdb_dir = len([folder for folder in os.listdir(pgdb_dir) if os.path.isdir(os.path.join(pgdb_dir, folder))])
+
     if nb_pgdb_dir != nb_genomes_dir:
         if os.path.exists(log_path):
             logger.critical("Something went wrong running Pathway Tools. See the log file in " + log_path)
@@ -906,6 +936,7 @@ def comm_scope_run(instance, output_dir, host_mn=None):
 
     with open(com_scopes_path, 'w') as dumpfile:
         json.dump(microbiota_scope, dumpfile, indent=4)
+
     logger.info('Community scopes for all metabolic networks available in ' +
                 com_scopes_path)
 

@@ -118,9 +118,9 @@ def pgdb_to_sbml(pgdb_dir, output_dir, noorphan_bool, padmet_bool, sbml_level, c
 
     logger.info('######### Creating SBML files #########')
     sbml_dir = os.path.join(output_dir, 'sbml')
+    padmet_dir = os.path.join(output_dir, 'padmet')
 
     if padmet_bool:
-        padmet_dir = os.path.join(output_dir, 'padmet')
         if not utils.is_valid_dir(padmet_dir):
             logger.critical('Impossible to access/create output directory')
             sys.exit(1)

@@ -96,6 +96,15 @@ def main():
         action="store_true",
         default=False,
     )
+    parent_parser_xml = argparse.ArgumentParser(add_help=False)
+    parent_parser_xml.add_argument(
+        "--pwt-xml",
+        dest="pwt_xml",
+        help="use this option to use Pathway Tools xml",
+        required=False,
+        action="store_true",
+        default=False,
+    )
     parent_parser_s = argparse.ArgumentParser(add_help=False)
     parent_parser_s.add_argument(
         "-s",
@@ -168,7 +177,8 @@ def main():
         help="metabolic network reconstruction",
         parents=[
             parent_parser_g, parent_parser_o, parent_parser_c, parent_parser_q,
-            parent_parser_l, parent_parser_no, parent_parser_p, parent_parser_cl
+            parent_parser_l, parent_parser_no, parent_parser_p, parent_parser_cl,
+            parent_parser_xml
         ],
         description=
         "Run metabolic network reconstruction for each annotated genome of the input directory, using Pathway Tools"
@@ -227,7 +237,7 @@ def main():
         parents=[
             parent_parser_g, parent_parser_s, parent_parser_m, parent_parser_o,
             parent_parser_c, parent_parser_q, parent_parser_no, parent_parser_p,
-            parent_parser_t_optional, parent_parser_cl
+            parent_parser_t_optional, parent_parser_cl, parent_parser_xml
         ],
         description=
         "Run the whole workflow: metabolic network reconstruction, individual and community scope analysis and community selection"
@@ -300,7 +310,7 @@ def main():
     # deal with given subcommand
     if args.cmd == "workflow":
         main_workflow(args.genomes, args.out, args.cpu, args.clean, args.seeds,
-                      args.noorphan, args.padmet, new_arg_modelhost, args.targets)
+                      args.noorphan, args.padmet, new_arg_modelhost, args.targets, args.pwt_xml)
     elif args.cmd in ["iscope", "cscope", "addedvalue", "mincom", "metacom"]:
         if not os.path.isdir(args.networksdir):
             logger.critical(args.networksdir + " is not a correct directory path")
@@ -327,7 +337,7 @@ def main():
             main_metacom(network_dir, args.out, args.seeds, new_arg_modelhost, args.targets)
     elif args.cmd == "recon":
         main_recon(args.genomes, args.out, args.noorphan, args.padmet, args.level, args.cpu,
-                   args.clean)
+                   args.clean, args.pwt_xml)
     elif args.cmd == "seeds":
         if not utils.is_valid_file(args.metabolites):
             logger.critical(args.metabolites + " is not a correct filepath")
@@ -358,7 +368,7 @@ def main_recon(*allargs):
     """
     pgdbdir, sbmldir, padmet_folder= recon(*allargs)
     logger.info("PGDB created in " + pgdbdir)
-    if allargs[3]:
+    if allargs[3] and padmet_folder:
         logger.info("PADMET files created in " + padmet_folder)
 
     logger.info("SBML files created in " + sbmldir)
