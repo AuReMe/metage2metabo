@@ -1,4 +1,4 @@
-biopython==1.74
+biopython>=1.74
 clyngor>=0.3.31
 clyngor-with-clingo>=5.3.post1
 ete3==3.1.1
