@@ -276,7 +276,7 @@ def test_m2m_metacom_targets_import():
     # ensure the newly producible targets are ok
     assert set(d_mincom['producible']) == PROD_TARGETS
     # ensure the bacteria in union are ok
-    assert set(d_target['keystone_species']) == UNION
+    assert set(d_target['key_species']) == UNION
     # ensure the newly producible targets are ok
     assert set(d_target['mincom_producible']) == PROD_TARGETS
 

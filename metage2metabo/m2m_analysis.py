@@ -108,9 +108,9 @@ def enumeration(sbml_folder, target_file, seed_file, output_json, host_file):
     logger.info(str(len(enumeration)) + ' minimal communities to produce the target metabolites')
     # Give union of solutions
     union = results['union_bacteria']
-    logger.info('######### Keystone species: Union of minimal communities #########')
+    logger.info('######### Key species: Union of minimal communities #########')
     logger.info("# Bacteria occurring in at least one minimal community enabling the producibility of the target metabolites given as inputs")
-    logger.info("Keystone species = " +
+    logger.info("Key species = " +
                 str(len(union)))
     logger.info("\n".join(union))
     # Give intersection of solutions
@@ -120,7 +120,7 @@ def enumeration(sbml_folder, target_file, seed_file, output_json, host_file):
     logger.info("Essential symbionts = " +
                 str(len(intersection)))
     logger.info("\n".join(intersection))
-    # Give keystones, essential and alternative symbionts
+    # Give key species, essential and alternative symbionts
     alternative_symbionts = list(set(union) - set(intersection))
     logger.info('######### Alternative symbionts: Difference between Union and Intersection #########')
     logger.info("# Bacteria occurring in at least one minimal community but not all minimal community enabling the producibility of the target metabolites given as inputs")
@@ -178,8 +178,8 @@ def stat_analysis(json_file_folder, output_dir, taxon_file=None):
     starttime = time.time()
 
     miscoto_stat_output = os.path.join(output_dir, 'miscoto_stats.txt')
-    key_species_stats_output = os.path.join(output_dir, 'keystone_species_stats.tsv')
-    key_species_supdata_output = os.path.join(output_dir, 'keystone_species_supdata.tsv')
+    key_species_stats_output = os.path.join(output_dir, 'key_species_stats.tsv')
+    key_species_supdata_output = os.path.join(output_dir, 'key_species_supdata.tsv')
     json_paths = file_or_folder(json_file_folder)
 
     if taxon_file:
@@ -196,9 +196,9 @@ def stat_analysis(json_file_folder, output_dir, taxon_file=None):
     ) as key_sup_file, open(miscoto_stat_output, "w") as stats_output:
         key_stats_writer = csv.writer(key_stats_file, delimiter="\t")
         if all_phylums:
-            key_stats_writer.writerow(["target_categories", "keystones_group", *sorted(all_phylums), "Sum"])
+            key_stats_writer.writerow(["target_categories", "key_group", *sorted(all_phylums), "Sum"])
         else:
-            key_stats_writer.writerow(["target_categories", "keystones_group", "data", "Sum"])
+            key_stats_writer.writerow(["target_categories", "key_group", "data", "Sum"])
         key_sup_writer = csv.writer(key_sup_file, delimiter="\t")
         statswriter = csv.writer(stats_output, delimiter="\t")
         statswriter.writerow(["categories", "nb_target", "size_min_sol", "size_union", "size_intersection", "size_enum"])
@@ -354,8 +354,8 @@ def detect_phylum_species(phylum_named_species, all_phylums):
     return phylum_species
 
 
-def detect_keystone_species(json_elements, all_phylums, phylum_named_species=None):
-    """Detect keystone species (essential and alternative symbionts) from the miscoto json
+def detect_key_species(json_elements, all_phylums, phylum_named_species=None):
+    """Detect key species (essential and alternative symbionts) from the miscoto json
 
     Args:
         json_elements (dict): miscoto results in a json dictionary
@@ -396,37 +396,37 @@ def detect_keystone_species(json_elements, all_phylums, phylum_named_species=Non
     return key_stone_species, essential_symbionts, alternative_symbionts
 
 
-def create_stat_species(target_category, json_elements, keystone_stats_writer, keystone_sup_writer, phylum_named_species=None, all_phylums=None):
-    """Write stats on keystone species (essential and alternative symbionts) from the miscoto json
+def create_stat_species(target_category, json_elements, key_stats_writer, key_sup_writer, phylum_named_species=None, all_phylums=None):
+    """Write stats on key species (essential and alternative symbionts) from the miscoto json
 
     Args:
         target_category (str): name of a target file (without extension)
         json_elements (dict): miscoto results in a json dictionary
-        key_stats_writer (csv.writer): writer for stats of each group (keystone species) in each phylum
-        keystone_sup_writer (csv.writer): writer for all keystone species in each phylum
+        key_stats_writer (csv.writer): writer for stats of each group (key species) in each phylum
+        key_sup_writer (csv.writer): writer for all key species in each phylum
         phylum_named_species (dict): {species_ID: species_named_after_phylum}
         all_phylums (list): all phylum in the dataset
     """
-    key_stone_species, essential_symbionts, alternative_symbionts = detect_keystone_species(json_elements, all_phylums, phylum_named_species)
+    key_stone_species, essential_symbionts, alternative_symbionts = detect_key_species(json_elements, all_phylums, phylum_named_species)
 
     key_stone_counts = [len(key_stone_species[phylum]) for phylum in sorted(list(key_stone_species.keys()))]
-    keystone_stats_writer.writerow([target_category, "key_stone_species"] + key_stone_counts + [sum(key_stone_counts)])
+    key_stats_writer.writerow([target_category, "key_stone_species"] + key_stone_counts + [sum(key_stone_counts)])
 
     essential_symbiont_counts = [len(essential_symbionts[phylum]) for phylum in sorted(list(essential_symbionts.keys()))]
-    keystone_stats_writer.writerow([target_category, "essential_symbionts"] + essential_symbiont_counts + [sum(essential_symbiont_counts)])
+    key_stats_writer.writerow([target_category, "essential_symbionts"] + essential_symbiont_counts + [sum(essential_symbiont_counts)])
 
     alternative_symbiont_counts = [len(alternative_symbionts[phylum]) for phylum in sorted(list(alternative_symbionts.keys()))]
-    keystone_stats_writer.writerow([target_category, "alternative_symbionts"] + alternative_symbiont_counts + [sum(alternative_symbiont_counts)])
+    key_stats_writer.writerow([target_category, "alternative_symbionts"] + alternative_symbiont_counts + [sum(alternative_symbiont_counts)])
 
     if all_phylums:
         for phylum in sorted(all_phylums):
-            keystone_sup_writer.writerow([target_category, "key_stone_species", phylum] + key_stone_species[phylum])
-            keystone_sup_writer.writerow([target_category, "essential_symbionts", phylum] + essential_symbionts[phylum])
-            keystone_sup_writer.writerow([target_category, "alternative_symbionts", phylum] + alternative_symbionts[phylum])
+            key_sup_writer.writerow([target_category, "key_stone_species", phylum] + key_stone_species[phylum])
+            key_sup_writer.writerow([target_category, "essential_symbionts", phylum] + essential_symbionts[phylum])
+            key_sup_writer.writerow([target_category, "alternative_symbionts", phylum] + alternative_symbionts[phylum])
     else:
-        keystone_sup_writer.writerow([target_category, "key_stone_species", "data"] + key_stone_species["data"])
-        keystone_sup_writer.writerow([target_category, "essential_symbionts", "data"] + essential_symbionts["data"])
-        keystone_sup_writer.writerow([target_category, "alternative_symbionts", "data"] + alternative_symbionts["data"])
+        key_sup_writer.writerow([target_category, "key_stone_species", "data"] + key_stone_species["data"])
+        key_sup_writer.writerow([target_category, "essential_symbionts", "data"] + essential_symbionts["data"])
+        key_sup_writer.writerow([target_category, "alternative_symbionts", "data"] + alternative_symbionts["data"])
 
 
 def get_phylum(phylum_file):
@@ -458,8 +458,8 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
         taxon_file (str): mpwt taxon file for species in sbml folder
     """
     miscoto_stat_output = os.path.join(output_dir, 'miscoto_stats.txt')
-    key_species_stats_output = os.path.join(output_dir,'keystone_species_stats.tsv')
-    key_species_supdata_output = os.path.join(output_dir, 'keystone_species_supdata.tsv')
+    key_species_stats_output = os.path.join(output_dir,'key_species_stats.tsv')
+    key_species_supdata_output = os.path.join(output_dir, 'key_species_supdata.tsv')
 
     gml_output = os.path.join(output_dir, 'gml')
 
@@ -484,17 +484,17 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
         all_phylums = None
 
     with open(key_species_stats_output, 'w') as key_stats_file, open(key_species_supdata_output, 'w') as key_sup_file, open(miscoto_stat_output, 'w') as stats_output:
-        keystone_stats_writer = csv.writer(key_stats_file, delimiter='\t')
+        key_stats_writer = csv.writer(key_stats_file, delimiter='\t')
         if all_phylums:
-            keystone_stats_writer.writerow(['target_categories', 'keystones_group', *sorted(all_phylums), 'Sum'])
+            key_stats_writer.writerow(['target_categories', 'key_group', *sorted(all_phylums), 'Sum'])
         else:
-            keystone_stats_writer.writerow(['target_categories', 'keystones_group', 'data', 'Sum'])
-        keystone_sup_writer = csv.writer(key_sup_file, delimiter='\t')
+            key_stats_writer.writerow(['target_categories', 'key_group', 'data', 'Sum'])
+        key_sup_writer = csv.writer(key_sup_file, delimiter='\t')
         for target_category in target_categories:
             target_output_gml_path = os.path.join(gml_output, target_category + '.gml')
             with open(json_paths[target_category]) as json_data:
                 dicti = json.load(json_data)
-            create_stat_species(target_category, dicti, keystone_stats_writer, keystone_sup_writer, phylum_named_species, all_phylums)
+            create_stat_species(target_category, dicti, key_stats_writer, key_sup_writer, phylum_named_species, all_phylums)
             G = nx.Graph()
             added_node = []
             species_weight = {}

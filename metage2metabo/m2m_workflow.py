@@ -319,9 +319,9 @@ def mincom(instance_w_targets, out_dir):
     logger.info("\n".join(one_sol_bact))
     # Give union of solutions
     union = all_results['union_bacteria']
-    logger.info('######### Keystone species: Union of minimal communities #########')
+    logger.info('######### Key species: Union of minimal communities #########')
     logger.info('# Bacteria occurring in at least one minimal community enabling the producibility of the target metabolites given as inputs')
-    logger.info('Number of keystone species => ' +
+    logger.info('Number of key species => ' +
                 str(len(union)) + "\n")
     logger.info("\n".join(union))
     # Give intersection of solutions
@@ -331,7 +331,7 @@ def mincom(instance_w_targets, out_dir):
     logger.info('Number of essential symbionts => ' +
                 str(len(intersection)) + "\n")
     logger.info("\n".join(intersection))
-    # Give keystones, essential and alternative symbionts
+    # Give key species, essential and alternative symbionts
     alternative_symbionts = list(set(union) - set(intersection))
     logger.info('######### Alternative symbionts: Difference between Union and Intersection #########')
     logger.info('# Bacteria occurring in at least one minimal community but not all minimal communities enabling the producibility of the target metabolites given as inputs')
@@ -413,7 +413,7 @@ def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, add
         with open(mincom_path) as json_data:
             mincom_producible_compounds = json.load(json_data)
         prod_targets['mincom_producible'] = mincom_producible_compounds['producible']
-        prod_targets['keystone_species'] = mincom_producible_compounds['union_bacteria']
+        prod_targets['key_species'] = mincom_producible_compounds['union_bacteria']
         prod_targets['mincom_optsol_producers'] = {}
         prod_targets['mincom_union_producers'] = {}
         prod_targets['mincom_inter_producers'] = {}

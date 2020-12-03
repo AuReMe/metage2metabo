@@ -57,9 +57,9 @@ It uses the following mandatory inputs (run ``m2m_analysis enum --help`` for opt
         ######### Enumeration of solution for: targets_toy #########
         ######### Enumeration of minimal communities #########
         5 minimal communities to produce the target metabolites
-        ######### Keystone species: Union of minimal communities #########
+        ######### Key species: Union of minimal communities #########
         # Bacteria occurring in at least one minimal community enabling the producibility of the target metabolites given as inputs
-        Keystone species = 17
+        Key species = 17
         GCA_003437885
         GCA_003437665
         GCA_003437945
@@ -110,7 +110,7 @@ It uses the following mandatory inputs (run ``m2m_analysis enum --help`` for opt
 
 m2m_analysis stats
 ++++++++++++++++++
-``m2m_analysis stats`` computes statistics on keystone species.
+``m2m_analysis stats`` computes statistics on key species.
 
 It uses the following mandatory inputs (run ``m2m_analysis stats --help`` for optional arguments):
 
@@ -133,8 +133,8 @@ It uses the following mandatory inputs (run ``m2m_analysis stats --help`` for op
     ::
 
         output_directory
-        ├── keystone_species_stats.tsv
-        ├── keystone_species_supdata.tsv
+        ├── key_species_stats.tsv
+        ├── key_species_supdata.tsv
         ├── miscoto_stats.txt
 
 m2m_analysis graph
@@ -167,8 +167,8 @@ You can use the `taxon file from gut experience <https://github.com/AuReMe/metag
         output_directory
         ├── gml
         │   ├── targets_toy.gml
-        ├── keystone_species_stats.tsv
-        ├── keystone_species_supdata.tsv
+        ├── key_species_stats.tsv
+        ├── key_species_supdata.tsv
         ├── miscoto_stats.txt
 
 m2m_analysis powergraph
@@ -264,9 +264,9 @@ It uses the following mandatory inputs (run ``m2m_analysis workflow --help`` for
         ######### Enumeration of solution for: targets_toy #########
         ######### Enumeration of minimal communities #########
         5 minimal communities to produce the target metabolites
-        ######### Keystone species: Union of minimal communities #########
+        ######### Key species: Union of minimal communities #########
         # Bacteria occurring in at least one minimal community enabling the producibility of the target metabolites given as inputs
-        Keystone species = 17
+        Key species = 17
         GCA_003437885
         GCA_003437665
         GCA_003437945
@@ -366,6 +366,6 @@ It uses the following mandatory inputs (run ``m2m_analysis workflow --help`` for
         │   ├── targets_toy.bbl
         ├── svg
         │   ├── targets_toy.bbl.svg
-        ├── keystone_species_stats.tsv
-        ├── keystone_species_supdata.tsv
+        ├── key_species_stats.tsv
+        ├── key_species_supdata.tsv
         ├── miscoto_stats.txt

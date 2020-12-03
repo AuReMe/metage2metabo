@@ -135,7 +135,7 @@ More information about this command in the [m2m_analysis Documentation](https://
 ````
 usage: m2m_analysis [-h] [-v] {enum,stats,graph,powergraph,workflow} ...
 
-Detection of keystone species among communities.
+Detection of key species among communities.
  For specific help on each subcommand use: m2m_analysis {cmd} --help
 
 optional arguments:
@@ -147,7 +147,7 @@ subcommands:
 
   {enum,stats,graph,powergraph,workflow}
     enum                enumeration using miscoto
-    stats               statistics on keystone species
+    stats               statistics on key species
     graph               graph creation with enumeration solution
     powergraph          powergraph creation and visualization
     workflow            whole workflow

@@ -161,7 +161,7 @@ The results are stored in a json with 17 keys:
 
 * ``exchanged``, ``union_exchanged`` and ``inter_exchanged``: the exchanged compounds by the community, this step needs a lot of resources so it is not used in m2m. If you want to use it, use miscoto with the minexch option.
 
-* ``keystone_species``: organism from all the minimal communities.
+* ``key_species``: organism from all the minimal communities.
 
 * ``essential_symbionts``: organism in the intersection of all the minimal communities. They are occuring in all minimal solution.
 
@@ -196,7 +196,7 @@ This json contains 10 keys:
 
 * ``mincom_producible``: the compounds producible by the minimal community.
 
-* ``keystone_species``: organism from all the minimal communities.
+* ``key_species``: organism from all the minimal communities.
 
 * ``mincom_inter_producers``: the organism that have the final reaction to produce the target in the intersection. It is a dictionary, with each target as key and the organism producing these targets as value.
 
