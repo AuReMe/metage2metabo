@@ -571,9 +571,11 @@ def create_padmet_stat(species_name, padmet_file):
 
 def create_sbml_stat(species_name, sbml_file):
     """Extract reactions/pathways/compounds/genes from a sbml file.
+
     Args:
         species_name (str): species names
         sbml_file (str): path to a sbml file
+
     Returns
         list: [species name, list of genes, list of reactions, list of reactions associated with genes, list of compounds]
     """
