@@ -750,7 +750,7 @@ Optional arguments:
         Number of compounds in all GSMN: 2095
         Average reactions per GSMN: 1437.00(+/- 678.82)
         Average compounds per GSMN: 1560.00(+/- 615.18)
-        Average genes per GSMN: 3402.00(+/- 1576.85)
+        Average genes per GSMN: 893.00(+/- 475.18)
         Average pathways per GSMN: 257.00(+/- 134.35)
         Percentage of reactions associated with genes: 79.90(+/- 3.20)
         --- Recon runtime 574.26 seconds ---

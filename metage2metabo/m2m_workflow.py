@@ -550,28 +550,30 @@ def create_padmet_stat(species_name, padmet_file):
     all_rxns = [node for node in padmetSpec.dicOfNode.values() if node.type == "reaction"]
     all_genes = [node.id for node in padmetSpec.dicOfNode.values() if node.type == "gene"]
     gene_associated_rxns = []
+    genes_with_rxns = []
     rxns = []
     for rxn_node in all_rxns:
         total_cpd_id.update([rlt.id_out for rlt in padmetSpec.dicOfRelationIn[rxn_node.id] if rlt.type in ["consumes","produces"]])
         pathways_ids = set([rlt.id_out for rlt in padmetSpec.dicOfRelationIn[rxn_node.id] if rlt.type == "is_in_pathway"])
         rxns.append(rxn_node.id)
         if any([rlt for rlt in padmetSpec.dicOfRelationIn[rxn_node.id] if rlt.type == "is_linked_to"]):
+            genes_with_rxns.extend([rlt.id_out for rlt in padmetSpec.dicOfRelationIn[rxn_node.id] if rlt.type == "is_linked_to"])
             gene_associated_rxns.append(rxn_node.id)
         total_pwy_id.update(pathways_ids)
 
     all_pwys = [node_id for (node_id, node) in padmetSpec.dicOfNode.items() if node_id in total_pwy_id]
     all_cpds = [node_id for (node_id, node) in padmetSpec.dicOfNode.items() if node_id in total_cpd_id]
 
-    return [species_name, all_genes, rxns, gene_associated_rxns, all_cpds, all_pwys]
+    genes_with_rxns = set(genes_with_rxns)
+
+    return [species_name, genes_with_rxns, rxns, gene_associated_rxns, all_cpds, all_pwys]
 
 
 def create_sbml_stat(species_name, sbml_file):
     """Extract reactions/pathways/compounds/genes from a sbml file.
-
     Args:
         species_name (str): species names
         sbml_file (str): path to a sbml file
-
     Returns
         list: [species name, list of genes, list of reactions, list of reactions associated with genes, list of compounds]
     """
@@ -580,6 +582,8 @@ def create_sbml_stat(species_name, sbml_file):
     genes = []
     reactions = []
     gene_associated_rxns = []
+    fbc_gene_associated_rxns = []
+    fbc_rxn_associated_genes = []
     compounds = []
     for e in sbml:
         if e.tag[0] == "{":
@@ -602,9 +606,39 @@ def create_sbml_stat(species_name, sbml_file):
                             for subsubsubel in subsubel.getchildren():
                                 if 'GENE_ASSOCIATION' in subsubsubel.text:
                                     for gene in sbmlPlugin.parseGeneAssoc(subsubsubel.text):
-                                        genes.append(gene.replace('GENE_ASSOCIATION:', ''))
+                                        if gene not in genes:
+                                            genes.append(gene.replace('GENE_ASSOCIATION:', ''))
                                     if reaction_id not in gene_associated_rxns:
                                         gene_associated_rxns.append(reaction_id)
+                    # Use geneProductAssociation for xml from MetaFlux.
+                    elif 'geneProductAssociation' in subel.tag:
+                        for subsubel in subel.getchildren():
+                            if 'geneProductRef' in subsubel.tag:
+                                gene = subsubel.get('{http://www.sbml.org/sbml/level3/version1/fbc/version2}geneProduct')
+                                if gene:
+                                    gene = gene.replace('G_', '')
+                                    if gene not in fbc_rxn_associated_genes:
+                                        fbc_rxn_associated_genes.append(gene)
+                                    if reaction_id not in fbc_gene_associated_rxns:
+                                        fbc_gene_associated_rxns.append(reaction_id)
+                            else:
+                                for subsubsubel in subsubel.getchildren():
+                                    gene = subsubsubel.get('{http://www.sbml.org/sbml/level3/version1/fbc/version2}geneProduct')
+                                    if gene:
+                                        gene = gene.replace('G_', '')
+                                        if gene not in fbc_rxn_associated_genes:
+                                            fbc_rxn_associated_genes.append(gene)
+                                        if reaction_id not in fbc_gene_associated_rxns:
+                                            fbc_gene_associated_rxns.append(reaction_id)
+
+    # For XML from MetaFlux, use genes from geneProductAssociation to get genes and reaction with genes.
+    if len(genes) == 0:
+        if len(fbc_rxn_associated_genes) > 0:
+            genes = fbc_rxn_associated_genes
+
+    if len(gene_associated_rxns) == 0:
+        if len(fbc_gene_associated_rxns) > 0:
+            gene_associated_rxns = fbc_gene_associated_rxns
 
     return [species_name, genes, reactions, gene_associated_rxns, compounds]
 
