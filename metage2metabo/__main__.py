@@ -100,7 +100,7 @@ def main():
     parent_parser_xml.add_argument(
         "--pwt-xml",
         dest="pwt_xml",
-        help="use this option to use Pathway Tools xml",
+        help="use this option to use Pathway Tools xml (incompatible with -p)",
         required=False,
         action="store_true",
         default=False,
@@ -301,6 +301,11 @@ def main():
         logger.warning(f"\n A metabolic model is given for an host. The metabolite producibility of the community will display metabolites that can be produced by the hsot or the microbiome, *not including* the metabolites that the host can produce by itself. If this is not what you want to do, you can consider placing the host in the same directory as the symbionts, which will lead to a complete community scope. \n")
     else:
         new_arg_modelhost = None
+
+    if args.cmd in ["workflow", "recon"]:
+        if args.pwt_xml and args.padmet:
+            logger.critical("-p and --pwt-xml are incompatible arguments")
+            sys.exit(1)
 
     if "seeds" in args and args.seeds is not None:
         if not utils.is_valid_file(args.seeds):

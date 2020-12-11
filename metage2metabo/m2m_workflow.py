@@ -162,6 +162,10 @@ def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clea
     """
     starttime = time.time()
 
+    if use_pwt_xml and padmet_bool:
+        logger.critical("-p/padmet_bool and --pwt-xml/use_pwt_xml are incompatible arguments")
+        sys.exit(1)
+
     # Create PGDBs
     pgdb_dir = genomes_to_pgdb(inp_dir, out_dir, nb_cpu,
                                    clean, use_pwt_xml)

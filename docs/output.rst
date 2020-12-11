@@ -92,7 +92,7 @@ If you use the reconstruction (with ``m2m recon`` or ``m2m workflow``), the draf
 
 For each genome, if no errors occur, there will be a folder named after the genome folder name containing the Pathway-Genome Database (PGDB). The PGDB is stored using attribute-values flat files (the .dat extension file).
 
-By using the ``--pwt-xml``, m2m will extract the xml created by MetaFlux during PathoLogic instead of extracting the attribute-values flat files .dat files.
+By using the ``--pwt-xml``, m2m will extract the xml created by MetaFlux (a module of Pathway Tools) instead of extracting the attribute-values flat .dat files.
 
 sbml
 ----
@@ -122,7 +122,7 @@ The indiv_scopes folder is created after the individual scopes step (in ``m2m wo
 
 The results are stored in a json file named ``indiv_scopes.json``. The keys in this file are each metabolic network and the values are the compounds that can be produced individually by the metabolic network.
 
-Also it occur that seeds are produbile by individual organisms, they will be listed in ``indiv_produced_seeds.json``. The keys in this file are each metabolic network and the values are the seeds that can be produced individually by the metabolic network.
+Also it can occur that seeds are produbile by individual organisms, in this case they will be listed in ``indiv_produced_seeds.json``. The keys in this file are each metabolic network and the values are the seeds that can be produced individually by the metabolic network.
 
 The reverse of the previous iscope dictionary is stored in two files ``rev_iscope.json`` and ``rev_iscope.tsv``. The latter file is a matrix with compounds as column header and species in row. For each compounds, we have the producibility of the compounds by the species (0 not producible and 1 producible).
 
@@ -142,7 +142,7 @@ The results are stored in a json with 8 keys:
 
 * ``host_unprodtargets``: if a host is given as input, contains the targets not producible by the host.
 
-* ``host_scope``: if a host is given as input, contains all the compounds producible by the host. If no host is given as input, contains the seeds.
+* ``host_scope``: if a host is given as input, contains all the compounds producible by the host.
 
 * ``com_prodtargets``: the targets producible by the community.
 
@@ -173,25 +173,25 @@ Using the addedvalue or targets given by the user, the mincom step (``m2m worfkl
 
 The results are stored in a json with 17 keys:
 
-* ``bacteria``: bacteria in the optimal solution.
+* ``bacteria``: organisms in the optimal solution.
 
 * ``still_unprod``: compounds unproducible by the community.
 
 * ``newly_prod``: compounds producible by the community.
 
-* ``union_bacteria``: bacteria from all the minimal communities.
+* ``union_bacteria``: organisms from all the minimal communities.
 
-* ``inter_bacteria``: bacteria from the intersection of all the minimal communities.
+* ``inter_bacteria``: organisms from the intersection of all the minimal communities.
 
 * ``one_model``: results of the optimal solution.
 
-* ``exchanged``, ``union_exchanged`` and ``inter_exchanged``: the exchanged compounds by the community, this step needs a lot of resources so it is not used in m2m. If you want to use it, use miscoto with the minexch option.
+* ``exchanged``, ``union_exchanged`` and ``inter_exchanged``: the exchanged compounds by the community, this step needs a lot of resources so it is not used in m2m. If you want to use it, use miscoto with the ``minexch`` option.
 
-* ``key_species``: organism from all the minimal communities.
+* ``key_species``: organisms from all the minimal communities.
 
-* ``essential_symbionts``: organism in the intersection of all the minimal communities. They are occuring in all minimal solution.
+* ``essential_symbionts``: organisms in the intersection of all the minimal communities. They are occuring in all minimal solution.
 
-* ``alternative_symbionts``: organism appearing in at least one minimal community but not in all.
+* ``alternative_symbionts``: organisms appearing in at least one minimal community but not in all.
 
 * ``score_optimum_inter``: the optimum score found for the intersection, it corresponds to the number of organism in the minimal community.
 

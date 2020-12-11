@@ -45,6 +45,10 @@ It uses the following mandatory inputs (run ``m2m_analysis enum --help`` for opt
 -s file                seeds SBML file
 -t directory           targets SBML file or folder containing multiple targets SBML files
 -o directory           output directory for results
+
+Optional arguments:
+
+-q               quiet mode
 -m file                host metabolic network in SBML
 
 .. code:: sh
@@ -116,6 +120,10 @@ It uses the following mandatory inputs (run ``m2m_analysis stats --help`` for op
 
 -j directory           directory of miscoto output JSONs or single JSON
 -o directory           output directory for results
+
+Optional arguments:
+
+-q               quiet mode
 --taxon file           mpwt taxon file
 
 .. code:: sh
@@ -146,6 +154,10 @@ It uses the following mandatory inputs (run ``m2m_analysis graph --help`` for op
 -j directory           directory of miscoto output JSONs or single JSON
 -t directory           targets SBML file or folder containing multiple targets SBML files
 -o directory           output directory for results
+
+Optional arguments:
+
+-q               quiet mode
 --taxon file           mpwt taxon file
 
 You can use the `taxon file from gut experience <https://github.com/AuReMe/metage2metabo/blob/master/article_data/gut_microbiota/taxon_id.tsv>`__.
@@ -180,6 +192,10 @@ It uses the following mandatory inputs (run ``m2m_analysis powergraph --help`` f
 --oog file             Oog jar file
 -g file                directory of GML files or a GML file
 -o directory           output directory for results
+
+Optional arguments:
+
+-q               quiet mode
 
 .. code:: sh
 
@@ -250,8 +266,12 @@ It uses the following mandatory inputs (run ``m2m_analysis workflow --help`` for
 -s file                seeds SBML file
 -t directory           targets SBML file or folder containing multiple targets SBML files
 -o directory           output directory for results
--m file                host metabolic network in SBML
 --oog file             Oog jar file
+
+Optional arguments:
+
+-q               quiet mode
+-m file                host metabolic network in SBML
 --taxon file           mpwt taxon file
 
 .. code:: sh

@@ -5,6 +5,9 @@ Requirements and Installation
 Requirements
 ============
 
+m2m uses Pathway Tools for the reconstruction of draft metabolic networks from annotated genomes.
+
+
 * `Pathway-Tools <http://bioinformatics.ai.sri.com/ptools/>`__ version 22.5 or higher (free for `academic users <https://biocyc.org/download-bundle.shtml>`__)
     * Pathway-Tools requirements
         * **Linux**: Gnome terminal and Libxm4
@@ -66,9 +69,9 @@ m2m relies on several Python packages:
 
 A list of Python dependencies is available in `requirements.txt <https://github.com/AuReMe/metage2metabo/blob/master/requirements.txt>`__
 
-Tested on Linux (Ubuntu, Fedora, Debian) and MacOs (version 10.14).
+Developed and tested on Linux (Ubuntu, Fedora, Debian) and MacOs (version 10.14) with Python3.6.
 
-Tested with Python v3.6, v3.7.
+Continuous Integration using GitHub Actions with Python3.6 and Python3.7 on ubuntu-latest, macos-latest and windows-latest (`corresponding virtual environment <https://docs.github.com/en/free-pro-team@latest/actions/reference/specifications-for-github-hosted-runners#supported-runners-and-hardware-resources>`__).
 
 Installation with pip
 =====================
@@ -113,7 +116,7 @@ Singularity with Pathway Tools
 
 Singularity [Ku2017]_ can be used to launch m2m on a cluster. Please refer to the `recipe <https://github.com/AuReMe/metage2metabo/tree/master/recipes>`__   of the Github repository of the project.
 The Singularity container has to be created from the recipe. You might need to do it on a personal computer since it requires administrator priviledges.
-To use the container on a cluster, the path to Pathway Tools ptools folder should be indicated in the recipe. Therefore, you have to replace '/external/folder/ptools' with the path where you want to put the ptools-local folder (which will contain the PGDB created by Pathway-Tools).
+To use the container on a cluster, the path to Pathway Tools ptools folder should be indicated in the recipe. Therefore, you have to replace ``/external/folder/ptools`` with the path where you want to put the ptools-local folder (which will contain the PGDB created by Pathway-Tools).
 
 Like for the Dockerfile, Pathway-Tools installer is hardcoded in the recipe so if you use another version, you have to modify the recipe.
 And the **Pathway Tools installer** and **Oog.jar file** must be stored in the same folder than the Singularity recipe.

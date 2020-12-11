@@ -1,7 +1,7 @@
 Metage2Metabo (M2M)
 ===================
 
-Metage2metabo is a Python3 tool to perform graph-based metabolic analysis starting from annotated genomes (**reference genomes or metagenome-assembled genomes**.
+Metage2metabo is a Python3 tool to perform graph-based metabolic analysis starting from annotated genomes (**reference genomes or metagenome-assembled genomes**).
 It uses **Pathway Tools** in a automatic and parallel way to *reconstruct metabolic networks* for a large number of genomes.
 The obtained metabolic networks are then *analyzed individually and collectively* in order to get the *added value of metabolic cooperation in microbiota* over individual metabolism, and to *identify and screen interesting organisms* among all.
 
@@ -14,7 +14,9 @@ General information about the modelling
 
 M2M has two main dependencies for modelling metabolic networks: `MeneTools <https://github.com/cfrioux/MeneTools>`__ and `Miscoto <https://github.com/cfrioux/miscoto>`__. Accordingly metabolic models in M2M follow the producibility in metabolic networks as defined by the `network expansion <http://www.ncbi.nlm.nih.gov/pubmed/15712108>`__ algorithm.
 Mainly, two rules are followed:
+
 * a *recursive rule*: the products of a reactions are producible if **all** reactants of this reaction are themselves producible
+
 * an *initiation rule*: producibility is initiated by the presence of nutrients, called *seeds*. 
 
 A metabolite that is producible from a set of nutrients is described as being "in the scope of the seeds".

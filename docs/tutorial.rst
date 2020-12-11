@@ -7,7 +7,7 @@ It contains enough data to run the different subcommands.
 Outputs and logs
 ----------------
 
-By default, ``m2m`` writes into the console (stdout) and into a log file located at the root of the results directory and named after the subcommand that wad executed. The option ``-q`` can be given to any ``m2m`` subcommand to write in the log file and write to stdout only the warnings, errors and critical issues, together with the path to the log file.
+By default, ``m2m`` writes into the console (stdout) and into a log file located at the root of the results directory and named after the subcommand that was executed. The option ``-q`` can be given to any ``m2m`` subcommand to write in the log file and to stdout only the warnings, errors and critical issues, together with the path to the log file.
 
 m2m recon
 ---------
@@ -28,7 +28,7 @@ Optional arguments:
 -p               create padmet files from PGDB
 -l int           specify the level for the sbml to be created
 -q               quiet mode
---pwt-xml        use this option to use Pathway Tools xml
+--pwt-xml        extract xml from Pathway Tools instead of using padmet to create sbml
 
 The input genomic data has to follow a strict structure:
 
@@ -108,7 +108,7 @@ Please go check the `documentation of mpwt <https://github.com/AuReMe/mpwt#genba
 
         The output shows that PGDB are created with Pathway Tools. Then the .dat files are extracted and used to build SBML files of the metabolic models.
 * files outputs
-    * In `output_directory/pgdb`, the .dat files of Pathway Tools. The corresponding SBMLs are in `output_directory/sbml`. The structure of the output directory after this ``recon`` command is shown below :
+    * In ``output_directory/pgdb``, the .dat files of Pathway Tools. The corresponding SBMLs are in ``output_directory/sbml``. The structure of the output directory after this ``recon`` command is shown below :
 
     ::
 
@@ -185,45 +185,23 @@ Please go check the `documentation of mpwt <https://github.com/AuReMe/mpwt#genba
                 ├── organism-params.dat
                 ├── pathologic.log
 
+By using the ``--pwt-xml``, m2m will extract the xml files created by MetaFlux from the PGDBs created by Pathway Tools. This will modify the files stored in the ``pgdb`` folder:
+
+::
+
+    output_directory/
+    ├── m2m_recon.log
+    ├── pgdb
+    │   ├── GCA_003433665.xml
+    │   └── GCA_003433675.xml
+    └── recon_stats.tsv
+    └── sbml
+        ├── GCA_003433665.sbml
+        └── GCA_003433675.sbml
 
 m2m iscope, cscope and addedvalue
 ---------------------------------
-The three subcommands require metabolic networks under the SBML format. Some metabolic networks are available as a compressed archive in `metabolic_data`. Uncompress the file and the directory can be fed to the subcommands. These commands also require a seeds file comprising the metabolic compounds available to assess reachability/producibility in the models. This seeds file needs to be in SBML format. You can use the one in the `metabolic data` directory.
-
-Optional: create the seeds SBML file
-*************************************
-To create a seeds file starting from a list of metabolic identifiers (matching identifiers of compounds of the organisms metabolic networks), you can use the ``m2m seeds`` command:
-
-.. code:: sh
-
-    m2m seeds --metabolites metabolites_file.txt -o output/directory
-
-The resulting seeds file will be created in output/directory/seeds.sbml
-
-An example of structure of the metabolites file is the following:
-
-.. code:: 
-
-    M_AMMONIA_c
-    M_ZN__43__2_c
-    M_CARBON__45__DIOXIDE_c
-    M_OXYGEN__45__MOLECULE_c
-
-The resulting SBML will have such a design:
-
-.. code:: xml
-
-    <?xml version="1.0" encoding="UTF-8"?>
-        <sbml xmlns="http://www.sbml.org/sbml/level2" level="2" version="1">
-        <model id="metabolites">
-            <listOfSpecies>
-            <species id="M_AMMONIA_c" name="AMMONIA" compartment="c"/>
-            <species id="M_ZN__43__2_c" name="ZN+2" compartment="c"/>
-            <species id="M_CARBON__45__DIOXIDE_c" name="CARBON-DIOXIDE" compartment="c"/>
-            <species id="M_OXYGEN__45__MOLECULE_c" name="OXYGEN-MOLECULE" compartment="c"/>
-            </listOfSpecies>
-    </model>
-    </sbml>
+The three subcommands require metabolic networks in the SBML format. Some metabolic networks are available as a compressed archive in `metabolic_data`. Uncompress the file and the directory can be fed to the subcommands. These commands also require a seeds file comprising the metabolic compounds available to assess reachability/producibility in the models. This seeds file needs to be in SBML format. You can use the one in the ``metabolic_data`` directory.
 
 iscope
 *******
@@ -236,6 +214,7 @@ It uses the following mandatory inputs (run ``m2m iscope --help`` for optional a
 -o directory           output directory for results
 
 Optional argument
+
 -q                     quiet mode
 -c int           number of CPU for multi-processing
 
@@ -269,9 +248,9 @@ Optional argument
         --- Total runtime 9.08 seconds ---
         --- Logs written in output_directory//m2m_iscope.log ---
 
-    These results mean that 135 metabolites can be reached by all organisms. When gathering reachable metabolites for all organisms, the union consists of 625 metabolites (including the seeds). Finally metrics show the min, max and average number of compounds in all scopes
+    These results mean that 135 metabolites can be reached by all organisms. When gathering reachable metabolites for all organisms, the union consists of 625 metabolites (including the seeds). Finally metrics show the min, max and arithmetic mean number of compounds in all scopes.
 * files outputs
-    * In `output_directory/indiv_scopes/indiv_scopes.json`. A json file that can be easily loaded as a dictionary (or humanly read as it it) that contains the set of reachable metabolites for each organism. /!\\ Warning: the seeds are included in the scopes, hence they will never be empty. Logs are written in `output_directory/m2m_iscope.log` .
+    * In ``output_directory/indiv_scopes/indiv_scopes.json``: a json file that can be easily loaded as a dictionary (or humanly read as it it) that contains the set of reachable metabolites for each organism. /!\\ Warning: the seeds are included in the scopes, hence they will never be empty. Logs are written in ``output_directory/m2m_iscope.log``.
 
 cscope
 *******
@@ -314,7 +293,7 @@ Optional arguments:
 
     651 metabolites are reachable by the microbiota. This does not include the seeds. The list of metabolites is given in output. 
 * files outputs
-    * In addition to the logs at the root of the results directory, a json file with the results is created in `output_directory/community_analysis/indiv_scopes.json`.
+    * In addition to the logs at the root of the results directory, a json file with the results is created in ``output_directory/community_analysis/indiv_scopes.json``.
     * To screen the putative redundancy of metabolite producibility predicted for the genomes, we also provide `rev_iscope.tsv` and `rev_iscope.json` that reverse the information from `indiv_scopes.json`. This means that if org1 produces A and B, org2 produces B and C, `indiv_scopes.json` will describe the following: {'org1': ['A', 'B'], 'org2: ['B', 'C']}. `reverse_scope.json` will contain {'A': ['org1'], 'B': ['org1', 'org2'], 'C': ['org2']}, and `reverse_scope.tsv` will contain the same information as a matrix. 
 
 addedvalue
@@ -382,7 +361,7 @@ Optional arguments:
 
     As you can see, the individual and community scopes are run again. In addition to the previous outputs, the union of all individual scopes and the community scopes are printed. Finally, the difference between the two sets, that is to say the metabolites that can only be produced collectively (i.e. by at least two bacteria cooperating) is displayed. Here it consists of 119 metabolites. 
 * files outputs
-    * A targets SBML file is generated. It can be used with `` m2m mincom`` . Newly producible metabolites are written in a json file. The json files associated to ``iscope`` and ``cscope`` are also produced.
+    * A targets SBML file is generated. It can be used with ``m2m mincom`` . Newly producible metabolites are written in a json file. The json files associated to ``iscope`` and ``cscope`` are also produced.
 
     ::
 
@@ -397,9 +376,44 @@ Optional arguments:
         │   └── rev_iscope.json
         │   └── rev_iscope.tsv
 
+Optional: create the seeds SBML file
+*************************************
+To create a seeds file starting from a list of metabolic identifiers (matching identifiers of compounds of the organisms metabolic networks), you can use the ``m2m seeds`` command:
+
+.. code:: sh
+
+    m2m seeds --metabolites metabolites_file.txt -o output/directory
+
+The resulting seeds file will be created in ``output/directory/seeds.sbml``.
+
+An example of structure of the metabolites file is the following:
+
+.. code::
+
+    M_AMMONIA_c
+    M_ZN__43__2_c
+    M_CARBON__45__DIOXIDE_c
+    M_OXYGEN__45__MOLECULE_c
+
+The resulting SBML will have such a design:
+
+.. code:: xml
+
+    <?xml version="1.0" encoding="UTF-8"?>
+        <sbml xmlns="http://www.sbml.org/sbml/level2" level="2" version="1">
+        <model id="metabolites">
+            <listOfSpecies>
+            <species id="M_AMMONIA_c" name="AMMONIA" compartment="c"/>
+            <species id="M_ZN__43__2_c" name="ZN+2" compartment="c"/>
+            <species id="M_CARBON__45__DIOXIDE_c" name="CARBON-DIOXIDE" compartment="c"/>
+            <species id="M_OXYGEN__45__MOLECULE_c" name="OXYGEN-MOLECULE" compartment="c"/>
+            </listOfSpecies>
+    </model>
+    </sbml>
+
 m2m mincom
 ----------
-`m2m mincom` requires an additional target file that is available in `metabolic_data` or can be generated by `m2m addedvalue` in which case it will be stored in `result_directory/community_analysis/targets.sbml`
+``m2m mincom`` requires an additional target file that is available in `metabolic_data` or can be generated by ``m2m addedvalue`` in which case it will be stored in ``result_directory/community_analysis/targets.sbml``
 
 It uses the following mandatory inputs (run ``m2m mincom --help`` for optional arguments):
 
@@ -505,13 +519,13 @@ Optional arguments:
         --- Logs written in output_directory//m2m_mincom.log ---
 
 
-    This output gives the result of minimal community selection. It means that for producing the 119 metabolic targets, a minimum of 13 bacteria out of the 17 is required. One example of such minimal community is given. In addition, the whole space of solution is studied. All bacteria (17) occur in at least one minimal community (key species). Finally, the intersection gives the following information: a set of 12 bacteria occurs in each minimal communtity. This means that these 12 bacteria are needed in any case (essential symbionts), and that any of the remaining 5 bacteria (alternative symbionts) can complete the missing function(s).
+    This output gives the result of minimal community selection. It means that for producing the 120 metabolic targets, a minimum of 13 bacteria out of the 17 is required. One example of such minimal community is given. In addition, the whole space of solution is studied. All bacteria (17) occur in at least one minimal community (key species). Finally, the intersection gives the following information: a set of 12 bacteria occurs in each minimal communtity. This means that these 12 bacteria are needed in any case (essential symbionts), and that any of the remaining 5 bacteria (alternative symbionts) can complete the missing function(s).
 * files outputs
     * As for other commands, a json file with the results is produced in ``output_directory/community_analysis/comm_scopes.json``, together with logs at the root of the results directory.
 
 m2m metacom
 ------------
-`m2m metacom` runs all analyses: individual scopes, community scopes, and minimal community selection based on the metabolic added-value of the microbiota.
+``m2m metacom`` runs all analyses: individual scopes, community scopes, and minimal community selection based on the metabolic added-value of the microbiota.
 
 It uses the following mandatory inputs (run ``m2m metacom --help`` for optional arguments):
 
@@ -674,7 +688,7 @@ Optional arguments:
 
 m2m workflow and m2m test
 -------------------------
-`m2m workflow` starts from metabolic network reconstruction and runs all analyses: individual scopes, community scopes, and minimal community selection based on the metabolic added-value of the microbiota.
+``m2m workflow`` starts from metabolic network reconstruction and runs all analyses: individual scopes, community scopes, and minimal community selection based on the metabolic added-value of the microbiota.
 
 It uses the following mandatory inputs (run ``m2m workflow --help`` for optional arguments):
 
@@ -693,15 +707,15 @@ Optional arguments:
 -t file          Optional targets for metabolic analysis, if not used
                  metage2metabo will use the addedvalue of the community
 -q               quiet mode
---pwt-xml        use this option to use Pathway Tools xml
+--pwt-xml        extract xml from Pathway Tools instead of using padmet to create sbml
 
-You can run the workflow analysis with the two genbanks files available in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/metage2metabo>`__ (`workflow_data`). Two genomes are available in the compressed archive workflow_genomes.tar.gz. The archive has to be uncompressed before testing.
+You can run the workflow analysis with the two genbanks files available in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/metage2metabo>`__ (`workflow_data`). Two genomes are available in the compressed archive `workflow_genomes.tar.gz`. The archive has to be uncompressed before testing.
 
 .. code:: sh
 
     m2m workflow -g workflow_genomes -s workflow_data/seeds_workflow.sbml -o output_directory/
 
-Or you can run the test argument (which use the same data):
+Or you can run the test argument (which use the same data): ``m2m test``.
 
 Which uses the following mandatory inputs (run ``m2m test --help`` for optional arguments):
 
@@ -840,7 +854,7 @@ Optional arguments:
 
 
 * files outputs
-    * Numerous files are created in the output_directory, including the logs at the root of the results directory.
+    * Numerous files are created in the `output_directory`, including the logs at the root of the results directory.
     
     .. code ::
 

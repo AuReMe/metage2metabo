@@ -5,7 +5,10 @@ Commands
 Outputs and logs
 -----------------
 
-By default, ``m2m`` writes into the console (stdout) and into a log file located at the root of the results directory and named after the subcommand that wad executed. The option ``-q`` can be given to any ``m2m`` subcommand to write in the log file and write to stdout only the warnings, errors and critical issues, together with the path to the log file.
+By default, ``m2m`` writes into the console (stdout) and into a log file located at the root of the results directory and named after the subcommand that was executed. The option ``-q`` can be given to any ``m2m`` subcommand to write in the log file and to stdout only the warnings, errors and critical issues, together with the path to the log file.
+
+m2m Commands
+------------
 
 Features
 ========
@@ -73,7 +76,7 @@ m2m recon
                                     protein association
             -p, --padmet          create padmet files
             --clean               clean PGDBs if already present
-            --pwt-xml             use this option to use Pathway Tools xml
+            --pwt-xml             use this option to use Pathway Tools xml (incompatible with -p)
 
 
 m2m iscope
@@ -199,7 +202,7 @@ m2m workflow
                                     Optional targets for metabolic analysis, if not used
                                     metage2metabo will use the addedvalue of the community
             --clean               clean PGDBs if already present
-            --pwt-xml             use this option to use Pathway Tools xml
+            --pwt-xml             use this option to use Pathway Tools xml (incompatible with -p)
 
 
 m2m metacom

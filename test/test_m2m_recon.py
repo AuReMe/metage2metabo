@@ -41,7 +41,7 @@ def test_m2m_recon_call():
 
     shutil.rmtree('recon_data_output')
 
-    subprocess.call(['m2m', 'recon', '-g', 'recon_data', '-o', 'recon_data_output', '-c', '1', '-p', '--pwt-xml'])
+    subprocess.call(['m2m', 'recon', '-g', 'recon_data', '-o', 'recon_data_output', '-c', '1', '--pwt-xml'])
     reader = SBMLReader()
     document = reader.readSBML(sbml_file_path)
     # Extract reaction ID from annotaiton.
