@@ -28,6 +28,7 @@ Optional arguments:
 -p               create padmet files from PGDB
 -l int           specify the level for the sbml to be created
 -q               quiet mode
+--pwt-xml        use this option to use Pathway Tools xml
 
 The input genomic data has to follow a strict structure:
 
@@ -236,6 +237,7 @@ It uses the following mandatory inputs (run ``m2m iscope --help`` for optional a
 
 Optional argument
 -q                     quiet mode
+-c int           number of CPU for multi-processing
 
 .. code:: sh
 
@@ -524,6 +526,7 @@ Optional arguments:
 -t file                Optional targets for metabolic analysis, if not used
                        metage2metabo will use the addedvalue of the community
 -q                     quiet mode
+-c int           number of CPU for multi-processing
 
 .. code:: sh
 
@@ -690,6 +693,7 @@ Optional arguments:
 -t file          Optional targets for metabolic analysis, if not used
                  metage2metabo will use the addedvalue of the community
 -q               quiet mode
+--pwt-xml        use this option to use Pathway Tools xml
 
 You can run the workflow analysis with the two genbanks files available in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/metage2metabo>`__ (`workflow_data`). Two genomes are available in the compressed archive workflow_genomes.tar.gz. The archive has to be uncompressed before testing.
 

@@ -187,7 +187,7 @@ def main():
         "iscope",
         help="individual scope computation",
         parents=[
-            parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_q
+            parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_q, parent_parser_c
         ],
         description=
         "Compute individual scopes (reachable metabolites from seeds) for each metabolic network of the input directory"
@@ -247,7 +247,7 @@ def main():
         help="whole metabolism community analysis",
         parents=[
             parent_parser_n, parent_parser_s, parent_parser_m, parent_parser_o,
-            parent_parser_t_optional, parent_parser_q
+            parent_parser_t_optional, parent_parser_q, parent_parser_c
         ],
         description=
         "Run the whole metabolism community analysis: individual and community scope analysis and community selection"
@@ -325,7 +325,7 @@ def main():
             if itsct_seeds_targets != set():
                 logger.warning(f"\nWARNING: compounds {*list(itsct_seeds_targets),} are both in seeds and targets. Since they are in seeds, they will be in each organism's individual producibility scope (iscope), but not appear in the community scope (cscope). To be certain that they are produced (through an activable reaction and not just because they are seeds), check the output file: producibility_targets.json.\n")
         if args.cmd == "iscope":
-            main_iscope(network_dir, args.seeds, args.out)
+            main_iscope(network_dir, args.seeds, args.out, args.cpu)
         elif args.cmd == "cscope":
             main_cscope(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
         elif args.cmd == "addedvalue":
@@ -334,7 +334,7 @@ def main():
         elif args.cmd == "mincom":
             main_mincom(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
         elif args.cmd == "metacom":
-            main_metacom(network_dir, args.out, args.seeds, new_arg_modelhost, args.targets)
+            main_metacom(network_dir, args.out, args.seeds, new_arg_modelhost, args.targets, args.cpu)
     elif args.cmd == "recon":
         main_recon(args.genomes, args.out, args.noorphan, args.padmet, args.level, args.cpu,
                    args.clean, args.pwt_xml)

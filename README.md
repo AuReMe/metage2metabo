@@ -102,8 +102,9 @@ Also, m2m_analysis relies on other packages:
 
 ## Installation
 
-Tested on Linux (Ubuntu, Fedora, Debian) and MacOs (version 10.14).
-Tested with Python3.6
+Developed and tested on Linux (Ubuntu, Fedora, Debian) and MacOs (version 10.14) with Python3.6.
+
+Continuous Integration using GitHub Actions with Python3.6 and Python3.7 on ubuntu-latest, macos-latest and windows-latest ([corresponding virtual environment](https://docs.github.com/en/free-pro-team@latest/actions/reference/specifications-for-github-hosted-runners#supported-runners-and-hardware-resources)).
 
 ### Installation with pip
 

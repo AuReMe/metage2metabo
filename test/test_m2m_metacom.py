@@ -237,7 +237,7 @@ def test_m2m_metacom_targets_import():
     with tarfile.open(toy_bact_tgz_path) as tar:
         tar.extractall(path=respath)
     metage2metabo.m2m_workflow.metacom_analysis(sbml_dir=toy_bact_path, out_dir=respath,
-                seeds=seeds_path, host_mn=None, targets_file=targets_path)
+                seeds=seeds_path, host_mn=None, targets_file=targets_path, cpu_number=1)
 
     iscope_file = os.path.join(*[respath, 'indiv_scopes', 'indiv_scopes.json'])
     cscope_file = os.path.join(*[respath, 'community_analysis', 'comm_scopes.json'])

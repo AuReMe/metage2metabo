@@ -54,7 +54,7 @@ m2m recon
     .. code::
 
         usage: m2m recon [-h] -g GENOMES -o OUPUT_DIR [-c CPU] [-q] [-l {2,3}]
-                        [--noorphan] [-p] [--clean]
+                        [--noorphan] [-p] [--clean] [--pwt-xml]
 
         Run metabolic network reconstruction for each annotated genome of the input
         directory, using Pathway Tools
@@ -73,13 +73,15 @@ m2m recon
                                     protein association
             -p, --padmet          create padmet files
             --clean               clean PGDBs if already present
+            --pwt-xml             use this option to use Pathway Tools xml
+
 
 m2m iscope
 ==========
 
     .. code::
 
-        usage: m2m iscope [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR [-q]
+        usage: m2m iscope [-h] -n NETWORKS_DIR -s SEEDS -o OUPUT_DIR [-q] [-c CPU]
 
         Compute individual scopes (reachable metabolites from seeds) for each
         metabolic network of the input directory
@@ -93,6 +95,7 @@ m2m iscope
             -o OUPUT_DIR, --out OUPUT_DIR
                                     output directory path
             -q, --quiet           quiet mode
+            -c CPU, --cpu CPU     cpu number for multi-process
 
 m2m cscope
 ==========
@@ -172,6 +175,7 @@ m2m workflow
 
         usage: m2m workflow [-h] -g GENOMES -s SEEDS [-m MODELHOST] -o OUPUT_DIR
                             [-c CPU] [-q] [--noorphan] [-p] [-t TARGETS] [--clean]
+                            [--pwt-xml]
 
         Run the whole workflow: metabolic network reconstruction, individual and
         community scope analysis and community selection
@@ -192,9 +196,10 @@ m2m workflow
                                     protein association
             -p, --padmet          create padmet files
             -t TARGETS, --targets TARGETS
-                                    Optionnal targets for metabolic analysis, if not used
+                                    Optional targets for metabolic analysis, if not used
                                     metage2metabo will use the addedvalue of the community
             --clean               clean PGDBs if already present
+            --pwt-xml             use this option to use Pathway Tools xml
 
 
 m2m metacom
@@ -203,7 +208,7 @@ m2m metacom
     .. code::
 
         usage: m2m metacom [-h] -n NETWORKS_DIR -s SEEDS [-m MODELHOST] -o OUPUT_DIR
-                        [-t TARGETS] [-q]
+                        [-t TARGETS] [-q] [-c CPU]
 
         Run the whole metabolism community analysis: individual and community scope
         analysis and community selection
@@ -219,9 +224,10 @@ m2m metacom
         -o OUPUT_DIR, --out OUPUT_DIR
                                 output directory path
         -t TARGETS, --targets TARGETS
-                            Optionnal targets for metabolic analysis, if not used
-                            metage2metabo will use the addedvalue of the community
+                                Optional targets for metabolic analysis, if not used
+                                metage2metabo will use the addedvalue of the community
         -q, --quiet           quiet mode
+        -c CPU, --cpu CPU     cpu number for multi-process
 
 
 m2m seeds

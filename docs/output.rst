@@ -53,6 +53,30 @@ m2m Outputs
         │   ├── mincom.json
         ├── producibility_targets.json
 
+By using the ``--pwt-xml`` option, m2m will use the xml files from Pathway Tools and there will be no .dat files.
+
+    .. code ::
+
+        output_directory/
+        ├── m2m_command.log
+        ├── pgdb
+        │   ├── species_1.xml
+        │   └── ...
+        └── sbml
+            ├── species_1.sbml
+            └── ...
+        └── recon_stats.tsv
+        ├── indiv_scopes
+        │   └── indiv_produced_seeds.json
+        │   └── indiv_scopes.json
+        │   └── rev_iscope.json
+        │   └── rev_iscope.tsv
+        ├── community_analysis
+        │   ├── comm_scopes.json
+        │   ├── addedvalue.json
+        │   ├── targets.sbml
+        │   ├── mincom.json
+        ├── producibility_targets.json
 
 m2m_command.log
 ---------------
@@ -67,6 +91,8 @@ pgdb folder
 If you use the reconstruction (with ``m2m recon`` or ``m2m workflow``), the draft metabolic network inferred by Pathway Tools for each of your species will be stored in this ``pgdb`` folder.
 
 For each genome, if no errors occur, there will be a folder named after the genome folder name containing the Pathway-Genome Database (PGDB). The PGDB is stored using attribute-values flat files (the .dat extension file).
+
+By using the ``--pwt-xml``, m2m will extract the xml created by MetaFlux during PathoLogic instead of extracting the attribute-values flat files .dat files.
 
 sbml
 ----

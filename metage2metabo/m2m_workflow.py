@@ -71,10 +71,10 @@ def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_b
     sbml_dir = recon(inp_dir, out_dir, noorphan_bool, padmet_bool, 2, nb_cpu, clean, use_pwt_xml)[1]
 
     # METABOLISM COMMUNITY ANALYSIS
-    metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file)
+    metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, nb_cpu)
 
 
-def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
+def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, cpu_number=1):
     """Run the metabolism community analysis part of m2m.
 
     Args:
@@ -83,9 +83,10 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file):
         seeds (str): seeds file
         host_mn (str): metabolic network file for host
         targets_file (str): targets file
+        cpu_number (int): number of CPU to use for multiprocessing
     """
     # INDIVIDUAL SCOPES
-    union_targets_iscope = iscope(sbml_dir, seeds, out_dir)
+    union_targets_iscope = iscope(sbml_dir, seeds, out_dir, cpu_number)
     # COMMUNITY SCOPE
     instance_com, targets_cscope = cscope(sbml_dir, seeds, out_dir, targets_file, host_mn)
     # ADDED VALUE
@@ -190,13 +191,14 @@ def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clea
     return pgdb_dir, sbml_dir, padmet_folder
 
 
-def iscope(sbmldir, seeds, out_dir):
+def iscope(sbmldir, seeds, out_dir, cpu_number=1):
     """Compute individual scopes (reachable metabolites) for SBML files in a directory.
     
     Args:
         sbmldir (str): SBML files directory
         seeds (str): SBML seeds file
         out_dir (str): output directory
+        cpu_number (int): number of CPU to use for multiprocessing
 
     Returns:
         set: union of reachable metabolites for all metabolic networks
@@ -208,7 +210,7 @@ def iscope(sbmldir, seeds, out_dir):
             name for name in os.listdir(sbmldir) if os.path.isfile(os.path.join(sbmldir, name))
             and utils.get_extension(os.path.join(sbmldir, name)).lower() in ["xml", "sbml"]
     ]) > 1:
-        scope_json = indiv_scope_run(sbmldir, seeds, out_dir)
+        scope_json = indiv_scope_run(sbmldir, seeds, out_dir, cpu_number)
         logger.info("Individual scopes for all metabolic networks available in " + scope_json)
         # Analyze the individual scopes results (json file)
         reachable_metabolites_union = analyze_indiv_scope(scope_json, seeds)
@@ -802,13 +804,14 @@ def analyze_recon(sbml_folder, output_stat_file, padmet_folder=None, padmet_bool
         logger.info('Percentage of reactions associated with genes: ' + str(gene_reactions_assoc_percentages[0]))
 
 
-def indiv_scope_run(sbml_dir, seeds, output_dir):
+def indiv_scope_run(sbml_dir, seeds, output_dir, cpu_number=1):
     """Run Menetools and analyse individual metabolic capabilities.
     
     Args:
         sbml_dir (str): directory of SBML files
         seeds (str): SBML seeds file
         output_dir (str): directory for results
+        cpu_number (int): number of CPU to use for multiprocessing
     
     Returns:
         str: path to output file for scope from Menetools analysis
@@ -830,21 +833,28 @@ def indiv_scope_run(sbml_dir, seeds, output_dir):
     ]
     all_scopes = {}
     all_produced_seeds = {}
+    multiprocessing_indiv_scopes = []
     for f in all_files:
         bname = utils.get_basename(f)
-        try:
-            menescope_results = run_menescope(
-                draft_sbml=os.path.join(sbml_dir, f), seeds_sbml=seeds)
-        except:
-            traceback_str = traceback.format_exc()
-            # Don't print the traceback if the error is linked to SystemExit as the error has been hanled by menetools.
-            if 'SystemExit: 1' not in traceback_str:
-                logger.critical(traceback_str)
-            logger.critical('---------------Something went wrong running Menetools on " + f + "---------------')
-            sys.exit(1)
+        sbml_path = os.path.join(sbml_dir, f)
+        multiprocessing_indiv_scopes.append((sbml_path, bname, seeds))
 
+    menescope_pool = Pool(cpu_number)
+    results = menescope_pool.starmap(indiv_scope_on_species, multiprocessing_indiv_scopes)
+    for result in results:
+        error = result[0]
+        if error is True:
+            logger.critical('------------An error occurred during M2M run of Menetools, M2M will stop-------------')
+            menescope_pool.close()
+            menescope_pool.join()
+            sys.exit(1)
+        bname = result[1]
+        menescope_results = result[2]
         all_scopes[bname] = menescope_results['scope']
         all_produced_seeds[bname] = menescope_results['produced_seeds']
+
+    menescope_pool.close()
+    menescope_pool.join()
 
     with open(indiv_scopes_path, 'w') as dumpfile:
         json.dump(all_scopes, dumpfile, indent=4)
@@ -853,6 +863,33 @@ def indiv_scope_run(sbml_dir, seeds, output_dir):
         json.dump(all_produced_seeds, dumpfile, indent=4)
 
     return indiv_scopes_path
+
+
+def indiv_scope_on_species(sbml_path, bname, seeds_path):
+    """Run Menetools and analyse individual metabolic capabilities on a sbml.
+
+    Args:
+        sbml_path (str): path to SBML file
+        bname (str): name linked to SBML file
+        seeds (str): SBML seeds file
+
+    Returns:
+        list: [boolean error, bname, dictionary containing menescope results]
+    """
+    error = False
+    try:
+        menescope_results = run_menescope(
+            draft_sbml=sbml_path, seeds_sbml=seeds_path)
+    except:
+        traceback_str = traceback.format_exc()
+        # Don't print the traceback if the error is linked to SystemExit as the error has been hanled by menetools.
+        if 'SystemExit: 1' not in traceback_str:
+            logger.critical(traceback_str)
+        logger.critical('---------------Something went wrong running Menetools on ' + bname + '---------------')
+        error = True
+        menescope_results = None
+
+    return [error, bname, menescope_results]
 
 
 def analyze_indiv_scope(jsonfile, seeds):
