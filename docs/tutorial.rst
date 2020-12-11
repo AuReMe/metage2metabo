@@ -62,7 +62,7 @@ Please go check the `documentation of mpwt <https://github.com/AuReMe/mpwt#genba
 
 .. code:: sh
 
-    m2m recon -g workflow_genomes -o output_directory -c cpu_number [--clean] [--orphan] [-p] [-l sbml_level]
+    m2m recon -g workflow_genomes -o output_directory -c cpu_number [--clean] [--orphan] [-p] [-l sbml_level] [--pwt-xml]
 
 * standard output
     .. code:: 

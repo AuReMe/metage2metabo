@@ -125,6 +125,43 @@ More informations in the [Docker and Singularity Documentation](https://metage2m
 
 M2M commands are listed in the [Commands Documentation](https://metage2metabo.readthedocs.io/en/latest/command.html).
 
+````
+Copyright (C) Dyliss
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+m2m is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+
+usage: m2m [-h] [-v]
+        {recon,iscope,cscope,addedvalue,mincom,seeds,workflow,metacom,test}
+        ...
+
+From metabolic network reconstruction with annotated genomes to metabolic
+capabilities screening to identify organisms of interest in a large
+microbiota. For specific help on each subcommand use: m2m {cmd} --help
+
+optional arguments:
+-h, --help            show this help message and exit
+-v, --version         show program's version number and exit
+
+subcommands:
+valid subcommands:
+
+{recon,iscope,cscope,addedvalue,mincom,seeds,workflow,metacom,test}
+    recon               metabolic network reconstruction
+    iscope              individual scope computation
+    cscope              community scope computation
+    addedvalue          added value of microbiota's metabolism over
+                        individual's
+    mincom              minimal communtity selection
+    seeds               creation of seeds SBML file
+    workflow            whole workflow
+    metacom             whole metabolism community analysis
+    test                test on sample data from rumen experiments
+
+Requires: Pathway Tools installed and in $PATH, and NCBI Blast
+````
+
 ## Analysis of the minimal solutions
 
 M2M performs a community minimization to find the union and intersection of the minimal communities. But it is possible to analyze all the minimal communities.
