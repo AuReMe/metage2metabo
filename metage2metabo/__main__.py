@@ -15,7 +15,7 @@ from metage2metabo.m2m_workflow import run_workflow, recon, iscope, cscope, adde
 from metage2metabo import sbml_management, utils
 
 VERSION = pkg_resources.get_distribution("metage2metabo").version
-LICENSE = """Copyright (C) Dyliss
+LICENSE = """Copyright (C) Dyliss & Pleiade
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 metage2metabo is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.\n

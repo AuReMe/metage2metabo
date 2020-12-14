@@ -126,7 +126,7 @@ More informations in the [Docker and Singularity Documentation](https://metage2m
 M2M commands are listed in the [Commands Documentation](https://metage2metabo.readthedocs.io/en/latest/command.html).
 
 ````
-Copyright (C) Dyliss
+Copyright (C) Dyliss & Pleiade
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 m2m is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
