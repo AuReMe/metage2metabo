@@ -187,7 +187,7 @@ for (status in c("status_l1", "status_l2", "status_l3")){
     geom_boxplot() + 
     theme_classic() +
     facet_grid(~ .data[[status]], labeller = label_wrap_gen(width=10)) +
-    # ggtitle("Taxonomic composition of keystone species") +
+    # ggtitle("Taxonomic composition of key species") +
     scale_fill_manual(values=taxcolors) +
     # scale_y_continuous(trans='sqrt') +
     labs(y= "compositional ratio", x = "category", fill = "Phylum") +

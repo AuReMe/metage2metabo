@@ -13,7 +13,7 @@ import tarfile
 import json
 import networkx as nx
 
-KEYSTONE_SPECIES = ['GCA_003437665', 'GCA_003437785', 'GCA_003437345',
+KEY_SPECIES = ['GCA_003437665', 'GCA_003437785', 'GCA_003437345',
                      'GCA_003437325', 'GCA_003437055', 'GCA_003437195',
                      'GCA_003437375', 'GCA_003437905', 'GCA_003437715',
                      'GCA_003437885', 'GCA_003437945', 'GCA_003437815',
@@ -87,10 +87,10 @@ def test_m2m_analysis_call():
         '-q'])
 
 
-    # KEYSTONE SPECIES ANALYSIS
+    # KEY SPECIES ANALYSIS
     with open(json_file, 'r') as json_data:
         d_m2m_analysis = json.load(json_data)
-    assert sorted(d_m2m_analysis['union_bacteria']) == sorted(KEYSTONE_SPECIES)
+    assert sorted(d_m2m_analysis['union_bacteria']) == sorted(KEY_SPECIES)
     assert sorted(d_m2m_analysis['inter_bacteria']) == sorted(ESSENTIAL_SYMBIONTS)
     assert sorted(set(d_m2m_analysis['union_bacteria'])-set(d_m2m_analysis['inter_bacteria'])) == sorted(ALTERNATIVE_SYMBIONTS)
     expected_solutions = sorted([sorted(sol) for sol in list(ENUM_BACTERIA.values())])
