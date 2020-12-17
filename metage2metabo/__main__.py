@@ -328,7 +328,7 @@ def main():
             # test if some targets are seeds
             itsct_seeds_targets = sbml_management.compare_seeds_and_targets(args.seeds, args.targets)
             if itsct_seeds_targets != set():
-                logger.warning(f"\nWARNING: compounds {*list(itsct_seeds_targets),} are both in seeds and targets. Since they are in seeds, they will be in each organism's individual producibility scope (iscope), but not appear in the community scope (cscope). To be certain that they are produced (through an activable reaction and not just because they are seeds), check the output file: producibility_targets.json.\n")
+                logger.warning(f"\nWARNING: compounds {*list(itsct_seeds_targets),} are both in seeds and targets. Since they are in seeds, they will be in each organism's individual producibility scope (iscope), but not appear in the community scope (cscope). As they belong to iscopes, note that they will be indicated as 'individually producible' by all genomes in the file producibility_targets.json. To be certain that they are produced (through an activable reaction and not just because they are seeds), check the output file: indiv_scopes/indiv_produced_seeds.json.\n")
         if args.cmd == "iscope":
             main_iscope(network_dir, args.seeds, args.out, args.cpu)
         elif args.cmd == "cscope":
