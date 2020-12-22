@@ -289,6 +289,8 @@ def test_m2m_metacom_targets_import():
         model = document.getModel()
         sbml_name, _ = os.path.splitext(sbml_file)
         sbml_products[sbml_name] = [product.getSpecies() for sbml_reaction in model.getListOfReactions() for product in sbml_reaction.getListOfProducts()]
+        sbml_products[sbml_name].extend([reactant.getSpecies() for sbml_reaction in model.getListOfReactions() if sbml_reaction.reversible == True for reactant in sbml_reaction.getListOfReactants()])
+        sbml_products[sbml_name] = set(sbml_products[sbml_name])
 
     for target in d_target['com_only_producers']:
         for species in d_target['com_only_producers'][target]:
