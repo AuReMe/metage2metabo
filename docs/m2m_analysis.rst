@@ -389,3 +389,101 @@ Optional arguments:
         ├── key_species_stats.tsv
         ├── key_species_supdata.tsv
         ├── miscoto_stats.txt
+
+m2m_analysis output files
+-------------------------
+
+::
+
+    output_directory
+    ├── json
+    │   ├── targets_toy.json
+    ├── gml
+    │   ├── targets_toy.gml
+    ├── bbl
+    │   ├── targets_toy.bbl
+    ├── svg
+    │   ├── targets_toy.bbl.svg
+    ├── key_species_stats.tsv
+    ├── key_species_supdata.tsv
+    ├── miscoto_stats.txt
+    ├── taxon_phylum.tsv (with the ``--taxon`` option)
+    ├── taxon_tree.txt (with the ``--taxon`` option)
+
+
+Miscoto results
++++++++++++++++
+
+``miscoto_stats.txt``: for each target, this file summarizes the result of miscoto with: the number of targets, the size of the minimal solutions, the size of the union of the minimal solution (the key species), the size of the intersection of the minimal solutions (the essential symbionts)) and the size of the enumeration (the number of minimal solutions).
+
+``json/*.json``: for each target, there will be a miscoto json result file. If you have given one target file, the result file will be named according to the name of the target file.
+
+The json contains 21 keys:
+
+* ``bacteria``: organisms in the optimal solution.
+
+* ``still_unprod``: compounds unproducible by the community.
+
+* ``newly_prod``: compounds newly producible by the community.
+
+* ``producible``: compounds producible by the community.
+
+* ``union_bacteria``: organisms from all the minimal communities.
+
+* ``inter_bacteria``: organisms from the intersection of all the minimal communities.
+
+* ``one_model``: results of the optimal solution.
+
+* ``exchanged``, ``union_exchanged``, ``inter_exchanged`` and ``enum_exchanged``: the exchanged compounds by the community, this step needs a lot of resources so it is not used in m2m. If you want to use it, use miscoto with the ``minexch`` option.
+
+* ``key_species``: organisms from all the minimal communities.
+
+* ``essential_symbionts``: organisms in the intersection of all the minimal communities. They are occuring in all minimal solution.
+
+* ``alternative_symbionts``: organisms appearing in at least one minimal community but not in all.
+
+* ``score_optimum_inter``: the optimum score found for the intersection, it corresponds to the number of organism in the minimal community.
+
+* ``score_optimum_union``: the optimum score found for the union, it corresponds to the number of organism in the minimal community.
+
+* ``inter_targetsproducers``: the organism that have the final reaction to produce the target in the intersection. It is a dictionary, with each target as key and the organism producing these targets as value.
+
+* ``union_targetsproducers``: the organism that have the final reaction to produce the target in the union. It is a dictionary, with each target as key and the organism producing these targets as value.
+
+* ``one_model_targetsproducers``: the organism that have the final reaction to produce the target in the optimal solution. It is a dictionary, with each target as key and the organism producing these targets as value.
+
+* ``enum_bacteria``: all the minimal solutions. It is a dictionary, with a number (linked to a minimal solution) as key and the organisms in the corresponding minimal solution as value.
+
+* ``enum_targetsproducers``: the organism that have the final reaction to produce the target in the union. It is a dictionary, with a number (corresponding to a minimal solution) as key and a dictionary as value This sub-dictionary contains each target as key and the organism producing these targets as value.
+
+
+Key species files
++++++++++++++++++
+
+``key_species_stats.tsv``: for each target, this file contains the number of key species, essential and alternative symbionts. If you have used the "--taxon" option, the column corresponds to each taxonomic groups.
+
+``key_species_supdata.tsv``: for each target, this file contains the name of species in the key species, essential or alternative symbionts groups. If you have used the "--taxon" option, there will be new rows linked to each taxonomic groups.
+
+Solution graph
+++++++++++++++
+
+The solution graph is stored in a gml file (``gml/*.gml``). The nodes of the graph are species occuring in minimal solutions. An edge is created between two nodes when the two nodes are in the same minimal solutions.
+
+Compressed solution graph (powergraph)
+++++++++++++++++++++++++++++++++++++++
+
+The previous solution graph is then compressed into a powergraph using PowerGrasp. The result file is bbl file (``bbl/*.bbl``).
+
+Picture of the powergraph
++++++++++++++++++++++++++
+
+The compresed graph is then drawn using the Oog Power Graph Command line tool. A svg file is then created (``svg/*.svg``).
+
+Taxonomy linked files
++++++++++++++++++++++
+
+If you have used the ``--taxon``, two new files have been created:
+
+``taxon_phylum.tsv``: it is a tsv file with 9 columns. The row corresponds to the species in your community. For each species, you will have its name in your dataset, its taxID (from taxon_id.tsv), an attributed taxonomic name (used in the powergraph), then the taxonomic classification: phylum, class, order, family, genus and species.
+
+``taxon_tree.txt``: the topology of the taxonomic classification of your species according to the NCBI taxonomy.
