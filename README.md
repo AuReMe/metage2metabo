@@ -6,6 +6,7 @@ Metage2metabo is a Python3 (Python >= 3.6, tested with 3.6 and 3.7) tool to perf
 m2m can be used as a whole workflow (``` m2m workflow ```, ``` m2m metacom ```) or steps can be performed individually (``` m2m recon ``` , ``` m2m iscope ``` , ``` m2m cscope ```, ``` m2m addedvalue ```, ``` m2m mincom ```, ``` m2m seeds ```).
 
 **If you use M2M, please cite**
+
 Belcour* A, Frioux* C, Aite M, Bretaudeau A, Hildebrand F, Siegel A. Metage2Metabo, microbiota-scale metabolic complementarity for the identification of key species. eLife 2020;9:e61968 [https://doi.org/10.7554/eLife.61968](https://doi.org/10.7554/eLife.61968).
 
 ## Table of contents
