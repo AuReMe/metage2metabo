@@ -39,7 +39,7 @@ MESSAGE = """
 Detection of key species among communities.
 """
 REQUIRES = """
-Requires: Oog jar file (http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-command-line-tool.html) for powergraph visualization.
+Oog jar file (http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-command-line-tool.html) for powergraph svg creation.
 """
 
 root_logger = logging.getLogger()
@@ -147,8 +147,8 @@ def main():
     parent_parser_jar = argparse.ArgumentParser(add_help=False)
     parent_parser_jar.add_argument(
 		"--oog",
-		help="OOG jar file for powergraph",
-		required=True,
+		help="OOG jar file for powergraph svg creation using Power Graph Command Line Tool",
+		required=False,
 		type=str)
 
     # subparsers
@@ -188,7 +188,7 @@ def main():
             parent_parser_g, parent_parser_o, parent_parser_jar, parent_parser_q
         ],
         description=
-        "Compress the GMl graph of solution and create a powergraph (bbl) and a svg of the graph"
+        "Compress the GMl graph of solution and create a powergraph (bbl), a website format of the powergraph and a svg of the graph (if you use the --oog option)"
     )
     wkf_parser = subparsers.add_parser(
         "workflow",

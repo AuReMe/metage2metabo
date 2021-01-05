@@ -28,6 +28,7 @@ import subprocess
 import logging
 import zipfile
 
+from bubbletools import convert
 from ete3 import NCBITaxa
 from itertools import combinations
 from metage2metabo import utils, sbml_management
@@ -263,13 +264,19 @@ def powergraph_analysis(gml_file_folder, output_dir, oog_jar):
 
     bbl_path = os.path.join(output_dir, 'bbl')
     svg_path = os.path.join(output_dir, 'svg')
+    html_output = os.path.join(output_dir, 'html')
 
     if not utils.is_valid_dir(bbl_path):
-        logger.critical("Impossible to access/create output directory")
+        logger.critical("Impossible to access/create output directory " + bbl_path)
         sys.exit(1)
 
-    if not utils.is_valid_dir(svg_path):
-        logger.critical("Impossible to access/create output directory")
+    if oog_jar:
+        if not utils.is_valid_dir(c):
+            logger.critical("Impossible to access/create output directory " +  svg_path)
+            sys.exit(1)
+
+    if not utils.is_valid_dir(html_output):
+        logger.critical("Impossible to access/create output directory " + html_output)
         sys.exit(1)
 
     for gml_path in gml_paths:
@@ -278,7 +285,9 @@ def powergraph_analysis(gml_file_folder, output_dir, oog_jar):
         logger.info('######### Graph compression: ' + gml_path + ' #########')
         compression(gml_input, bbl_output)
         logger.info('######### PowerGraph visualization: ' + gml_path + ' #########')
-        bbl_to_svg(oog_jar, bbl_output, svg_path)
+        bbl_to_html(bbl_output, html_output)
+        if oog_jar:
+            bbl_to_svg(oog_jar, bbl_output, svg_path)
 
     logger.info(
         "--- Powergraph runtime %.2f seconds ---\n" % (time.time() - starttime))
@@ -603,6 +612,17 @@ def check_oog_jar_file(oog_jar):
         return True
     else:
         sys.exit('Check Oog.jar: not a correct jar file ' + oog_jar)
+
+
+def bbl_to_html(bbl_input, html_output):
+    """Powergraph website creation.
+    This create a folder with html/CSS/JS files. By using the index.html file in a browser, user can see the powergraph.
+
+    Args:
+        bbl_input (str): bbl input file
+        svg_output (str): html output file
+    """
+    convert.bubble_to_js(bbl_input, html_output)
 
 
 def bbl_to_svg(oog_jar, bbl_input, svg_output):
