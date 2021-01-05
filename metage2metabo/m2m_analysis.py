@@ -79,7 +79,7 @@ def run_analysis_workflow(sbml_folder, target_folder_file, seed_file, output_dir
 
     gml_output = graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file)
 
-    powergraph_analysis(gml_output, output_dir, oog_jar)
+    powergraph_analysis(output_dir, oog_jar, taxon_file)
 
     logger.info(
         "--- m2m_analysis runtime %.2f seconds ---\n" % (time.time() - starttime))
@@ -107,7 +107,7 @@ def enumeration(sbml_folder, target_file, seed_file, output_json, host_file):
     enumeration = str(len(results['enum_bacteria']))
     minimal_solution_size = str(len(results["bacteria"]))
     logger.info('######### Enumeration of minimal communities #########')
-    logger.info(enumeration + ' minimal communities (each containing ' + minimal_solution_size + ' species) to produce the target metabolites')
+    logger.info(enumeration + ' minimal communities (each containing ' + minimal_solution_size + ' species) producing the target metabolites')
     # Give union of solutions
     union = results['union_bacteria']
     logger.info('######### Key species: Union of minimal communities #########')
@@ -185,7 +185,7 @@ def stat_analysis(json_file_folder, output_dir, taxon_file=None):
     json_paths = file_or_folder(json_file_folder)
 
     if taxon_file:
-        phylum_output_file = os.path.join(output_dir, 'taxon_phylum.tsv')
+        c
         tree_output_file = os.path.join(output_dir, 'taxon_tree.txt')
         extract_taxa(taxon_file, phylum_output_file, tree_output_file)
         phylum_species, all_phylums = get_phylum(phylum_output_file)
@@ -251,21 +251,22 @@ def graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file)
     return gml_output
 
 
-def powergraph_analysis(gml_file_folder, output_dir, oog_jar):
+def powergraph_analysis(m2m_analysis_folder, oog_jar=None, taxon_file=None):
     """Run the graph compression and picture creation
 
     Args:
-        gml_file_folder (str): gml directory or gml file
-        output_dir (str): results directory
+        m2m_analysis_folder (str): m2m analysis directory with gml files
         oog_jar (str): path to OOG jar file
+        taxon_file (str): mpwt taxon file for species in sbml folder
     """
     starttime = time.time()
 
-    gml_paths = file_or_folder(gml_file_folder)
+    gml_folder = os.path.join(m2m_analysis_folder, 'gml')
+    gml_paths = file_or_folder(gml_folder)
 
-    bbl_path = os.path.join(output_dir, 'bbl')
-    svg_path = os.path.join(output_dir, 'svg')
-    html_output = os.path.join(output_dir, 'html')
+    bbl_path = os.path.join(m2m_analysis_folder, 'bbl')
+    svg_path = os.path.join(m2m_analysis_folder, 'svg')
+    html_output = os.path.join(m2m_analysis_folder, 'html')
 
     if not utils.is_valid_dir(bbl_path):
         logger.critical("Impossible to access/create output directory " + bbl_path)
@@ -280,8 +281,11 @@ def powergraph_analysis(gml_file_folder, output_dir, oog_jar):
         logger.critical("Impossible to access/create output directory " + html_output)
         sys.exit(1)
 
+    es_as_for_tagets = find_essential_alternatives(m2m_analysis_folder, taxon_file)
+
     for gml_path in gml_paths:
         bbl_output = os.path.join(bbl_path, gml_path + '.bbl')
+        svg_file = os.path.join(svg_path, gml_path + '.bbl.svg')
         gml_input = gml_paths[gml_path]
         logger.info('######### Graph compression: ' + gml_path + ' #########')
         compression(gml_input, bbl_output)
@@ -289,6 +293,10 @@ def powergraph_analysis(gml_file_folder, output_dir, oog_jar):
         bbl_to_html(bbl_output, html_output)
         if oog_jar:
             bbl_to_svg(oog_jar, bbl_output, svg_path)
+        essentials = es_as_for_tagets[gml_path]['essential_symbionts']
+        alternatives = es_as_for_tagets[gml_path]['alternative_symbionts']
+        update_js(html_output, essentials, alternatives)
+        update_svg(svg_file, essentials, alternatives)
 
     logger.info(
         "--- Powergraph runtime %.2f seconds ---\n" % (time.time() - starttime))
@@ -373,7 +381,7 @@ def detect_key_species(json_elements, all_phylums, phylum_named_species=None):
         phylum_named_species (dict): {species_ID: species_named_after_phylum}
 
     Returns:
-        key_stone_species (dict): {Phylum: [species_1, species_2]}
+        key_species (dict): {Phylum: [species_1, species_2]}
         essential_symbionts (dict): {Phylum: [species_1, species_2]}
         alternative_symbionts (dict): {Phylum: [species_1, species_2]}
     """
@@ -387,23 +395,23 @@ def detect_key_species(json_elements, all_phylums, phylum_named_species=None):
         intersections = json_elements["inter_bacteria"]
 
     if phylum_named_species:
-        key_stone_species = detect_phylum_species(unions, all_phylums)
+        key_species = detect_phylum_species(unions, all_phylums)
         essential_symbionts = detect_phylum_species(intersections, all_phylums)
         alternative_symbionts = {}
-        for phylum in key_stone_species:
-            alternative_symbionts[phylum] = list(set(key_stone_species[phylum]) - set(essential_symbionts[phylum]))
+        for phylum in key_species:
+            alternative_symbionts[phylum] = list(set(key_species[phylum]) - set(essential_symbionts[phylum]))
         for phylum in all_phylums:
             if phylum not in alternative_symbionts:
                 alternative_symbionts[phylum] = []
     else:
-        key_stone_species = {}
+        key_species = {}
         essential_symbionts = {}
         alternative_symbionts = {}
-        key_stone_species["data"] = unions
+        key_species["data"] = unions
         essential_symbionts["data"] = intersections
         alternative_symbionts["data"] = list(set(unions) - set(intersections))
 
-    return key_stone_species, essential_symbionts, alternative_symbionts
+    return key_species, essential_symbionts, alternative_symbionts
 
 
 def create_stat_species(target_category, json_elements, key_stats_writer, key_sup_writer, phylum_named_species=None, all_phylums=None):
@@ -420,7 +428,7 @@ def create_stat_species(target_category, json_elements, key_stats_writer, key_su
     key_stone_species, essential_symbionts, alternative_symbionts = detect_key_species(json_elements, all_phylums, phylum_named_species)
 
     key_stone_counts = [len(key_stone_species[phylum]) for phylum in sorted(list(key_stone_species.keys()))]
-    key_stats_writer.writerow([target_category, "key_stone_species"] + key_stone_counts + [sum(key_stone_counts)])
+    key_stats_writer.writerow([target_category, "key_species"] + key_stone_counts + [sum(key_stone_counts)])
 
     essential_symbiont_counts = [len(essential_symbionts[phylum]) for phylum in sorted(list(essential_symbionts.keys()))]
     key_stats_writer.writerow([target_category, "essential_symbionts"] + essential_symbiont_counts + [sum(essential_symbiont_counts)])
@@ -641,3 +649,90 @@ def bbl_to_svg(oog_jar, bbl_input, svg_output):
         logger.info('######### Creation of the powergraph svg accessible at ' + svg_output + ' #########')
         oog_cmds = ["java", "-jar", oog_jar, "-inputfiles=" + bbl_input, "-img", "-outputdir=" + svg_output]
         subprocess.call(oog_cmds)
+
+
+def find_essential_alternatives(output_folder, taxon_file):
+    key_species_file = os.path.join(output_folder, 'key_species_supdata.tsv')
+
+    es_as_for_tagets = {}
+    with open(key_species_file, 'r') as input_file:
+        csvreader = csv.reader(input_file, delimiter='\t')
+        for row in csvreader:
+            target = row[0]
+            if target not in es_as_for_tagets:
+                es_as_for_tagets[target] = {}
+            if row[1] in ['essential_symbionts', 'alternative_symbionts']:
+                if row[1] not in es_as_for_tagets[target]:
+                    es_as_for_tagets[target][row[1]] = row[3:]
+                else:
+                    es_as_for_tagets[target][row[1]].extend(row[3:])
+
+    es_as_for_tagets[target]['essential_symbionts'] = list(set(es_as_for_tagets[target]['essential_symbionts']))
+    es_as_for_tagets[target]['alternative_symbionts'] = list(set(es_as_for_tagets[target]['alternative_symbionts']))
+
+    if taxon_file:
+        phylum_file = os.path.join(output_folder, 'taxon_phylum.tsv')
+        phylum_species, all_phylums = get_phylum(phylum_file)
+        print(es_as_for_tagets)
+        for target in es_as_for_tagets:
+            es_as_for_tagets[target]['essential_symbionts'] = [phylum_species[species] for species in es_as_for_tagets[target]['essential_symbionts']]
+            es_as_for_tagets[target]['alternative_symbionts'] = [phylum_species[species] for species in es_as_for_tagets[target]['alternative_symbionts']]
+        print(es_as_for_tagets)
+    return es_as_for_tagets
+
+
+def update_js(html_output, essentials, alternatives):
+    selector_color = '''
+    {
+        selector: 'node[type="essential"]',
+        css: {
+            'background-color': 'green',
+        }
+    },
+    {
+        selector: 'node[type="alternative"]',
+        css: {
+            'background-color': 'blue',
+        }
+    },
+    '''
+
+    js_folder = os.path.join(html_output, 'js')
+    graph_js = os.path.join(js_folder, 'graph.js')
+    new_graph_sj = ''
+    with open(graph_js, 'r') as input_js:
+        for line in input_js:
+            if "data: { 'id'" in line:
+                species_id = line.split("'id':")[1].split(',')[0].strip("'| ")
+                if species_id in essentials:
+                    line = line.replace(" } },", ", 'type': 'essential' } },")
+                if species_id in alternatives:
+                    line = line.replace(" } },", ", 'type': 'alternative' } },")
+            new_graph_sj += line
+            if 'style: [' in line:
+                new_graph_sj += selector_color
+
+    with open(graph_js, 'w') as input_js:
+        input_js.write(new_graph_sj)
+
+
+def update_svg(svg_file, essentials, alternatives):
+    new_svg = []
+    line_before = ''
+    with open(svg_file, 'r') as input_js:
+        for line in input_js:
+            if '<text' in line:
+                species_id = line.split('>')[1].split('<')[0]
+                if species_id in essentials:
+                    line = line.replace('style="stroke:none;"', 'style="stroke:none;fill:green"')
+                    line_before = line_before.replace('style="stroke:none;"', 'style="stroke:none;fill:green"')
+                    new_svg[-1] = line_before
+                if species_id in alternatives:
+                    line = line.replace('style="stroke:none;"', 'style="stroke:none;fill:blue"')
+                    line_before = line_before.replace('style="stroke:none;"', 'style="stroke:none;fill:blue"')
+                    new_svg[-1] = line_before
+            new_svg.append(line)
+            line_before = line
+
+    with open(svg_file, 'w') as input_js:
+        input_js.write(''.join(new_svg))

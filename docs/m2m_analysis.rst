@@ -474,7 +474,7 @@ Compressed solution graph (power graph)
 
 The previous solution graph is then compressed into a power graph using PowerGrASP. The result file is bbl file (``bbl/*.bbl``).
 
-You can use this file to visualize the power graph with Cytoscape. To do this you need the `version 2.8.2 of Cytoscape <chianti.ucsd.edu/Cyto-2_8_2/>`__ and the `CyOog plugin <http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-cytoscape-plugin.html>`__.
+You can use this file to visualize the power graph with Cytoscape. To do this you need the `version 2.8.2 of Cytoscape <http://chianti.ucsd.edu/Cyto-2%5F8%5F2/>`__ and the `CyOog plugin <http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-cytoscape-plugin.html>`__.
 When you have installed Cytoscape, put the file ``CyOog.jar`` in ``path/to/cytoscape/install/dir/plugins/``.
 
 m2m_analysis can also create visualization of the power graph.
