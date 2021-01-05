@@ -104,9 +104,10 @@ def enumeration(sbml_folder, target_file, seed_file, output_json, host_file):
         optsol=True, output_json=output_json)
 
     # Give enumeration of solutions
-    enumeration = results['enum_bacteria']
+    enumeration = str(len(results['enum_bacteria']))
+    minimal_solution_size = str(len(results["bacteria"]))
     logger.info('######### Enumeration of minimal communities #########')
-    logger.info(str(len(enumeration)) + ' minimal communities to produce the target metabolites')
+    logger.info(enumeration + ' minimal communities (each containing ' + minimal_solution_size + ' species) to produce the target metabolites')
     # Give union of solutions
     union = results['union_bacteria']
     logger.info('######### Key species: Union of minimal communities #########')
@@ -271,7 +272,7 @@ def powergraph_analysis(gml_file_folder, output_dir, oog_jar):
         sys.exit(1)
 
     if oog_jar:
-        if not utils.is_valid_dir(c):
+        if not utils.is_valid_dir(svg_path):
             logger.critical("Impossible to access/create output directory " +  svg_path)
             sys.exit(1)
 
@@ -508,7 +509,7 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
             added_node = []
             species_weight = {}
             if dicti['still_unprod'] != []:
-                print('ERROR ', dicti["still_unprod"], ' is unproducible')
+                logger.warning('ERROR ', dicti["still_unprod"], ' is unproducible')
             len_target[target_category] = len(dicti['newly_prod']) + len(dicti['still_unprod'])
             len_min_sol[target_category] = len(dicti['bacteria'])
             len_union[target_category] = len(dicti['union_bacteria'])
@@ -622,6 +623,7 @@ def bbl_to_html(bbl_input, html_output):
         bbl_input (str): bbl input file
         svg_output (str): html output file
     """
+    logger.info('######### Creation of the powergraph website accessible at ' + html_output + ' #########')
     convert.bubble_to_js(bbl_input, html_output)
 
 
@@ -636,5 +638,6 @@ def bbl_to_svg(oog_jar, bbl_input, svg_output):
     check_oog = check_oog_jar_file(oog_jar)
 
     if check_oog:
+        logger.info('######### Creation of the powergraph svg accessible at ' + svg_output + ' #########')
         oog_cmds = ["java", "-jar", oog_jar, "-inputfiles=" + bbl_input, "-img", "-outputdir=" + svg_output]
         subprocess.call(oog_cmds)

@@ -8,7 +8,7 @@ Requirements
 
 m2m_analysis needs:
 
-* `Oog Power Graph Command line tool <http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-command-line-tool.html>`__: used to create a svg file of the powergraph. It is a jar file (compiled for Java 6), so you need at least Java 6.
+* `Oog Power Graph Command line tool <http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-command-line-tool.html>`__: used to create a svg file of the power graph. It is a jar file (compiled for Java 6), so you need at least Java 6.
 
 * These python packages:
 
@@ -469,13 +469,18 @@ Solution graph
 
 The solution graph is stored in a gml file (``gml/*.gml``). The nodes of the graph are species occuring in minimal solutions. An edge is created between two nodes when the two nodes are in the same minimal solutions.
 
-Compressed solution graph (powergraph)
+Compressed solution graph (power graph)
 ++++++++++++++++++++++++++++++++++++++
 
-The previous solution graph is then compressed into a powergraph using PowerGrasp. The result file is bbl file (``bbl/*.bbl``).
+The previous solution graph is then compressed into a power graph using PowerGrASP. The result file is bbl file (``bbl/*.bbl``).
 
-Picture of the powergraph
-+++++++++++++++++++++++++
+You can use this file to visualize the power graph with Cytoscape. To do this you need the `version 2.8.2 of Cytoscape <chianti.ucsd.edu/Cyto-2_8_2/>`__ and the `CyOog plugin <http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-cytoscape-plugin.html>`__.
+When you have installed Cytoscape, put the file ``CyOog.jar`` in ``path/to/cytoscape/install/dir/plugins/``.
+
+m2m_analysis can also create visualization of the power graph.
+
+Picture of the power graph
+++++++++++++++++++++++++++
 
 The compresed graph is then drawn using the Oog Power Graph Command line tool. A svg file is then created (``svg/*.svg``).
 
@@ -484,6 +489,6 @@ Taxonomy linked files
 
 If you have used the ``--taxon``, two new files have been created:
 
-``taxon_phylum.tsv``: it is a tsv file with 9 columns. The row corresponds to the species in your community. For each species, you will have its name in your dataset, its taxID (from taxon_id.tsv), an attributed taxonomic name (used in the powergraph), then the taxonomic classification: phylum, class, order, family, genus and species.
+``taxon_phylum.tsv``: it is a tsv file with 9 columns. The row corresponds to the species in your community. For each species, you will have its name in your dataset, its taxID (from taxon_id.tsv), an attributed taxonomic name (used in the power graph), then the taxonomic classification: phylum, class, order, family, genus and species.
 
 ``taxon_tree.txt``: the topology of the taxonomic classification of your species according to the NCBI taxonomy.
