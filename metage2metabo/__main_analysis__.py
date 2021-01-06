@@ -149,6 +149,12 @@ def main():
 		help="OOG jar file for powergraph svg creation using Power Graph Command Line Tool",
 		required=False,
 		type=str)
+    parent_parser_level = argparse.ArgumentParser(add_help=False)
+    parent_parser_level.add_argument(
+		"--level",
+		help="Taxonomy level, must be: phylum, class, order, family, genus or species. By default, it is phylum.",
+		required=False,
+		type=str)
 
     # subparsers
     subparsers = parser.add_subparsers(
@@ -168,7 +174,7 @@ def main():
         "stats",
         help="statistics on key species",
         parents=[
-            parent_parser_j, parent_parser_o, parent_parser_taxon, parent_parser_q
+            parent_parser_j, parent_parser_o, parent_parser_taxon, parent_parser_q, parent_parser_level
         ],
         description=
         "Compute statistics on key species in the community"
@@ -177,14 +183,16 @@ def main():
         "graph",
         help="graph creation with enumeration solution",
         parents=[
-            parent_parser_j, parent_parser_o, parent_parser_t, parent_parser_taxon, parent_parser_q
+            parent_parser_j, parent_parser_o, parent_parser_t, parent_parser_taxon, parent_parser_q,
+            parent_parser_level
         ],
         description="Create the solution graph using the JSON from miscoto enumeration")
     powergraph_parser = subparsers.add_parser(
         "powergraph",
         help="powergraph creation and visualization",
         parents=[
-            parent_parser_m2m_analysis_input, parent_parser_jar, parent_parser_q, parent_parser_taxon
+            parent_parser_m2m_analysis_input, parent_parser_jar, parent_parser_q, parent_parser_taxon,
+            parent_parser_level
         ],
         description=
         "Compress the GMl graph of solution and create a powergraph (bbl), a website format of the powergraph and a svg of the graph (if you use the --oog option)"
@@ -194,7 +202,7 @@ def main():
         help="whole workflow",
         parents=[
             parent_parser_s, parent_parser_n, parent_parser_t, parent_parser_m, parent_parser_o, parent_parser_jar,
-            parent_parser_taxon, parent_parser_q
+            parent_parser_taxon, parent_parser_q, parent_parser_level
         ],
         description=
         "Run the whole workflow: miscoto enumeration, statistics on key species, graph on solution and powergraph creation"
@@ -248,18 +256,23 @@ def main():
             new_arg_modelhost = None
 
 
+    if args.level:
+        if args.level not in ['phylum', 'class', 'order', 'family', 'genus', 'species']:
+            logger.critical("Error with --level arugment, it must be one among: phylum, class, order, family, genus or species")
+            sys.exit(1)
+
     # deal with given subcommand
     if args.cmd == "workflow":
         main_analysis_workflow(network_dir, args.targets, args.seeds, args.out, args.taxon,
-                                args.oog, new_arg_modelhost)
+                                args.oog, new_arg_modelhost, args.level)
     elif args.cmd == "enum":
         main_enumeration(network_dir, args.targets, args.seeds, args.out, new_arg_modelhost)
     elif args.cmd == "stats":
-        main_stat(args.json, args.out, args.taxon)
+        main_stat(args.json, args.out, args.taxon, args.level)
     elif args.cmd == "graph":
-        main_graph(args.json, args.targets, args.out, args.taxon)
+        main_graph(args.json, args.targets, args.out, args.taxon, args.level)
     elif args.cmd == "powergraph":
-        main_powergraph(args.input, args.oog, args.taxon)
+        main_powergraph(args.input, args.oog, args.taxon, args.level)
 
     logger.info("--- Total runtime %.2f seconds ---" % (time.time() - start_time))
 
