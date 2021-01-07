@@ -161,6 +161,8 @@ def enumeration_analysis(sbml_folder, target_folder_file, seed_file, output_dir,
         logger.info('######### Enumeration of solution for: '+ target_path + ' #########')
         target_pathname = target_paths[target_path]
         output_json = os.path.join(output_jsons, target_path + '.json')
+        if os.path.exists(output_json):
+            logger.info('######### Enumeration has already been done for '+ target_path + ', it will not be launched again. #########')
         miscoto_json = enumeration(sbml_folder, target_pathname, seed_file, output_json, host_file)
         miscoto_jsons[target_path] = miscoto_json
 
@@ -381,7 +383,12 @@ def powergraph_analysis(m2m_analysis_folder, oog_jar=None, taxon_file=None, taxo
                 shutil.rmtree(html_target +'_taxon')
             shutil.copytree(html_target, html_target +'_taxon')
             update_js_taxonomy(html_target +'_taxon', phylum_colors)
+            output_html_merged = os.path.join(html_output, gml_path + '_powergraph_taxon.html')
+            merge_html_css_js(html_target +'_taxon', output_html_merged)
+
         update_js(html_target, essentials, alternatives)
+        output_html_merged = os.path.join(html_output, gml_path + '_powergraph.html')
+        merge_html_css_js(html_target, output_html_merged)
 
         if oog_jar:
             bbl_to_svg(oog_jar, bbl_output, svg_path)
@@ -912,3 +919,50 @@ def update_svg_taxonomy(svg_file, phylum_colors):
 
     with open(svg_file, 'w') as input_js:
         input_js.write(''.join(new_svg))
+
+
+def merge_html_css_js(html_output, merged_html_path):
+    index_html = os.path.join(html_output, 'index.html')
+    style_css = os.path.join(html_output, 'style.css')
+    js_folder = os.path.join(html_output, 'js')
+    graph_js = os.path.join(js_folder, 'graph.js')
+    cytoscape_min_js = os.path.join(js_folder, 'cytoscape.min.js')
+    cytoscape_cose_bilkent_js = os.path.join(js_folder, 'cytoscape-cose-bilkent.js')
+
+    output_html = os.path.join(merged_html_path)
+
+    with open(style_css, 'r') as input_css:
+        css_str =  input_css.read()
+
+    with open(graph_js, 'r') as input_graph_js:
+        graph_js_str =  input_graph_js.read()
+
+    with open(cytoscape_min_js, 'r') as input_cytoscape_min_js:
+        cytoscape_min_js_str =  input_cytoscape_min_js.read()
+
+    with open(cytoscape_cose_bilkent_js, 'r') as input_cytoscape_cose_bilkent_js:
+        cytoscape_cose_bilkent_js_str =  input_cytoscape_cose_bilkent_js.read()
+
+    new_html_str = ''
+    line_before = ''
+    with open(index_html, 'r') as input_html_file:
+        for line in input_html_file:
+            if '<head>' in line_before:
+                new_html_str += '        <style>'
+                new_html_str += css_str
+                new_html_str += '        </style>'
+            if 'meta name="viewport"' in line_before:
+                new_html_str += '    <script>'
+                new_html_str += cytoscape_min_js_str
+                new_html_str += cytoscape_cose_bilkent_js_str
+                new_html_str += '    </script>'
+            if 'div id="cy"' in line_before:
+                new_html_str += '    <script>'
+                new_html_str += graph_js_str
+                new_html_str += '    </script>'
+            if 'script' not in line and 'link' not in line:
+                new_html_str +=  line
+            line_before = line
+
+    with open(output_html, 'w') as output_hml_file:
+        output_hml_file.write(new_html_str)
