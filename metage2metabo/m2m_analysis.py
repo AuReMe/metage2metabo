@@ -282,7 +282,7 @@ def powergraph_analysis(m2m_analysis_folder, oog_jar=None, taxon_file=None, taxo
         logger.critical("Impossible to access/create output directory " + html_output)
         sys.exit(1)
 
-    es_as_for_tagets = find_essential_alternatives(m2m_analysis_folder, taxon_file)
+    es_as_for_targets = find_essential_alternatives(m2m_analysis_folder, taxon_file)
 
     # 26 colours from Alphabet project (minus white):
     # https://en.wikipedia.org/wiki/Help:Distinguishable_colors
@@ -372,8 +372,8 @@ def powergraph_analysis(m2m_analysis_folder, oog_jar=None, taxon_file=None, taxo
         compression(gml_input, bbl_output)
         logger.info('######### PowerGraph visualization: ' + gml_path + ' #########')
 
-        essentials = es_as_for_tagets[gml_path]['essential_symbionts']
-        alternatives = es_as_for_tagets[gml_path]['alternative_symbionts']
+        essentials = es_as_for_targets[gml_path]['essential_symbionts']
+        alternatives = es_as_for_targets[gml_path]['alternative_symbionts']
 
         bbl_to_html(bbl_output, html_target)
         if taxon_file:
@@ -439,12 +439,15 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_
                         phylum = ranks[taxonomy_index]
                     else:
                         phylum = "no_information"
+
+                    phylum = phylum.replace(' ', '_').replace('.', '')
                     if phylum not in phylum_count:
                         phylum_count[phylum] = 1
                     elif phylum == "no_information":
                         phylum_count[phylum] = ""
                     else:
                         phylum_count[phylum] += 1
+
                     row = ([line[0], line[1]] + [phylum + '__' + str(phylum_count[phylum])] + ranks)
                     csvwriter.writerow(row)
 
@@ -474,7 +477,7 @@ def detect_phylum_species(phylum_named_species, all_phylums):
 
     for phylum in all_phylums:
         if phylum not in phylum_species:
-            phylum_species[taxonomy] = []
+            phylum_species[phylum] = []
 
     return phylum_species
 
@@ -504,9 +507,13 @@ def detect_key_species(json_elements, all_phylums, phylum_named_species=None):
     if phylum_named_species:
         key_species = detect_phylum_species(unions, all_phylums)
         essential_symbionts = detect_phylum_species(intersections, all_phylums)
+
         alternative_symbionts = {}
         for phylum in key_species:
-            alternative_symbionts[phylum] = list(set(key_species[phylum]) - set(essential_symbionts[phylum]))
+            if phylum in essential_symbionts:
+                alternative_symbionts[phylum] = list(set(key_species[phylum]) - set(essential_symbionts[phylum]))
+            else:
+                alternative_symbionts[phylum] = list(set(key_species[phylum]))
         for phylum in all_phylums:
             if phylum not in alternative_symbionts:
                 alternative_symbionts[phylum] = []
@@ -546,8 +553,14 @@ def create_stat_species(target_category, json_elements, key_stats_writer, key_su
     if all_phylums:
         for phylum in sorted(all_phylums):
             key_sup_writer.writerow([target_category, "key_stone_species", phylum] + key_stone_species[phylum])
-            key_sup_writer.writerow([target_category, "essential_symbionts", phylum] + essential_symbionts[phylum])
-            key_sup_writer.writerow([target_category, "alternative_symbionts", phylum] + alternative_symbionts[phylum])
+            if phylum in essential_symbionts:
+                key_sup_writer.writerow([target_category, "essential_symbionts", phylum] + essential_symbionts[phylum])
+            else:
+                key_sup_writer.writerow([target_category, "essential_symbionts", phylum])
+            if phylum in alternative_symbionts:
+                key_sup_writer.writerow([target_category, "alternative_symbionts", phylum] + alternative_symbionts[phylum])
+            else:
+                key_sup_writer.writerow([target_category, "alternative_symbionts", phylum])
     else:
         key_sup_writer.writerow([target_category, "key_stone_species", "data"] + key_stone_species["data"])
         key_sup_writer.writerow([target_category, "essential_symbionts", "data"] + essential_symbionts["data"])
@@ -864,7 +877,7 @@ def update_svg(svg_file, essentials, alternatives):
     with open(svg_file, 'r') as input_js:
         for line in input_js:
             if '<text' in line:
-                species_id = line.split('>')[1].split('<')[0].split('__')[0]
+                species_id = line.split('>')[1].split('<')[0]
                 if species_id in essentials:
                     line = line.replace('style="stroke:none;"', 'style="stroke:none;fill:#D41159"')
                     line_before = line_before.replace('style="stroke:none;"', 'style="stroke:none;fill:#D41159"')
@@ -880,6 +893,7 @@ def update_svg(svg_file, essentials, alternatives):
 
     with open(svg_file, 'w') as input_js:
         input_js.write(''.join(new_svg))
+
 
 def update_svg_taxonomy(svg_file, phylum_colors):
     new_svg = []
