@@ -13,19 +13,23 @@ logger = logging.getLogger(__name__)
 
 
 def get_compounds(sbml_file):
-    """Get target from sbml
+    """Get compound from sbml
 
     Args:
         sbml_file (str): SBML file
 
     Returns:
-        list: target
+        list: compound
     """
     reader = SBMLReader()
     document = reader.readSBML(sbml_file)
     model = document.getModel()
-    targets = [target.id for target in model.getListOfSpecies()]
-    return targets
+    if model is None:
+        logger.critical('SBML file "' + sbml_file + '" not well formatted. Is this file a SBML? Does it contains <model></model> tags?')
+        sys.exit(1)
+    compounds = [compound.id for compound in model.getListOfSpecies()]
+    return compounds
+
 
 def compare_seeds_and_targets(seedfile, targetfile):
     """Returns the intersection of the seeds and the targets
