@@ -188,20 +188,19 @@ def stat_analysis(json_file_folder, output_dir, taxon_file=None, taxonomy_level=
     json_paths = file_or_folder(json_file_folder)
 
     if taxon_file:
-        c
         tree_output_file = os.path.join(output_dir, 'taxon_tree.txt')
-        extract_taxa(taxon_file, phylum_output_file, tree_output_file, taxonomy_level)
-        phylum_species, all_phylums = get_phylum(phylum_output_file)
+        extract_taxa(taxon_file, taxonomy_output_file, tree_output_file, taxonomy_level)
+        taxon_species, all_taxons = get_taxonomy(taxonomy_output_file)
     else:
-        phylum_species = None
-        all_phylums = None
+        taxon_species = None
+        all_taxons = None
 
-    with open(key_species_stats_output, "w") as key_stats_file, open(
-        key_species_supdata_output, "w"
-    ) as key_sup_file, open(miscoto_stat_output, "w") as stats_output:
+    with open(key_species_stats_output, "w") as key_stats_file, \
+            open(key_species_supdata_output, "w") as key_sup_file, \
+            open(miscoto_stat_output, "w") as stats_output:
         key_stats_writer = csv.writer(key_stats_file, delimiter="\t")
-        if all_phylums:
-            key_stats_writer.writerow(["target_categories", "key_group", *sorted(all_phylums), "Sum"])
+        if all_taxons:
+            key_stats_writer.writerow(["target_categories", "key_group", *sorted(all_taxons), "Sum"])
         else:
             key_stats_writer.writerow(["target_categories", "key_group", "data", "Sum"])
         key_sup_writer = csv.writer(key_sup_file, delimiter="\t")
@@ -210,7 +209,7 @@ def stat_analysis(json_file_folder, output_dir, taxon_file=None, taxonomy_level=
         for json_path in json_paths:
             with open(json_paths[json_path]) as json_data:
                 json_elements = json.load(json_data)
-            create_stat_species(json_path, json_elements, key_stats_writer, key_sup_writer, phylum_species, all_phylums)
+            create_stat_species(json_path, json_elements, key_stats_writer, key_sup_writer, taxon_species, all_taxons)
             statswriter.writerow([json_path, str(len(json_elements["newly_prod"]) + len(json_elements["still_unprod"])),
 									str(len(json_elements["bacteria"])), str(len(json_elements["union_bacteria"])),
                     				str(len(json_elements["inter_bacteria"])), str(len(json_elements["enum_bacteria"]))])
@@ -239,14 +238,13 @@ def graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file=
     gml_output = os.path.join(output_dir, 'gml')
 
     if taxon_file:
-        phylum_output_file = os.path.join(output_dir, 'taxon_phylum.tsv')
+        taxonomy_output_file = os.path.join(output_dir, 'taxonomy_species.tsv')
         tree_output_file = os.path.join(output_dir, 'taxon_tree.txt')
-        if not os.path.exists(phylum_output_file):
-            extract_taxa(taxon_file, phylum_output_file, tree_output_file, taxonomy_level)
+        extract_taxa(taxon_file, taxonomy_output_file, tree_output_file, taxonomy_level)
     else:
-        phylum_output_file = None
+        taxonomy_output_file = None
 
-    create_gml(json_paths, target_paths, output_dir, phylum_output_file)
+    create_gml(json_paths, target_paths, output_dir, taxonomy_output_file)
 
     logger.info(
         "--- Graph runtime %.2f seconds ---\n" % (time.time() - starttime))
@@ -347,18 +345,17 @@ def powergraph_analysis(m2m_analysis_folder, oog_jar=None, taxon_file=None, taxo
     "#92896B"]
 
     if taxon_file:
-        phylum_file = os.path.join(m2m_analysis_folder, 'taxon_phylum.tsv')
-        phylum_species, all_phylums = get_phylum(phylum_file)
-        phylum_colors = {}
+        taxonomy_output_file = os.path.join(m2m_analysis_folder, 'taxonomy_species.tsv')
+        taxon_species, all_taxons = get_taxon(taxonomy_output_file)
+        taxon_colors = {}
 
-        if len(all_phylums) <= 26:
+        if len(all_taxons) <= 26:
             used_colors = alphabet_project_distinct_hex_colors
         else:
             used_colors = hex_colors
 
-        for index, phylum in enumerate(all_phylums):
-            phylum_colors[phylum] = used_colors[index]
-
+        for index, taxon in enumerate(all_taxons):
+            taxon_colors[taxon] = used_colors[index]
 
     for gml_path in gml_paths:
         bbl_output = os.path.join(bbl_path, gml_path + '.bbl')
@@ -382,7 +379,7 @@ def powergraph_analysis(m2m_analysis_folder, oog_jar=None, taxon_file=None, taxo
             if os.path.exists(html_target +'_taxon'):
                 shutil.rmtree(html_target +'_taxon')
             shutil.copytree(html_target, html_target +'_taxon')
-            update_js_taxonomy(html_target +'_taxon', phylum_colors)
+            update_js_taxonomy(html_target +'_taxon', taxon_colors)
             output_html_merged = os.path.join(html_output, gml_path + '_powergraph_taxon.html')
             merge_html_css_js(html_target +'_taxon', output_html_merged)
 
@@ -395,19 +392,19 @@ def powergraph_analysis(m2m_analysis_folder, oog_jar=None, taxon_file=None, taxo
             if taxon_file:
                 taxonomy_svg_file = os.path.join(svg_path, gml_path + '_taxon.bbl.svg')
                 shutil.copyfile(svg_file, taxonomy_svg_file)
-                update_svg_taxonomy(taxonomy_svg_file, phylum_colors)
+                update_svg_taxonomy(taxonomy_svg_file, taxon_colors)
             update_svg(svg_file, essentials, alternatives)
 
     logger.info(
         "--- Powergraph runtime %.2f seconds ---\n" % (time.time() - starttime))
 
 
-def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_level):
+def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_level="phylum"):
     """From NCBI taxon ID, extract taxonomy rank and create a tree file
 
     Args:
         mpwt_taxon_file (str): mpwt taxon file for species in sbml folder
-        taxon_output_file (str): path to phylum output file
+        taxon_output_file (str): path to taxonomy output file
         tree_output_file (str): path to tree output file
 
     """
@@ -428,10 +425,10 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_
 
     taxon_ids = []
 
-    phylum_count = {}
-    with open(taxon_output_file, "w") as phylum_file:
-        csvwriter = csv.writer(phylum_file, delimiter="\t")
-        csvwriter.writerow(["species", "taxid", "phylum_number", "phylum", "class", "order", "family", "genus", "species"])
+    taxon_count = {}
+    with open(taxon_output_file, "w") as taxonomy_file:
+        csvwriter = csv.writer(taxonomy_file, delimiter="\t")
+        csvwriter.writerow(["organism_id", "taxid", "taxon_number", "phylum", "class", "order", "family", "genus", "species"])
         with open(mpwt_taxon_file, "r") as taxon_file:
             csvfile = csv.reader(taxon_file, delimiter="\t")
             for line in csvfile:
@@ -443,19 +440,19 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_
                     ranks2lineage = dict((rank, names[taxid]) for (taxid, rank) in lineage2ranks.items())
                     ranks = [ranks2lineage.get(rank, "no_information") for rank in ["phylum", "class", "order", "family", "genus", "species"]]
                     if ranks[taxonomy_index] != "no_information":
-                        phylum = ranks[taxonomy_index]
+                        taxon = ranks[taxonomy_index]
                     else:
-                        phylum = "no_information"
+                        taxon = "no_information"
 
-                    phylum = phylum.replace(' ', '_').replace('.', '')
-                    if phylum not in phylum_count:
-                        phylum_count[phylum] = 1
-                    elif phylum == "no_information":
-                        phylum_count[phylum] = ""
+                    taxon = taxon.replace(' ', '_').replace('.', '')
+                    if taxon not in taxon_count:
+                        taxon_count[taxon] = 1
+                    elif taxon == "no_information":
+                        taxon_count[taxon] = ""
                     else:
-                        phylum_count[phylum] += 1
+                        taxon_count[taxon] += 1
 
-                    row = ([line[0], line[1]] + [phylum + '__' + str(phylum_count[phylum])] + ranks)
+                    row = ([line[0], line[1]] + [taxon + '__' + str(taxon_count[taxon])] + ranks)
                     csvwriter.writerow(row)
 
     tree = ncbi.get_topology(taxon_ids)
@@ -464,66 +461,66 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_
         tree_file.write(tree.get_ascii(attributes=["sci_name", "rank"]))
 
 
-def detect_phylum_species(phylum_named_species, all_phylums):
-    """From a list of species named after their phylum, return a dictionary of {Phylum: [species_1, species_2]}
+def detect_taxon_species(taxon_named_species, all_taxons):
+    """From a list of species named after their taxon, return a dictionary of {taxon: [species_1, species_2]}
 
     Args:
-        phylum_named_species (dict): {species_ID: species_named_after_phylum}
-        all_phylums (list): all phylum in the dataset
+        taxon_named_species (dict): {species_ID: species_named_after_taxon}
+        all_taxons (list): all taxon in the dataset
 
     Returns:
-        dict: {Phylum: [species_1, species_2]}
+        dict: {taxon: [species_1, species_2]}
     """
-    phylum_species = {}
-    for phylum in phylum_named_species:
-        taxonomy = phylum.split('__')[0]
-        if taxonomy not in phylum_species:
-            phylum_species[taxonomy] = [phylum_named_species[phylum]]
+    taxon_species = {}
+    for species_id in taxon_named_species:
+        taxon = species_id.split('__')[0]
+        if taxon not in taxon_species:
+            taxon_species[taxon] = [taxon_named_species[species_id]]
         else:
-            phylum_species[taxonomy].append(phylum_named_species[phylum])
+            taxon_species[taxon].append(taxon_named_species[species_id])
 
-    for phylum in all_phylums:
-        if phylum not in phylum_species:
-            phylum_species[phylum] = []
+    for taxon in all_taxons:
+        if taxon not in taxon_species:
+            taxon_species[taxon] = []
 
-    return phylum_species
+    return taxon_species
 
 
-def detect_key_species(json_elements, all_phylums, phylum_named_species=None):
+def detect_key_species(json_elements, all_taxons, taxon_named_species=None):
     """Detect key species (essential and alternative symbionts) from the miscoto json
 
     Args:
         json_elements (dict): miscoto results in a json dictionary
-        all_phylums (list): all phylum in the dataset
-        phylum_named_species (dict): {species_ID: species_named_after_phylum}
+        all_taxons (list): all taxon in the dataset
+        taxon_named_species (dict): {species_ID: species_named_after_taxon}
 
     Returns:
-        key_species (dict): {Phylum: [species_1, species_2]}
-        essential_symbionts (dict): {Phylum: [species_1, species_2]}
-        alternative_symbionts (dict): {Phylum: [species_1, species_2]}
+        key_species (dict): {taxon: [species_1, species_2]}
+        essential_symbionts (dict): {taxon: [species_1, species_2]}
+        alternative_symbionts (dict): {taxon: [species_1, species_2]}
     """
-    if phylum_named_species:
-        unions = {phylum_named_species[species_union]: species_union
+    if taxon_named_species:
+        unions = {taxon_named_species[species_union]: species_union
             		for species_union in json_elements["union_bacteria"]}
-        intersections = {phylum_named_species[species_intersection]: species_intersection
+        intersections = {taxon_named_species[species_intersection]: species_intersection
             		for species_intersection in json_elements["inter_bacteria"]}
     else:
         unions = json_elements["union_bacteria"]
         intersections = json_elements["inter_bacteria"]
 
-    if phylum_named_species:
-        key_species = detect_phylum_species(unions, all_phylums)
-        essential_symbionts = detect_phylum_species(intersections, all_phylums)
+    if taxon_named_species:
+        key_species = detect_taxon_species(unions, all_taxons)
+        essential_symbionts = detect_taxon_species(intersections, all_taxons)
 
         alternative_symbionts = {}
-        for phylum in key_species:
-            if phylum in essential_symbionts:
-                alternative_symbionts[phylum] = list(set(key_species[phylum]) - set(essential_symbionts[phylum]))
+        for taxon in key_species:
+            if taxon in essential_symbionts:
+                alternative_symbionts[taxon] = list(set(key_species[taxon]) - set(essential_symbionts[taxon]))
             else:
-                alternative_symbionts[phylum] = list(set(key_species[phylum]))
-        for phylum in all_phylums:
-            if phylum not in alternative_symbionts:
-                alternative_symbionts[phylum] = []
+                alternative_symbionts[taxon] = list(set(key_species[taxon]))
+        for taxon in all_taxons:
+            if taxon not in alternative_symbionts:
+                alternative_symbionts[taxon] = []
     else:
         key_species = {}
         essential_symbionts = {}
@@ -535,63 +532,63 @@ def detect_key_species(json_elements, all_phylums, phylum_named_species=None):
     return key_species, essential_symbionts, alternative_symbionts
 
 
-def create_stat_species(target_category, json_elements, key_stats_writer, key_sup_writer, phylum_named_species=None, all_phylums=None):
+def create_stat_species(target_category, json_elements, key_stats_writer, key_sup_writer, taxon_named_species=None, all_taxons=None):
     """Write stats on key species (essential and alternative symbionts) from the miscoto json
 
     Args:
         target_category (str): name of a target file (without extension)
         json_elements (dict): miscoto results in a json dictionary
-        key_stats_writer (csv.writer): writer for stats of each group (key species) in each phylum
-        key_sup_writer (csv.writer): writer for all key species in each phylum
-        phylum_named_species (dict): {species_ID: species_named_after_phylum}
-        all_phylums (list): all phylum in the dataset
+        key_stats_writer (csv.writer): writer for stats of each group (key species) in each taxon
+        key_sup_writer (csv.writer): writer for all key species in each taxon
+        taxon_named_species (dict): {species_ID: species_named_after_taxon}
+        all_taxons (list): all taxon in the dataset
     """
-    key_stone_species, essential_symbionts, alternative_symbionts = detect_key_species(json_elements, all_phylums, phylum_named_species)
+    key_stone_species, essential_symbionts, alternative_symbionts = detect_key_species(json_elements, all_taxons, taxon_named_species)
 
-    key_stone_counts = [len(key_stone_species[phylum]) for phylum in sorted(list(key_stone_species.keys()))]
+    key_stone_counts = [len(key_stone_species[taxon]) for taxon in sorted(list(key_stone_species.keys()))]
     key_stats_writer.writerow([target_category, "key_species"] + key_stone_counts + [sum(key_stone_counts)])
 
-    essential_symbiont_counts = [len(essential_symbionts[phylum]) for phylum in sorted(list(essential_symbionts.keys()))]
+    essential_symbiont_counts = [len(essential_symbionts[taxon]) for taxon in sorted(list(essential_symbionts.keys()))]
     key_stats_writer.writerow([target_category, "essential_symbionts"] + essential_symbiont_counts + [sum(essential_symbiont_counts)])
 
-    alternative_symbiont_counts = [len(alternative_symbionts[phylum]) for phylum in sorted(list(alternative_symbionts.keys()))]
+    alternative_symbiont_counts = [len(alternative_symbionts[taxon]) for taxon in sorted(list(alternative_symbionts.keys()))]
     key_stats_writer.writerow([target_category, "alternative_symbionts"] + alternative_symbiont_counts + [sum(alternative_symbiont_counts)])
 
-    if all_phylums:
-        for phylum in sorted(all_phylums):
-            key_sup_writer.writerow([target_category, "key_stone_species", phylum] + key_stone_species[phylum])
-            if phylum in essential_symbionts:
-                key_sup_writer.writerow([target_category, "essential_symbionts", phylum] + essential_symbionts[phylum])
+    if all_taxons:
+        for taxon in sorted(all_taxons):
+            key_sup_writer.writerow([target_category, "key_stone_species", taxon] + key_stone_species[taxon])
+            if taxon in essential_symbionts:
+                key_sup_writer.writerow([target_category, "essential_symbionts", taxon] + essential_symbionts[taxon])
             else:
-                key_sup_writer.writerow([target_category, "essential_symbionts", phylum])
-            if phylum in alternative_symbionts:
-                key_sup_writer.writerow([target_category, "alternative_symbionts", phylum] + alternative_symbionts[phylum])
+                key_sup_writer.writerow([target_category, "essential_symbionts", taxon])
+            if taxon in alternative_symbionts:
+                key_sup_writer.writerow([target_category, "alternative_symbionts", taxon] + alternative_symbionts[taxon])
             else:
-                key_sup_writer.writerow([target_category, "alternative_symbionts", phylum])
+                key_sup_writer.writerow([target_category, "alternative_symbionts", taxon])
     else:
         key_sup_writer.writerow([target_category, "key_stone_species", "data"] + key_stone_species["data"])
         key_sup_writer.writerow([target_category, "essential_symbionts", "data"] + essential_symbionts["data"])
         key_sup_writer.writerow([target_category, "alternative_symbionts", "data"] + alternative_symbionts["data"])
 
 
-def get_phylum(phylum_file):
-    """From the phylum file (created by extract_taxa) create a dictionary and a list linking phylum and species
+def get_taxon(taxonomy_file_path):
+    """From the taxonomy file (created by extract_taxa) create a dictionary and a list linking taxon and species
 
     Args:
-        phylum_file (str): path to the phylum_file
+        taxonomy_file (str): path to the taxonomy_file
     """
-    phylum_named_species = {}
-    all_phylums = []
-    with open(phylum_file, "r") as phylum_file:
-        phylum_reader = csv.reader(phylum_file, delimiter="\t", quotechar="|")
-        for row in phylum_reader:
+    taxon_named_species = {}
+    all_taxons = []
+    with open(taxonomy_file_path, "r") as taxonomy_file:
+        taxonomy_reader = csv.reader(taxonomy_file, delimiter="\t", quotechar="|")
+        for row in taxonomy_reader:
             taxonomy = row[2].split('__')[0]
-            phylum_named_species[row[0]] = row[2]
-            if taxonomy not in all_phylums:
-                if "no_information" not in row[2] and "phylum_number" not in row[2]:
-                    all_phylums.append(taxonomy)
+            taxon_named_species[row[0]] = row[2]
+            if taxonomy not in all_taxons:
+                if "no_information" not in row[2] and "taxon_number" not in row[2]:
+                    all_taxons.append(taxonomy)
 
-    return phylum_named_species, all_phylums
+    return taxon_named_species, all_taxons
 
 
 def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
@@ -624,15 +621,15 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
         target_categories[target] = sbml_management.get_compounds(target_paths[target])
 
     if taxon_file:
-        phylum_named_species, all_phylums = get_phylum(taxon_file)
+        taxon_named_species, all_taxons = get_taxon(taxon_file)
     else:
-        phylum_named_species = None
-        all_phylums = None
+        taxon_named_species = None
+        all_taxons = None
 
     with open(key_species_stats_output, 'w') as key_stats_file, open(key_species_supdata_output, 'w') as key_sup_file, open(miscoto_stat_output, 'w') as stats_output:
         key_stats_writer = csv.writer(key_stats_file, delimiter='\t')
-        if all_phylums:
-            key_stats_writer.writerow(['target_categories', 'key_group', *sorted(all_phylums), 'Sum'])
+        if all_taxons:
+            key_stats_writer.writerow(['target_categories', 'key_group', *sorted(all_taxons), 'Sum'])
         else:
             key_stats_writer.writerow(['target_categories', 'key_group', 'data', 'Sum'])
         key_sup_writer = csv.writer(key_sup_file, delimiter='\t')
@@ -640,7 +637,7 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
             target_output_gml_path = os.path.join(gml_output, target_category + '.gml')
             with open(json_paths[target_category]) as json_data:
                 dicti = json.load(json_data)
-            create_stat_species(target_category, dicti, key_stats_writer, key_sup_writer, phylum_named_species, all_phylums)
+            create_stat_species(target_category, dicti, key_stats_writer, key_sup_writer, taxon_named_species, all_taxons)
             G = nx.Graph()
             added_node = []
             species_weight = {}
@@ -657,13 +654,13 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
                 ):
                     if species_1 not in added_node:
                         if taxon_file:
-                            G.add_node(phylum_named_species[species_1])
+                            G.add_node(taxon_named_species[species_1])
                         else:
                             G.add_node(species_1)
                         added_node.append(species_1)
                     if species_2 not in added_node:
                         if taxon_file:
-                            G.add_node(phylum_named_species[species_2])
+                            G.add_node(taxon_named_species[species_2])
                         else:
                             G.add_node(species_2)
                         added_node.append(species_2)
@@ -673,7 +670,7 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
                     else:
                         species_weight[combination_species] += 1
                     if taxon_file:
-                        G.add_edge(phylum_named_species[species_1], phylum_named_species[species_2], weight=species_weight[combination_species])
+                        G.add_edge(taxon_named_species[species_1], taxon_named_species[species_2], weight=species_weight[combination_species])
                     else:
                         G.add_edge(species_1, species_2, weight=species_weight[combination_species])
 
@@ -800,12 +797,12 @@ def find_essential_alternatives(output_folder, taxon_file):
     es_as_for_tagets[target]['alternative_symbionts'] = list(set(es_as_for_tagets[target]['alternative_symbionts']))
 
     if taxon_file:
-        phylum_file = os.path.join(output_folder, 'taxon_phylum.tsv')
-        phylum_species, all_phylums = get_phylum(phylum_file)
+        taxonomy_file = os.path.join(output_folder, 'taxonomy_species.tsv')
+        taxon_named_species, all_taxons = get_taxon(taxonomy_file)
 
         for target in es_as_for_tagets:
-            es_as_for_tagets[target]['essential_symbionts'] = [phylum_species[species] for species in es_as_for_tagets[target]['essential_symbionts']]
-            es_as_for_tagets[target]['alternative_symbionts'] = [phylum_species[species] for species in es_as_for_tagets[target]['alternative_symbionts']]
+            es_as_for_tagets[target]['essential_symbionts'] = [taxon_named_species[species] for species in es_as_for_tagets[target]['essential_symbionts']]
+            es_as_for_tagets[target]['alternative_symbionts'] = [taxon_named_species[species] for species in es_as_for_tagets[target]['alternative_symbionts']]
 
     return es_as_for_tagets
 
@@ -847,15 +844,15 @@ def update_js(html_output, essentials, alternatives):
         input_js.write(new_graph_sj)
 
 
-def update_js_taxonomy(html_output, phylum_colors):
+def update_js_taxonomy(html_output, taxon_colors):
     selector_color = ''
-    for phylum in phylum_colors:
-        phylum_color = phylum_colors[phylum]
+    for taxon in taxon_colors:
+        taxon_color = taxon_colors[taxon]
         selector_color += '''
         {
-            selector: 'node[type="'''+phylum+'''"]',
+            selector: 'node[type="'''+taxon+'''"]',
             css: {
-                'background-color': "'''+phylum_color+'''",
+                'background-color': "'''+taxon_color+'''",
             }
         },
         '''
@@ -866,9 +863,9 @@ def update_js_taxonomy(html_output, phylum_colors):
     with open(graph_js, 'r') as input_js:
         for line in input_js:
             if "data: { 'id'" in line:
-                species_phylum_id = line.split("'id':")[1].split(',')[0].strip("'| ").split('__')[0]
-                if species_phylum_id in phylum_colors:
-                    line = line.replace(" } },", ", 'type': '"+species_phylum_id+"' } },")
+                species_taxon_id = line.split("'id':")[1].split(',')[0].strip("'| ").split('__')[0]
+                if species_taxon_id in taxon_colors:
+                    line = line.replace(" } },", ", 'type': '"+species_taxon_id+"' } },")
 
             new_graph_sj += line
             if 'style: [' in line:
@@ -902,17 +899,17 @@ def update_svg(svg_file, essentials, alternatives):
         input_js.write(''.join(new_svg))
 
 
-def update_svg_taxonomy(svg_file, phylum_colors):
+def update_svg_taxonomy(svg_file, taxon_colors):
     new_svg = []
     line_before = ''
     with open(svg_file, 'r') as input_js:
         for line in input_js:
             if '<text' in line:
-                species_phylum_id = line.split('>')[1].split('<')[0].split('__')[0]
-                if species_phylum_id in phylum_colors:
-                    phylum_color = phylum_colors[species_phylum_id]
-                    line = line.replace('style="stroke:none;"', 'style="stroke:none;fill:{0};"'.format(phylum_color))
-                    line_before = line_before.replace('style="stroke:none;"', 'style="stroke:none;fill:{0};"'.format(phylum_color))
+                species_taxon_id = line.split('>')[1].split('<')[0].split('__')[0]
+                if species_taxon_id in taxon_colors:
+                    taxon_color = taxon_colors[species_taxon_id]
+                    line = line.replace('style="stroke:none;"', 'style="stroke:none;fill:{0};"'.format(taxon_color))
+                    line_before = line_before.replace('style="stroke:none;"', 'style="stroke:none;fill:{0};"'.format(taxon_color))
                     new_svg[-1] = line_before
             new_svg.append(line)
             line_before = line

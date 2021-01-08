@@ -260,6 +260,8 @@ def main():
             if args.level not in ['phylum', 'class', 'order', 'family', 'genus', 'species']:
                 logger.critical("Error with --level arugment, it must be one among: phylum, class, order, family, genus or species")
                 sys.exit(1)
+        if args.level is None:
+            args.level = 'phylum'
 
     # deal with given subcommand
     if args.cmd == "workflow":
