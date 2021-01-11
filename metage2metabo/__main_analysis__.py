@@ -42,11 +42,8 @@ REQUIRES = """
 Oog jar file (http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-command-line-tool.html) for powergraph svg creation.
 """
 
-root_logger = logging.getLogger()
-root_logger.setLevel(logging.INFO)
-logging.basicConfig(
-        format='%(message)s', level=logging.INFO)  #%(name)s:%(message)s
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
 
 # Check ASP binaries.
 if not which('clingo'):
@@ -217,9 +214,9 @@ def main():
 
     # set up the logger
     if args.quiet:
-        root_logger.setLevel(logging.CRITICAL)
+        logger.setLevel(logging.CRITICAL)
     else:
-        root_logger.setLevel(logging.INFO)
+        logger.setLevel(logging.INFO)
 
     # test writing in out_directory if a subcommand is given else print version and help
     if args.cmd:
@@ -231,6 +228,21 @@ def main():
         logger.info("m2m_analysis " + VERSION + "\n" + LICENSE)
         parser.print_help()
         sys.exit()
+
+    # add logger in file
+    formatter = logging.Formatter('%(message)s')
+    log_file_path = os.path.join(args.out, f'm2m_analysis_{args.cmd}.log')
+    file_handler = logging.FileHandler(log_file_path, 'w+')
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    # set up the default console logger
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(logging.INFO)
+    console_handler.setFormatter(formatter)
+    if args.quiet:
+        console_handler.setLevel(logging.WARNING)
+    logger.addHandler(console_handler)
 
     # Check Oog.jar file
     if args.cmd in ["workflow", "powergraph"]:

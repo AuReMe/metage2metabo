@@ -831,7 +831,7 @@ def update_js(html_output, essentials, alternatives):
     with open(graph_js, 'r') as input_js:
         for line in input_js:
             if "data: { 'id'" in line:
-                species_id = line.split("'id':")[1].split(',')[0].strip("'| ")
+                species_id = line.split("'id':")[1].split(',')[0].split("'")[1]
                 if species_id in essentials:
                     line = line.replace(" } },", ", 'type': 'essential' } },")
                 if species_id in alternatives:
