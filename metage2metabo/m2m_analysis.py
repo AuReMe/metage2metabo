@@ -19,14 +19,14 @@
 
 import csv
 import json
+import logging
 import miscoto
 import networkx as nx
 import os
 import shutil
+import subprocess
 import sys
 import time
-import subprocess
-import logging
 import zipfile
 
 from bubbletools import convert
@@ -438,16 +438,16 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_
                     lineage2ranks = ncbi.get_rank(lineage)
                     names = ncbi.get_taxid_translator(lineage)
                     ranks2lineage = dict((rank, names[taxid]) for (taxid, rank) in lineage2ranks.items())
-                    ranks = [ranks2lineage.get(rank, "no_information") for rank in ["phylum", "class", "order", "family", "genus", "species"]]
-                    if ranks[taxonomy_index] != "no_information":
+                    ranks = [ranks2lineage.get(rank, "unknown") for rank in ["phylum", "class", "order", "family", "genus", "species"]]
+                    if ranks[taxonomy_index] != "unknown":
                         taxon = ranks[taxonomy_index]
                     else:
-                        taxon = "no_information"
+                        taxon = "unknown"
 
                     taxon = taxon.replace(' ', '_').replace('.', '')
                     if taxon not in taxon_count:
                         taxon_count[taxon] = 1
-                    elif taxon == "no_information":
+                    elif taxon == "unknown":
                         taxon_count[taxon] = ""
                     else:
                         taxon_count[taxon] += 1
@@ -585,7 +585,7 @@ def get_taxon(taxonomy_file_path):
             taxonomy = row[2].split('__')[0]
             taxon_named_species[row[0]] = row[2]
             if taxonomy not in all_taxons:
-                if "no_information" not in row[2] and "taxon_number" not in row[2]:
+                if "taxon_number" not in row[2]:
                     all_taxons.append(taxonomy)
 
     return taxon_named_species, all_taxons
@@ -768,7 +768,7 @@ def bbl_to_svg(oog_jar, bbl_input, svg_output):
         bbl_input (str): bbl input file
         svg_output (str): svg output file
     """
-    if not which('java'):
+    if not shutil.which('java'):
         logger.critical('java is not in the Path, m2m_analysis option --oog can not work without it.')
         sys.exit(1)
 
