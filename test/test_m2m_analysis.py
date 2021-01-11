@@ -108,5 +108,51 @@ def test_m2m_analysis_call():
     # clean
     shutil.rmtree(respath)
 
+
+def test_m2m_analysis_workflow():
+    """
+    Test m2m analysis when called in terminal.
+    """
+    # RUN THE COMMAND
+    inppath = 'metabolic_data'
+    respath = 'm2m_analysis_output'
+    draft_path = os.path.join(respath, 'toy_bact')
+    draft_tgz_path = os.path.join(inppath, 'toy_bact.tar.gz')
+    seeds_path = os.path.join(inppath, 'seeds_toy.sbml')
+    targets_path = os.path.join(inppath, 'targets_toy.sbml')
+
+    html_file_path = os.path.join(*[respath, 'html', 'targets_toy_powergraph.html'])
+
+    if not os.path.exists(respath):
+        os.makedirs(respath)
+    with tarfile.open(draft_tgz_path) as tar:
+        tar.extractall(path=respath)
+    subprocess.call([
+        'm2m_analysis', 'workflow', '-n', draft_path, '-o',
+        respath, '-t', targets_path, '-s', seeds_path,
+        '-q'])
+
+    expected_results = {'essential': ['GCA_003438055', 'GCA_003437255', 'GCA_003437375',
+                    'GCA_003437715', 'GCA_003437295', 'GCA_003437905', 'GCA_003437815',
+                    'GCA_003437595', 'GCA_003437195', 'GCA_003437055', 'GCA_003437665',
+                    'GCA_003437885'],
+                    'alternative': ['GCA_003437345', 'GCA_003437175', 'GCA_003437945',
+                    'GCA_003437325', 'GCA_003437785']}
+    output_data = {}
+    with open(html_file_path, 'r') as output_file:
+        for line in output_file:
+            if "data: { 'id'" in line:
+                species_id = line.split("'id':")[1].split(',')[0].split("'")[1]
+                if 'PWRN-' not in species_id:
+                    species_type = line.split("'type':")[1].split(',')[0].split("'")[1]
+                    if species_type not in output_data:
+                        output_data[species_type] = [species_id]
+                    else:
+                        output_data[species_type].append(species_id)
+
+    for species_type in output_data:
+        assert sorted(output_data[species_type]) == sorted(expected_results[species_type])
+
 if __name__ == "__main__":
     test_m2m_analysis_call()
+    test_m2m_analysis_workflow()

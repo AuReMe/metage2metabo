@@ -55,8 +55,9 @@ jobs:
       run: |
         pip install pytest
         cd test
-        pytest test_m2m_metacom.py
-        pytest test_m2m_mincom.py
         pytest test_m2m_addedvalue.py
         pytest test_m2m_analysis.py
         pytest test_m2m_cscope.py
+        pytest test_m2m_iscope.py
+        pytest test_m2m_metacom.py
+        pytest test_m2m_mincom.py

@@ -768,6 +768,10 @@ def bbl_to_svg(oog_jar, bbl_input, svg_output):
         bbl_input (str): bbl input file
         svg_output (str): svg output file
     """
+    if not which('java'):
+        logger.critical('java is not in the Path, m2m_analysis option --oog can not work without it.')
+        sys.exit(1)
+
     check_oog = check_oog_jar_file(oog_jar)
 
     if check_oog:
