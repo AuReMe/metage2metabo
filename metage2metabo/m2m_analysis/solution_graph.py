@@ -8,6 +8,7 @@ import time
 
 from itertools import combinations
 from metage2metabo import utils, sbml_management
+from metage2metabo.m2m_analysis.taxonomy import detect_taxon_species, get_taxon, extract_taxa
 
 logger = logging.getLogger(__name__)
 
@@ -228,6 +229,7 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
         statswriter.writerow(['categories', 'nb_target', 'size_min_sol', 'size_union', 'size_intersection', 'size_enum'])
         for miscoto_stat_output_data in miscoto_stat_output_datas:
             statswriter.writerow(miscoto_stat_output_data)
+
 
 def stat_analysis(json_file_folder, output_dir, taxon_file=None, taxonomy_level="phylum"):
     """Run the analysis part of the workflow on miscoto enumeration jsons
