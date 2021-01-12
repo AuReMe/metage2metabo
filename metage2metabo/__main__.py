@@ -81,7 +81,7 @@ def main():
     parent_parser_c.add_argument(
         "-c",
         "--cpu",
-        help="cpu number for multi-process",
+        help="cpu number for multiprocessing",
         required=False,
         type=int,
         default=1)
@@ -490,9 +490,11 @@ def main_test(outdir, cpu):
     padmet_bool=True
     host_mn=None
     targets_file=None
+    use_pwt_xml=False
     main_workflow(inp_dir, out_dir, nb_cpu,
                 clean, seeds, noorphan_bool,
-                padmet_bool, host_mn, targets_file)
+                padmet_bool, host_mn, targets_file,
+                use_pwt_xml)
 
 
 if __name__ == "__main__":
