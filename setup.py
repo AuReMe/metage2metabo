@@ -33,7 +33,8 @@ More information on usage and troubleshooting on Github: https://github.com/aure
     packages=['metage2metabo'],
     package_dir={'metage2metabo': 'metage2metabo'},
     package_data={'metage2metabo': ['workflow_data/workflow_genomes.tar.gz',
-                                    'workflow_data/seeds_workflow.sbml']},
+                                    'workflow_data/seeds_workflow.sbml',
+                                    'm2m/*.py', 'm2m_analysis/*.py']},
     entry_points={
         'console_scripts': [
             'm2m = metage2metabo.__main__:main',
