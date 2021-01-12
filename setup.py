@@ -30,11 +30,10 @@ setup(
 More information on usage and troubleshooting on Github: https://github.com/aureme/metage2metabo',
     author='AuReMe',
     author_email='gem-aureme@inria.fr',
-    packages=['metage2metabo'],
-    package_dir={'metage2metabo': 'metage2metabo'},
+    packages=['metage2metabo', 'metage2metabo.m2m', 'metage2metabo.m2m_analysis'],
+    package_dir={'metage2metabo': 'metage2metabo', 'metage2metabo.m2m': 'metage2metabo/m2m' , 'metage2metabo.m2m_analysis':'metage2metabo/m2m_analysis'},
     package_data={'metage2metabo': ['workflow_data/workflow_genomes.tar.gz',
-                                    'workflow_data/seeds_workflow.sbml',
-                                    'm2m/*.py', 'm2m_analysis/*.py']},
+                                    'workflow_data/seeds_workflow.sbml']},
     entry_points={
         'console_scripts': [
             'm2m = metage2metabo.__main__:main',
