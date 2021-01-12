@@ -1,17 +1,17 @@
-import logging
 import argparse
 import logging
 import os
 import pkg_resources
 import re
+import subprocess
 import sys
 import tarfile
 import time
 import traceback
-import subprocess
-from shutil import copyfile,which
 
-from metage2metabo.m2m_workflow import run_workflow, recon, iscope, cscope, addedvalue, mincom, instance_community, metacom_analysis
+from shutil import which
+
+from metage2metabo.m2m import run_workflow, recon, iscope, cscope, addedvalue, mincom, instance_community, metacom_analysis
 from metage2metabo import sbml_management, utils
 
 VERSION = pkg_resources.get_distribution("metage2metabo").version

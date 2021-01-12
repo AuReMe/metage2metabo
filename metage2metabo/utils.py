@@ -107,3 +107,27 @@ def check_program(program):
                 return True
 
     return False
+
+
+def file_or_folder(variable_folder_file):
+    """Check if the variable is file or a folder
+
+    Args:
+        variable_folder_file (str): path to a file or a folder
+
+    Returns:
+        dict: {name of input file: path to input file}
+    """
+    file_folder_paths = {}
+
+    if os.path.isfile(variable_folder_file):
+        filename = os.path.splitext(os.path.basename(variable_folder_file))[0]
+        file_folder_paths[filename] = variable_folder_file
+
+    # For folder, iterate through all files inside the folder.
+    elif os.path.isdir(variable_folder_file):
+        for file_from_folder in os.listdir(variable_folder_file):
+            filename = os.path.splitext(os.path.basename(file_from_folder))[0]
+            file_folder_paths[filename] = os.path.join(variable_folder_file, file_from_folder)
+
+    return file_folder_paths
