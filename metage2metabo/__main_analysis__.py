@@ -29,7 +29,7 @@ from metage2metabo import sbml_management, utils
 
 from metage2metabo.m2m_analysis.enumeration import enumeration_analysis
 from metage2metabo.m2m_analysis.graph_compression import powergraph_analysis, check_oog_jar_file
-from metage2metabo.m2m_analysis.solution_graph import graph_analysis, stat_analysis
+from metage2metabo.m2m_analysis.solution_graph import graph_analysis
 from metage2metabo.m2m_analysis.m2m_analysis_workflow import run_analysis_workflow
 
 VERSION = pkg_resources.get_distribution("metage2metabo").version
@@ -170,15 +170,6 @@ def main():
         description=
         "Run miscoto enumeration on sbml species with seeds and targets"
     )
-    stat_parser = subparsers.add_parser(
-        "stats",
-        help="statistics on key species",
-        parents=[
-            parent_parser_j, parent_parser_o, parent_parser_taxon, parent_parser_q, parent_parser_level
-        ],
-        description=
-        "Compute statistics on key species in the community"
-    )
     graph_parser = subparsers.add_parser(
         "graph",
         help="graph creation with enumeration solution",
@@ -192,7 +183,7 @@ def main():
         help="powergraph creation and visualization",
         parents=[
             parent_parser_m2m_analysis_input, parent_parser_jar, parent_parser_q, parent_parser_taxon,
-            parent_parser_level
+            parent_parser_level, parent_parser_o
         ],
         description=
         "Compress the GMl graph of solution and create a powergraph (bbl), a website format of the powergraph and a svg of the graph (if you use the --oog option)"
@@ -205,7 +196,7 @@ def main():
             parent_parser_taxon, parent_parser_q, parent_parser_level
         ],
         description=
-        "Run the whole workflow: miscoto enumeration, statistics on key species, graph on solution and powergraph creation"
+        "Run the whole workflow: miscoto enumeration, graph on solution and powergraph creation"
     )
 
     args = parser.parse_args()
@@ -270,7 +261,7 @@ def main():
         else:
             new_arg_modelhost = None
 
-    if args.cmd in ["workflow", "stats", "graph", "powergraph"]:
+    if args.cmd in ["workflow", "graph", "powergraph"]:
         if args.level:
             if args.level not in ['phylum', 'class', 'order', 'family', 'genus', 'species']:
                 logger.critical("Error with --level arugment, it must be one among: phylum, class, order, family, genus or species")
@@ -284,8 +275,6 @@ def main():
                                 args.oog, new_arg_modelhost, args.level)
     elif args.cmd == "enum":
         main_enumeration(network_dir, args.targets, args.seeds, args.out, new_arg_modelhost)
-    elif args.cmd == "stats":
-        main_stat(args.json, args.out, args.taxon, args.level)
     elif args.cmd == "graph":
         main_graph(args.json, args.targets, args.out, args.taxon, args.level)
     elif args.cmd == "powergraph":
@@ -304,12 +293,6 @@ def main_enumeration(*allargs):
     """Run enumeration command
     """
     enumeration_analysis(*allargs)
-
-
-def main_stat(*allargs):
-    """Run stat command
-    """
-    stat_analysis(*allargs)
 
 
 def main_graph(*allargs):

@@ -21,6 +21,7 @@ def graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file=
         target_folder_file (str): targets file or folder containing multiple sbmls
         output_dir (str): results directory
         taxon_file (str): mpwt taxon file for species in sbml folder
+        taxonomy_level (str): taxonomy level, must be: phylum, class, order, family, genus or species.
 
     Returns:
         str: path to folder containing gml results
@@ -229,49 +230,3 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
         statswriter.writerow(['categories', 'nb_target', 'size_min_sol', 'size_union', 'size_intersection', 'size_enum'])
         for miscoto_stat_output_data in miscoto_stat_output_datas:
             statswriter.writerow(miscoto_stat_output_data)
-
-
-def stat_analysis(json_file_folder, output_dir, taxon_file=None, taxonomy_level="phylum"):
-    """Run the analysis part of the workflow on miscoto enumeration jsons
-
-    Args:
-        json_file_folder (str): json file or folder containing multiple jsons
-        output_dir (str): results directory
-        taxon_file (str): mpwt taxon file for species in sbml folder
-    """
-    starttime = time.time()
-
-    miscoto_stat_output = os.path.join(output_dir, 'miscoto_stats.txt')
-    key_species_stats_output = os.path.join(output_dir, 'key_species_stats.tsv')
-    key_species_supdata_output = os.path.join(output_dir, 'key_species_supdata.tsv')
-    json_paths = utils.file_or_folder(json_file_folder)
-
-    if taxon_file:
-        tree_output_file = os.path.join(output_dir, 'taxon_tree.txt')
-        extract_taxa(taxon_file, taxonomy_output_file, tree_output_file, taxonomy_level)
-        taxon_species, all_taxons = get_taxonomy(taxonomy_output_file)
-    else:
-        taxon_species = None
-        all_taxons = None
-
-    with open(key_species_stats_output, "w") as key_stats_file, \
-            open(key_species_supdata_output, "w") as key_sup_file, \
-            open(miscoto_stat_output, "w") as stats_output:
-        key_stats_writer = csv.writer(key_stats_file, delimiter="\t")
-        if all_taxons:
-            key_stats_writer.writerow(["target_categories", "key_group", *sorted(all_taxons), "Sum"])
-        else:
-            key_stats_writer.writerow(["target_categories", "key_group", "data", "Sum"])
-        key_sup_writer = csv.writer(key_sup_file, delimiter="\t")
-        statswriter = csv.writer(stats_output, delimiter="\t")
-        statswriter.writerow(["categories", "nb_target", "size_min_sol", "size_union", "size_intersection", "size_enum"])
-        for json_path in json_paths:
-            with open(json_paths[json_path]) as json_data:
-                json_elements = json.load(json_data)
-            create_stat_species(json_path, json_elements, key_stats_writer, key_sup_writer, taxon_species, all_taxons)
-            statswriter.writerow([json_path, str(len(json_elements["newly_prod"]) + len(json_elements["still_unprod"])),
-									str(len(json_elements["bacteria"])), str(len(json_elements["union_bacteria"])),
-                    				str(len(json_elements["inter_bacteria"])), str(len(json_elements["enum_bacteria"]))])
-
-    logger.info(
-        "--- Stats runtime %.2f seconds ---\n" % (time.time() - starttime))

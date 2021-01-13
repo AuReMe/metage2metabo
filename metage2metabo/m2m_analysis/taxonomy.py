@@ -53,7 +53,7 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_
         mpwt_taxon_file (str): mpwt taxon file for species in sbml folder
         taxon_output_file (str): path to taxonomy output file
         tree_output_file (str): path to tree output file
-
+        taxonomy_level (str): taxonomy level, must be: phylum, class, order, family, genus or species.
     """
     ncbi = NCBITaxa()
 

@@ -21,6 +21,7 @@ def powergraph_analysis(m2m_analysis_folder, oog_jar=None, taxon_file=None, taxo
         m2m_analysis_folder (str): m2m analysis directory with gml files
         oog_jar (str): path to OOG jar file
         taxon_file (str): mpwt taxon file for species in sbml folder
+        taxonomy_level (str): taxonomy level, must be: phylum, class, order, family, genus or species.
     """
     starttime = time.time()
 
@@ -233,7 +234,7 @@ def bbl_to_html(bbl_input, html_output):
         svg_output (str): html output file
     """
     logger.info('######### Creation of the powergraph website accessible at ' + html_output + ' #########')
-    convert.bubble_to_js(bbl_input, html_output)
+    convert.bubble_to_js(bbl_input, html_output, width_as_cover=False)
 
 
 def bbl_to_svg(oog_jar, bbl_input, svg_output):

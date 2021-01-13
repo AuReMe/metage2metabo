@@ -1,4 +1,4 @@
 from metage2metabo.m2m_analysis.enumeration import enumeration_analysis
 from metage2metabo.m2m_analysis.graph_compression import powergraph_analysis, check_oog_jar_file
-from metage2metabo.m2m_analysis.solution_graph import graph_analysis, stat_analysis
+from metage2metabo.m2m_analysis.solution_graph import graph_analysis
 from metage2metabo.m2m_analysis.m2m_analysis_workflow import run_analysis_workflow
