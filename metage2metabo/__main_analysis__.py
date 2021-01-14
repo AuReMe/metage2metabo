@@ -134,14 +134,15 @@ def main():
         "-j",
         "--json",
         metavar="JSON_DIR_OR_FILE",
-        help="Folder containing JSON file of single JSON file containing miscoto enumeration results",
+        help="Folder containing JSON files of single JSON file containing miscoto enumeration results",
         required=True,
         type = str)
-    parent_parser_m2m_analysis_input = argparse.ArgumentParser(add_help=False)
-    parent_parser_m2m_analysis_input.add_argument(
-        "--input",
-        metavar="m2m_analysis folder",
-        help="M2M analysis folder with gml files from enumeration and graph parts of m2m",
+    parent_parser_g = argparse.ArgumentParser(add_help=False)
+    parent_parser_g.add_argument(
+        "-g",
+        "--gml",
+        metavar="GML_DIR_OR_FILE",
+        help="Folder containing GML files of single GML file containing m2m_analysis graph results",
         required=True)
     parent_parser_jar = argparse.ArgumentParser(add_help=False)
     parent_parser_jar.add_argument(
@@ -182,7 +183,7 @@ def main():
         "powergraph",
         help="powergraph creation and visualization",
         parents=[
-            parent_parser_m2m_analysis_input, parent_parser_jar, parent_parser_q, parent_parser_taxon,
+            parent_parser_g, parent_parser_jar, parent_parser_q, parent_parser_taxon,
             parent_parser_level, parent_parser_o
         ],
         description=
@@ -214,10 +215,9 @@ def main():
 
     # test writing in out_directory if a subcommand is given else print version and help
     if args.cmd:
-        if args.cmd != 'powergraph':
-            if not utils.is_valid_dir(args.out):
-                logger.critical("Impossible to access/create output directory")
-                sys.exit(1)
+        if not utils.is_valid_dir(args.out):
+            logger.critical("Impossible to access/create output directory")
+            sys.exit(1)
     else:
         logger.info("m2m_analysis " + VERSION + "\n" + LICENSE)
         parser.print_help()
@@ -278,7 +278,7 @@ def main():
     elif args.cmd == "graph":
         main_graph(args.json, args.targets, args.out, args.taxon, args.level)
     elif args.cmd == "powergraph":
-        main_powergraph(args.input, args.oog, args.taxon, args.level)
+        main_powergraph(args.gml, args.out, args.oog, args.taxon, args.level)
 
     logger.info("--- Total runtime %.2f seconds ---" % (time.time() - start_time))
 

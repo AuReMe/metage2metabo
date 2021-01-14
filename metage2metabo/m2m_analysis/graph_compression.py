@@ -1,5 +1,6 @@
 import csv
 import logging
+import networkx as nx
 import os
 import shutil
 import subprocess
@@ -9,28 +10,27 @@ import zipfile
 
 from bubbletools import convert
 from metage2metabo import utils
-from metage2metabo.m2m_analysis.taxonomy import get_taxon
+from metage2metabo.m2m_analysis.taxonomy import extract_taxa, get_taxon
 
 logger = logging.getLogger(__name__)
 
 
-def powergraph_analysis(m2m_analysis_folder, oog_jar=None, taxon_file=None, taxonomy_level="phylum"):
+def powergraph_analysis(gml_input_file_folder, output_folder, oog_jar=None, taxon_file=None, taxonomy_level="phylum"):
     """Run the graph compression and picture creation
 
     Args:
-        m2m_analysis_folder (str): m2m analysis directory with gml files
+        gml_input_file_folder (str): m2m analysis directory with gml files
         oog_jar (str): path to OOG jar file
-        taxon_file (str): mpwt taxon file for species in sbml folder
+        taxon_file (str): mpwt taxon file for species
         taxonomy_level (str): taxonomy level, must be: phylum, class, order, family, genus or species.
     """
     starttime = time.time()
 
-    gml_folder = os.path.join(m2m_analysis_folder, 'gml')
-    gml_paths = utils.file_or_folder(gml_folder)
+    gml_paths = utils.file_or_folder(gml_input_file_folder)
 
-    bbl_path = os.path.join(m2m_analysis_folder, 'bbl')
-    svg_path = os.path.join(m2m_analysis_folder, 'svg')
-    html_output = os.path.join(m2m_analysis_folder, 'html')
+    bbl_path = os.path.join(output_folder, 'bbl')
+    svg_path = os.path.join(output_folder, 'svg')
+    html_output = os.path.join(output_folder, 'html')
 
     if not utils.is_valid_dir(bbl_path):
         logger.critical("Impossible to access/create output directory " + bbl_path)
@@ -44,8 +44,6 @@ def powergraph_analysis(m2m_analysis_folder, oog_jar=None, taxon_file=None, taxo
     if not utils.is_valid_dir(html_output):
         logger.critical("Impossible to access/create output directory " + html_output)
         sys.exit(1)
-
-    es_as_for_targets = find_essential_alternatives(m2m_analysis_folder, taxon_file)
 
     # 26 colours from Alphabet project (minus white):
     # https://en.wikipedia.org/wiki/Help:Distinguishable_colors
@@ -108,8 +106,21 @@ def powergraph_analysis(m2m_analysis_folder, oog_jar=None, taxon_file=None, taxo
     "#92896B"]
 
     if taxon_file:
-        taxonomy_output_file = os.path.join(m2m_analysis_folder, 'taxonomy_species.tsv')
+        taxonomy_output_file = os.path.join(output_folder, 'taxonomy_species.tsv')
+        tree_output_file = os.path.join(output_folder, 'taxon_tree.txt')
+        if not os.path.exists(taxonomy_output_file):
+            extract_taxa(taxon_file, taxonomy_output_file, tree_output_file, taxonomy_level)
+
+        with open(taxonomy_output_file, 'r') as taxonomy_file_io:
+            csvreader = csv.reader(taxonomy_file_io, delimiter='\t')
+            first_row = next(csvreader)
+            taxonomy_file_level = first_row[2].split('_')[2]
+            if taxonomy_level != taxonomy_file_level:
+                logger.critical('Difference of taxonomy level between the input taxonomy level ('+taxonomy_level+') compared to '+taxonomy_output_file+' ('+taxonomy_file_level+').')
+                sys.exit(1)
+
         taxon_species, all_taxons = get_taxon(taxonomy_output_file)
+
         taxon_colors = {}
 
         if len(all_taxons) <= 26:
@@ -120,22 +131,25 @@ def powergraph_analysis(m2m_analysis_folder, oog_jar=None, taxon_file=None, taxo
         for index, taxon in enumerate(all_taxons):
             taxon_colors[taxon] = used_colors[index]
 
-    for gml_path in gml_paths:
-        bbl_output = os.path.join(bbl_path, gml_path + '.bbl')
-        svg_file = os.path.join(svg_path, gml_path + '.bbl.svg')
+    for target_name in gml_paths:
+        bbl_output = os.path.join(bbl_path, target_name + '.bbl')
+        svg_file = os.path.join(svg_path, target_name + '.bbl.svg')
 
-        html_target = os.path.join(html_output, gml_path)
+        html_target = os.path.join(html_output, target_name)
         if not utils.is_valid_dir(html_target):
             logger.critical("Impossible to access/create output directory " + html_target)
             sys.exit(1)
 
-        gml_input = gml_paths[gml_path]
-        logger.info('######### Graph compression: ' + gml_path + ' #########')
-        compression(gml_input, bbl_output)
-        logger.info('######### PowerGraph visualization: ' + gml_path + ' #########')
+        # Compress gml file into a bbl file with PowerGrASP.
+        gml_input_path = gml_paths[target_name]
+        logger.info('######### Graph compression: ' + target_name + ' #########')
+        compression(gml_input_path, bbl_output)
+        logger.info('######### PowerGraph visualization: ' + target_name + ' #########')
 
-        essentials = es_as_for_targets[gml_path]['essential_symbionts']
-        alternatives = es_as_for_targets[gml_path]['alternative_symbionts']
+        # Read gml file with networkx and extract the essential and alternative symbionts using the note of each node (organism).
+        graph = nx.read_gml(gml_input_path)
+        essentials = [organism for organism in graph.nodes if graph.nodes[organism]['note'] == 'ES']
+        alternatives = [organism for organism in graph.nodes if graph.nodes[organism]['note'] == 'AS']
 
         bbl_to_html(bbl_output, html_target)
         if taxon_file:
@@ -143,17 +157,22 @@ def powergraph_analysis(m2m_analysis_folder, oog_jar=None, taxon_file=None, taxo
                 shutil.rmtree(html_target +'_taxon')
             shutil.copytree(html_target, html_target +'_taxon')
             update_js_taxonomy(html_target +'_taxon', taxon_colors)
-            output_html_merged = os.path.join(html_output, gml_path + '_powergraph_taxon.html')
+            output_html_merged = os.path.join(html_output, target_name + '_powergraph_taxon.html')
             merge_html_css_js(html_target +'_taxon', output_html_merged)
 
         update_js(html_target, essentials, alternatives)
-        output_html_merged = os.path.join(html_output, gml_path + '_powergraph.html')
+        output_html_merged = os.path.join(html_output, target_name + '_powergraph.html')
         merge_html_css_js(html_target, output_html_merged)
 
         if oog_jar:
+            svg_file = os.path.join(svg_path, target_name + '.bbl.svg')
+            if os.path.exists(svg_file):
+                os.remove(svg_file)
             bbl_to_svg(oog_jar, bbl_output, svg_path)
             if taxon_file:
-                taxonomy_svg_file = os.path.join(svg_path, gml_path + '_taxon.bbl.svg')
+                taxonomy_svg_file = os.path.join(svg_path, target_name + '_taxon.bbl.svg')
+                if os.path.exists(taxonomy_svg_file):
+                    os.remove(taxonomy_svg_file)
                 shutil.copyfile(svg_file, taxonomy_svg_file)
                 update_svg_taxonomy(taxonomy_svg_file, taxon_colors)
             update_svg(svg_file, essentials, alternatives)
@@ -258,42 +277,6 @@ def bbl_to_svg(oog_jar, bbl_input, svg_output):
         subproc.wait()
 
 
-def find_essential_alternatives(output_folder, taxon_file):
-    """ Using key_species_supdata.tsv to find essential and alternative symbionts.
-
-    Args:
-        output_folder (str): path to output folder (containing key_species_supdata.tsv)
-        taxon_file (str): path to taxonomy file (to get taxons if provided)
-    """
-    key_species_file = os.path.join(output_folder, 'key_species_supdata.tsv')
-
-    es_as_for_tagets = {}
-    with open(key_species_file, 'r') as input_file:
-        csvreader = csv.reader(input_file, delimiter='\t')
-        for row in csvreader:
-            target = row[0]
-            if target not in es_as_for_tagets:
-                es_as_for_tagets[target] = {}
-            if row[1] in ['essential_symbionts', 'alternative_symbionts']:
-                if row[1] not in es_as_for_tagets[target]:
-                    es_as_for_tagets[target][row[1]] = row[3:]
-                else:
-                    es_as_for_tagets[target][row[1]].extend(row[3:])
-
-    es_as_for_tagets[target]['essential_symbionts'] = list(set(es_as_for_tagets[target]['essential_symbionts']))
-    es_as_for_tagets[target]['alternative_symbionts'] = list(set(es_as_for_tagets[target]['alternative_symbionts']))
-
-    if taxon_file:
-        taxonomy_file = os.path.join(output_folder, 'taxonomy_species.tsv')
-        taxon_named_species, all_taxons = get_taxon(taxonomy_file)
-
-        for target in es_as_for_tagets:
-            es_as_for_tagets[target]['essential_symbionts'] = [taxon_named_species[species] for species in es_as_for_tagets[target]['essential_symbionts']]
-            es_as_for_tagets[target]['alternative_symbionts'] = [taxon_named_species[species] for species in es_as_for_tagets[target]['alternative_symbionts']]
-
-    return es_as_for_tagets
-
-
 def update_js(html_output, essentials, alternatives):
     """Update graph.js to add colors for essential and alternative symbionts.
 
@@ -389,23 +372,33 @@ def update_svg(svg_file, essentials, alternatives):
         alternatives (list): list of alternative symbionts
     """
     new_svg = []
-    line_before = ''
+    previous_line = ''
     with open(svg_file, 'r') as input_js:
         for line in input_js:
             if '<text' in line:
                 species_id = line.split('>')[1].split('<')[0]
                 if species_id in essentials:
-                    line = line.replace('style="stroke:none;"', 'style="stroke:none;fill:#D41159"')
-                    line_before = line_before.replace('style="stroke:none;"', 'style="stroke:none;fill:#D41159"')
-                    line_before = line_before.replace('circle', 'ellipse rx="5" ry="5"')
-                    new_svg[-1] = line_before
+                    new_color = ' style="stroke:none;fill:#D41159"'
+                    line_before_style = line.split(' style="')[0]
+                    line_after_style = '"'.join(line.split(' style="')[1].split('"')[1:])
+                    line = line_before_style + new_color + line_after_style
+                    previous_line_before_style = previous_line.split(' style="')[0]
+                    previous_line_after_style = '"'.join(previous_line.split(' style="')[1].split('"')[1:])
+                    previous_line = previous_line_before_style + new_color + previous_line_after_style
+                    previous_line = previous_line.replace('circle', 'ellipse rx="5" ry="5"')
+                    new_svg[-1] = previous_line
                 if species_id in alternatives:
-                    line = line.replace('style="stroke:none;"', 'style="stroke:none;fill:#1A85FF"')
-                    line_before = line_before.replace('style="stroke:none;"', 'style="stroke:none;fill:#1A85FF"')
-                    line_before = line_before.replace('circle', 'ellipse rx="5" ry="5"')
-                    new_svg[-1] = line_before
+                    new_color = ' style="stroke:none;fill:#1A85FF"'
+                    line_before_style = line.split(' style="')[0]
+                    line_after_style = '"'.join(line.split(' style="')[1].split('"')[1:])
+                    line = line_before_style + new_color + line_after_style
+                    previous_line_before_style = previous_line.split(' style="')[0]
+                    previous_line_after_style = '"'.join(previous_line.split(' style="')[1].split('"')[1:])
+                    previous_line = previous_line_before_style + new_color + previous_line_after_style
+                    previous_line = previous_line.replace('circle', 'ellipse rx="5" ry="5"')
+                    new_svg[-1] = previous_line
             new_svg.append(line)
-            line_before = line
+            previous_line = line
 
     with open(svg_file, 'w') as input_js:
         input_js.write(''.join(new_svg))
@@ -419,18 +412,23 @@ def update_svg_taxonomy(svg_file, taxon_colors):
         taxon_colors (dict): dictionary {taxon_name: associated_color}
     """
     new_svg = []
-    line_before = ''
+    previous_line = ''
     with open(svg_file, 'r') as input_js:
         for line in input_js:
             if '<text' in line:
                 species_taxon_id = line.split('>')[1].split('<')[0].split('__')[0]
                 if species_taxon_id in taxon_colors:
                     taxon_color = taxon_colors[species_taxon_id]
-                    line = line.replace('style="stroke:none;"', 'style="stroke:none;fill:{0};"'.format(taxon_color))
-                    line_before = line_before.replace('style="stroke:none;"', 'style="stroke:none;fill:{0};"'.format(taxon_color))
-                    new_svg[-1] = line_before
+                    new_color = ' style="stroke:none;fill:{0};"'.format(taxon_color)
+                    line_before_style = line.split(' style="')[0]
+                    line_after_style = '"'.join(line.split(' style="')[1].split('"')[1:])
+                    line = line_before_style + new_color + line_after_style
+                    previous_line_before = previous_line.split(' style="')[0]
+                    previous_line_after_style = '"'.join(previous_line.split(' style="')[1].split('"')[1:])
+                    previous_line = previous_line_before + new_color + previous_line_after_style
+                    new_svg[-1] = previous_line
             new_svg.append(line)
-            line_before = line
+            previous_line = line
 
     with open(svg_file, 'w') as input_js:
         input_js.write(''.join(new_svg))

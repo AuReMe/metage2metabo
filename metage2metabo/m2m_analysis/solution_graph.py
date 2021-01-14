@@ -190,22 +190,21 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
             len_min_sol[target_category] = len(dicti['bacteria'])
             len_union[target_category] = len(dicti['union_bacteria'])
             len_intersection[target_category] = len(dicti['inter_bacteria'])
+            key_species_types = {organism:'ES' if organism in dicti['inter_bacteria'] else 'AS' for organism in dicti['union_bacteria']}
             len_solution[target_category] = len(dicti['enum_bacteria'])
             for sol in dicti['enum_bacteria']:
-                for species_1, species_2 in combinations(
-                    dicti['enum_bacteria'][sol], 2
-                ):
+                for species_1, species_2 in combinations(dicti['enum_bacteria'][sol], 2):
                     if species_1 not in added_node:
                         if taxon_file:
-                            G.add_node(taxon_named_species[species_1])
+                            G.add_node(taxon_named_species[species_1], note=key_species_types[species_1])
                         else:
-                            G.add_node(species_1)
+                            G.add_node(species_1, note=key_species_types[species_1])
                         added_node.append(species_1)
                     if species_2 not in added_node:
                         if taxon_file:
-                            G.add_node(taxon_named_species[species_2])
+                            G.add_node(taxon_named_species[species_2], note=key_species_types[species_2])
                         else:
-                            G.add_node(species_2)
+                            G.add_node(species_2, note=key_species_types[species_2])
                         added_node.append(species_2)
                     combination_species = '_'.join(sorted([species_1, species_2]))
                     if combination_species not in species_weight:
