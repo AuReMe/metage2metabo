@@ -21,30 +21,6 @@ def get_taxon(taxonomy_file_path):
 
     return taxon_named_species, all_taxons
 
-def detect_taxon_species(taxon_named_species, all_taxons):
-    """From a list of species named after their taxon, return a dictionary of {taxon: [species_1, species_2]}
-
-    Args:
-        taxon_named_species (dict): {species_ID: species_named_after_taxon}
-        all_taxons (list): all taxon in the dataset
-
-    Returns:
-        dict: {taxon: [species_1, species_2]}
-    """
-    taxon_species = {}
-    for species_id in taxon_named_species:
-        taxon = species_id.split('__')[0]
-        if taxon not in taxon_species:
-            taxon_species[taxon] = [taxon_named_species[species_id]]
-        else:
-            taxon_species[taxon].append(taxon_named_species[species_id])
-
-    for taxon in all_taxons:
-        if taxon not in taxon_species:
-            taxon_species[taxon] = []
-
-    return taxon_species
-
 
 def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_level="phylum"):
     """From NCBI taxon ID, extract taxonomy rank and create a tree file
