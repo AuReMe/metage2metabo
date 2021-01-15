@@ -111,14 +111,6 @@ def powergraph_analysis(gml_input_file_folder, output_folder, oog_jar=None, taxo
         if not os.path.exists(taxonomy_output_file):
             extract_taxa(taxon_file, taxonomy_output_file, tree_output_file, taxonomy_level)
 
-        with open(taxonomy_output_file, 'r') as taxonomy_file_io:
-            csvreader = csv.reader(taxonomy_file_io, delimiter='\t')
-            first_row = next(csvreader)
-            taxonomy_file_level = first_row[2].split('_')[2]
-            if taxonomy_level != taxonomy_file_level:
-                logger.critical('Difference of taxonomy level between the input taxonomy level ('+taxonomy_level+') compared to '+taxonomy_output_file+' ('+taxonomy_file_level+').')
-                sys.exit(1)
-
         taxon_species, all_taxons = get_taxon(taxonomy_output_file)
 
         taxon_colors = {}
@@ -150,6 +142,12 @@ def powergraph_analysis(gml_input_file_folder, output_folder, oog_jar=None, taxo
         graph = nx.read_gml(gml_input_path)
         essentials = [organism for organism in graph.nodes if graph.nodes[organism]['note'] == 'ES']
         alternatives = [organism for organism in graph.nodes if graph.nodes[organism]['note'] == 'AS']
+        if taxon_file:
+            key_species = essentials + alternatives
+            taxon_key_species = [organism.split('__')[0] for organism in key_species]
+            if len(set(all_taxons).intersection(set(taxon_key_species))) == 0:
+                logger.critical('Difference of taxonomy level between gml file ('+gml_input_path+') compared to '+taxonomy_output_file+'.')
+                sys.exit(1)
 
         bbl_to_html(bbl_output, html_target)
         if taxon_file:

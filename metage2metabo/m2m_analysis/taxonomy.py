@@ -95,7 +95,7 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_
 
     with open(taxon_output_file, "w") as taxonomy_file:
         csvwriter = csv.writer(taxonomy_file, delimiter="\t")
-        csvwriter.writerow(["organism_id", "taxid", "taxon_number_"+taxonomy_level, "phylum", "class", "order", "family", "genus", "species"])
+        csvwriter.writerow(["organism_id", "taxid", "taxon_number", "phylum", "class", "order", "family", "genus", "species"])
         for taxonomy_file_data in taxonomy_file_datas:
             csvwriter.writerow(taxonomy_file_data)
 
