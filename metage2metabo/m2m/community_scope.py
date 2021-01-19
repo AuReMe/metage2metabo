@@ -39,7 +39,7 @@ def cscope(sbmldir, seeds, out_dir, targets_file=None, host=None):
     return instance_com, community_reachable_metabolites
 
 
-def instance_community(sbml_dir, seeds, output_dir, targets_file = None, host_mn=None):
+def instance_community(sbml_dir, seeds, output_dir, targets_file=None, host_mn=None):
     """Create ASP instance for community analysis.
     
     Args:

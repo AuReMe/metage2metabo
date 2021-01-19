@@ -120,7 +120,7 @@ def indiv_scope_on_species(sbml_path, bname, seeds_path):
     Args:
         sbml_path (str): path to SBML file
         bname (str): name linked to SBML file
-        seeds (str): SBML seeds file
+        seeds_path (str): path to SBML seeds file
 
     Returns:
         list: [boolean error, bname, dictionary containing menescope results]

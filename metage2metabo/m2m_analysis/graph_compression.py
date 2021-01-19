@@ -19,7 +19,8 @@ def powergraph_analysis(gml_input_file_folder, output_folder, oog_jar=None, taxo
     """Run the graph compression and picture creation
 
     Args:
-        gml_input_file_folder (str): m2m analysis directory with gml files
+        gml_input_file_folder (str): path to the gml folder or the gml file
+        output_folder (str): path to the output folder
         oog_jar (str): path to OOG jar file
         taxon_file (str): mpwt taxon file for species
         taxonomy_level (str): taxonomy level, must be: phylum, class, order, family, genus or species.
@@ -248,7 +249,7 @@ def bbl_to_html(bbl_input, html_output):
 
     Args:
         bbl_input (str): bbl input file
-        svg_output (str): html output file
+        html_output (str): html output file
     """
     logger.info('######### Creation of the powergraph website accessible at ' + html_output + ' #########')
     convert.bubble_to_js(bbl_input, html_output, width_as_cover=False)
@@ -279,7 +280,7 @@ def update_js(html_output, essentials, alternatives):
     """Update graph.js to add colors for essential and alternative symbionts.
 
     Args:
-        chtml_output (str): path to html folder (containing js subfolder with gaph.js)
+        html_output (str): path to html folder (containing js subfolder with gaph.js)
         essentials (list): list of essential symbionts
         alternatives (list): list of alternative symbionts
     """

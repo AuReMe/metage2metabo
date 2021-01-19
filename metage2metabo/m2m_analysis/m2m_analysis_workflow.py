@@ -39,6 +39,7 @@ def run_analysis_workflow(sbml_folder, target_folder_file, seed_file, output_dir
         taxon_file (str): mpwt taxon file for species in sbml folder
         oog_jar (str): path to OOG jar file
         host_file (str): metabolic network file for host
+        taxonomy_level (str): taxonomy level, must be: phylum, class, order, family, genus or species.
     """
     starttime = time.time()
 

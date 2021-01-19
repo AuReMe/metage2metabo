@@ -6,7 +6,7 @@ def get_taxon(taxonomy_file_path):
     """From the taxonomy file (created by extract_taxa) create a dictionary and a list linking taxon and species
 
     Args:
-        taxonomy_file (str): path to the taxonomy_file
+        taxonomy_file_path (str): path to the taxonomy_file
     """
     taxon_named_species = {}
     all_taxons = []

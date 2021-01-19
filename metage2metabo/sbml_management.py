@@ -113,6 +113,7 @@ def pgdb_to_sbml(pgdb_dir, output_dir, noorphan_bool, padmet_bool, sbml_level, c
         pgdb_dir (str): PGDB directory
         output_dir (str): results directory
         noorphan_bool (bool): ignores orphan reactions if True
+        padmet_bool (bool): creates padmet files if True
         sbml_level (int): SBML level
         cpu (int): number of CPU for multi-process
     

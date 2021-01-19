@@ -81,7 +81,7 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean, use_pwt_xml):
         output_dir (str): output repository
         cpu (int): number of CPUs to use
         clean (bool): delete PGDBs in ptools-local coresponding to the input data
-        user_targets (list): targets provided by the user
+        use_pwt_xml (bool): use Pathway Tools XML instead of creating them with padmet
 
     Returns:
         pgdb_dir (str): pgdb repository
