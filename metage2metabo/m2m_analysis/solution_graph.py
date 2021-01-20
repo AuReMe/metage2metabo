@@ -115,28 +115,43 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
 
         len_solution[target_category] = len(dicti['enum_bacteria'])
         for sol in dicti['enum_bacteria']:
-            for species_1, species_2 in combinations(dicti['enum_bacteria'][sol], 2):
+            if len(dicti['enum_bacteria'][sol]) > 1:
+                for species_1, species_2 in combinations(dicti['enum_bacteria'][sol], 2):
+                    if species_1 not in added_node:
+                        if taxon_file:
+                            G.add_node(taxon_named_species[species_1], note=key_species_types[species_1])
+                        else:
+                            G.add_node(species_1, note=key_species_types[species_1])
+                        added_node.append(species_1)
+                    if species_2 not in added_node:
+                        if taxon_file:
+                            G.add_node(taxon_named_species[species_2], note=key_species_types[species_2])
+                        else:
+                            G.add_node(species_2, note=key_species_types[species_2])
+                        added_node.append(species_2)
+                    combination_species = '_'.join(sorted([species_1, species_2]))
+                    if combination_species not in species_weight:
+                        species_weight[combination_species] = 1
+                    else:
+                        species_weight[combination_species] += 1
+                    if taxon_file:
+                        G.add_edge(taxon_named_species[species_1], taxon_named_species[species_2], weight=species_weight[combination_species])
+                    else:
+                        G.add_edge(species_1, species_2, weight=species_weight[combination_species])
+            elif len(dicti['enum_bacteria'][sol]) == 1:
+                species_1 = dicti['enum_bacteria'][sol][0]
                 if species_1 not in added_node:
                     if taxon_file:
                         G.add_node(taxon_named_species[species_1], note=key_species_types[species_1])
                     else:
                         G.add_node(species_1, note=key_species_types[species_1])
                     added_node.append(species_1)
-                if species_2 not in added_node:
-                    if taxon_file:
-                        G.add_node(taxon_named_species[species_2], note=key_species_types[species_2])
-                    else:
-                        G.add_node(species_2, note=key_species_types[species_2])
-                    added_node.append(species_2)
-                combination_species = '_'.join(sorted([species_1, species_2]))
-                if combination_species not in species_weight:
-                    species_weight[combination_species] = 1
-                else:
-                    species_weight[combination_species] += 1
-                if taxon_file:
-                    G.add_edge(taxon_named_species[species_1], taxon_named_species[species_2], weight=species_weight[combination_species])
-                else:
-                    G.add_edge(species_1, species_2, weight=species_weight[combination_species])
+
+        # Check if all the nodes of G are not isolates.
+        if len(G.nodes) == nx.number_of_isolates(G):
+            logger.critical(r'/!\ Warning: All the nodes of the solution graph are isolated (they are not connected to other nodes). This lead to powergrasp creating san empty powergraph.')
+            logger.critical('So m2m_analysis stops at the solution graph step.')
+            sys.exit(1)
 
         miscoto_stat_output_datas.append([target_category, str(len_target[target_category]), str(len_min_sol[target_category]),
                                 str(len_union[target_category]), str(len_intersection[target_category]),
