@@ -9,6 +9,8 @@ m2m can be used as a whole workflow (``` m2m workflow ```, ``` m2m metacom ```) 
 
 Belcour* A, Frioux* C, Aite M, Bretaudeau A, Hildebrand F, Siegel A. Metage2Metabo, microbiota-scale metabolic complementarity for the identification of key species. eLife 2020;9:e61968 [https://doi.org/10.7554/eLife.61968](https://doi.org/10.7554/eLife.61968).
 
+For a summary of M2M and its applications, you can take a look at these [poster-slides](https://hal.inria.fr/hal-03151934/document), presented during the [JOBIM 2020 conference](https://jobim2020.sciencesconf.org/?forward-action=index&forward-controller=index&lang=en).
+
 ## Table of contents
 - [M2M - metage2metabo](#m2m---metage2metabo)
   - [Table of contents](#table-of-contents)
