@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbml xmlns="http://www.sbml.org/sbml/level3/version1/core" xmlns:fbc="http://www.sbml.org/sbml/level3/version1/fbc/version1" level="3" version="1" fbc:required="false">
+  <model id="GCA_003437055_v3" substanceUnits="mole" timeUnits="second" extentUnits="mole">
+    <listOfCompartments>
+      <compartment id="c" name="cytosol" size="1" constant="true"/>
+    </listOfCompartments>
+    <listOfSpecies>
+      <species metaid="M_E_c" id="M_C_c" name="C" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_F_c" id="M_D_c" name="D" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_G_c" id="M_E_c" name="E" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_H_c" id="M_F_c" name="F" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+    </listOfSpecies>
+    <listOfReactions>
+      <reaction id="R4" name="R4" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="M_E_c" stoichiometry="1" constant="false"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_G_c" stoichiometry="1" constant="false"/>
+        </listOfProducts>
+      </reaction>
+      <reaction id="R5" name="R5" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="M_F_c" stoichiometry="1" constant="false"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_H_c" stoichiometry="1" constant="false"/>
+        </listOfProducts>
+      </reaction>
+    </listOfReactions>
+  </model>
+</sbml>
