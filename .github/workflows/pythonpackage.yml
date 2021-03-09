@@ -12,6 +12,7 @@ on:
       - 'README.md'
       - '.readthedocs.yml'
       - 'recipes/**'
+      - 'tutorials'
   pull_request:
     branches: [ master ]
     paths-ignore:
@@ -20,6 +21,7 @@ on:
       - 'README.md'
       - '.readthedocs.yml'
       - 'recipes/**'
+      - 'tutorials'
 
 jobs:
   build:
