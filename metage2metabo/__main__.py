@@ -35,10 +35,19 @@ from metage2metabo.m2m.m2m_workflow import run_workflow, metacom_analysis
 from metage2metabo import sbml_management, utils
 
 VERSION = pkg_resources.get_distribution("metage2metabo").version
-LICENSE = """Copyright (C) Dyliss & Pleiade
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-metage2metabo is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.\n
+LICENSE = """Copyright (C) Dyliss & Pleiade\n
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.\n
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Lesser General Public License for more details.\n
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>\n
 """
 MESSAGE = """
 From metabolic network reconstruction with annotated genomes to metabolic capabilities screening to identify organisms of interest in a large microbiota.
