@@ -24,14 +24,20 @@ logger = logging.getLogger(__name__)
 
 def addedvalue(iscope_rm, cscope_rm, out_dir):
     """Compute the added value of considering interaction with microbiota metabolism rather than individual metabolisms.
-    
-    Args:
-        iscope_rm (set): union of metabolites in all individual scopes
-        cscope_rm (set): metabolites reachable by community/microbiota
-        out_dir (str): output directory
 
-    Returns:
-        set: set of metabolites that can only be reached by a community
+    Parameters
+    ----------
+    iscope_rm: set
+        union of metabolites in all individual scopes
+    cscope_rm: set
+        metabolites reachable by community/microbiota
+    out_dir: str
+        output directory
+
+    Returns
+    -------
+    set
+        set of metabolites that can only be reached by a community
     """
     # Community targets = what can be produced only if cooperation occurs between species
     newtargets = cscope_rm - iscope_rm

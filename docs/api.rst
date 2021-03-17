@@ -8,6 +8,10 @@ Workflow
 m2m workflow
 ++++++++++++
 
+.. automodule::  metage2metabo.m2m.m2m_workflow
+    :members:
+    :undoc-members:
+
 Reconstruction
 ++++++++++++++
 
