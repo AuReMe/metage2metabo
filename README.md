@@ -172,12 +172,12 @@ Requires: Pathway Tools installed and in $PATH, and NCBI Blast
 
 M2M performs a community minimization to find the union and intersection of the minimal communities. But it is possible to analyze all the minimal communities.
 M2M has a second command-line, named m2m_analysis that performs this analysis. This method is slower than m2m as all sollutions are enumerated.
-Then it creates a solutions graph and compresses it in a powergraph.
+Then it creates a solutions graph and compresses it in a powergraph. Then it creates visualization (html file and optionnaly svg files).
 
 More information about this command in the [m2m_analysis Documentation](https://metage2metabo.readthedocs.io/en/latest/m2m_analysis.html).
 
 ````
-usage: m2m_analysis [-h] [-v] {enum,stats,graph,powergraph,workflow} ...
+usage: m2m_analysis [-h] [-v] {enum,graph,powergraph,workflow} ...
 
 Detection of key species among communities.
  For specific help on each subcommand use: m2m_analysis {cmd} --help
@@ -189,14 +189,13 @@ optional arguments:
 subcommands:
   valid subcommands:
 
-  {enum,stats,graph,powergraph,workflow}
+  {enum,graph,powergraph,workflow}
     enum                enumeration using miscoto
-    stats               statistics on key species
     graph               graph creation with enumeration solution
     powergraph          powergraph creation and visualization
     workflow            whole workflow
 
-Requires: Oog jar file (http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-command-line-tool.html) for powergraph visualization.
+Oog jar file (http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-command-line-tool.html) for powergraph svg creation.
 ````
 
 ## Release Notes

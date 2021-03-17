@@ -5,7 +5,41 @@ m2m's API
 Workflow
 --------
 
-.. automodule::  metage2metabo.m2m_workflow
+m2m workflow
+++++++++++++
+
+Reconstruction
+++++++++++++++
+
+.. automodule::  metage2metabo.m2m_workflow.reconstruction
+    :members:
+    :undoc-members:
+
+Individual scope
+++++++++++++++++
+
+.. automodule::  metage2metabo.m2m_workflow.individual_scope
+    :members:
+    :undoc-members:
+
+Community scope
++++++++++++++++
+
+.. automodule::  metage2metabo.m2m_workflow.community_scope
+    :members:
+    :undoc-members:
+
+Cooperation potential (added-value)
++++++++++++++++++++++++++++++++++++
+
+.. automodule::  metage2metabo.m2m_workflow.community_addedvalue
+    :members:
+    :undoc-members:
+
+Minimal community
++++++++++++++++++
+
+.. automodule::  metage2metabo.m2m_workflow.minimal_community
     :members:
     :undoc-members:
 
@@ -20,6 +54,44 @@ Utils
 -----
 
 .. automodule::  metage2metabo.utils
+    :members:
+    :undoc-members:
+
+m2m_analysis
+------------
+
+m2m_analysis workflow
++++++++++++++++++++++
+
+.. automodule::  metage2metabo.m2m_analysis.m2m_analysis_workflow
+    :members:
+    :undoc-members:
+
+Enumeration of Minimal communities
+++++++++++++++++++++++++++++++++++
+
+.. automodule::  metage2metabo.m2m_analysis.enumeration
+    :members:
+    :undoc-members:
+
+Creation of graph solution
+++++++++++++++++++++++++++
+
+.. automodule::  metage2metabo.m2m_analysis.solution_graph
+    :members:
+    :undoc-members:
+
+Compression of graph
+++++++++++++++++++++
+
+.. automodule::  metage2metabo.m2m_analysis.graph_compression
+    :members:
+    :undoc-members:
+
+taxonomy
+++++++++++++++++++++
+
+.. automodule::  metage2metabo.m2m_analysis.taxonomy
     :members:
     :undoc-members:
 

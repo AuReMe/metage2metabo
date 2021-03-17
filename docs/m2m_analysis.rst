@@ -111,39 +111,7 @@ Optional arguments:
         output_directory
         ├── json
         │   ├── targets_toy.json
-
-m2m_analysis stats
-++++++++++++++++++
-``m2m_analysis stats`` computes statistics on key species.
-
-It uses the following mandatory inputs (run ``m2m_analysis stats --help`` for optional arguments):
-
--j directory           directory of miscoto output JSONs or single JSON
--o directory           output directory for results
-
-Optional arguments:
-
--q               quiet mode
---taxon file           mpwt taxon file
-
-.. code:: sh
-
-    m2m_analysis stats -j output_directory/json -o output_directory --taxon taxon_id.tsv
-
-* standard output
-    .. code::
-
-        --- Stats runtime 0.00 seconds ---
-
-        --- Total runtime 0.01 seconds ---
-
-* files output
-    ::
-
-        output_directory
-        ├── key_species_stats.tsv
-        ├── key_species_supdata.tsv
-        ├── miscoto_stats.txt
+        ├── m2m_analysis_enum.log
 
 m2m_analysis graph
 ++++++++++++++++++
@@ -159,12 +127,13 @@ Optional arguments:
 
 -q               quiet mode
 --taxon file           mpwt taxon file
+--level LEVEL         Taxonomy level, must be: phylum, class, order, family, genus or species. By default, it is phylum.
 
 You can use the `taxon file from gut experience <https://github.com/AuReMe/metage2metabo/blob/master/article_data/gut_microbiota/taxon_id.tsv>`__.
 
 .. code:: sh
 
-    m2m_analysis graph -j output_directory/json -t metabolic_data/targets_toy.sbml -o output_directory --taxon taxon_id.tsv
+    m2m_analysis graph -j output_directory/json -t metabolic_data/targets_toy.sbml -o output_directory
 
 * standard output
     .. code::
@@ -179,8 +148,9 @@ You can use the `taxon file from gut experience <https://github.com/AuReMe/metag
         output_directory
         ├── gml
         │   ├── targets_toy.gml
+        ├── key_species.json
         ├── key_species_stats.tsv
-        ├── key_species_supdata.tsv
+        ├── m2m_analysis_graph.log
         ├── miscoto_stats.txt
 
 m2m_analysis powergraph
@@ -189,13 +159,15 @@ m2m_analysis powergraph
 
 It uses the following mandatory inputs (run ``m2m_analysis powergraph --help`` for optional arguments):
 
---oog file             Oog jar file
 -g file                directory of GML files or a GML file
 -o directory           output directory for results
 
 Optional arguments:
 
 -q               quiet mode
+--oog file             Oog jar file
+--taxon TAXON         Mpwt taxon file
+--level LEVEL         Taxonomy level, must be: phylum, class, order, family, genus or species. By default, it is phylum.
 
 .. code:: sh
 
@@ -207,6 +179,11 @@ Optional arguments:
         ######### Graph compression: targets_toy #########
         Number of powernodes: 3
         Number of poweredges: 2
+        Compression runtime 7.94 seconds ---
+
+        ######### PowerGraph visualization: targets_toy #########
+        ######### Creation of the powergraph website accessible at out_t/html/targets_toy #########
+        ######### Creation of the powergraph svg accessible at out_t/svg #########
         ********************************************************************************
         *  Oog - PowerGraph Library (Matthias Reimann, c 2006-2012)                    *
         *  PowerGraph Analysis through the command line interface of Oog               *
@@ -238,6 +215,9 @@ Optional arguments:
         4001ms (15ms)
         <II> Create SVG ... 469ms
         <II> Image written (test_out/svg/targets_toy.bbl.svg)
+        --- Powergraph runtime 22.25 seconds ---
+
+        --- Total runtime 22.44 seconds ---
 
 * files output
     ::
@@ -245,12 +225,21 @@ Optional arguments:
         output_directory
         ├── bbl
         │   ├── targets_toy.bbl
+        ├── html
+        │   ├── targets_toy
+        │   |   ├── js
+        │   |   |   ├── cytoscape.min.js
+        │   |   |   ├── cytoscape-cose-bilkent.js
+        │   |   |   ├── graph.js
+        │   |   ├── index.html
+        │   |   ├── style.css
+        │   ├── targets_toy_powergraph.html
         ├── svg
         │   ├── targets_toy.bbl.svg
+        ├── m2m_analysis_powergraph.log
 
 
-
-This command creates the following svg:
+This command creates the following svg (node colords: dark pink for essential symbionts and blue for alternative symbionts):
 
 .. image:: images/targets_toy.bbl.svg
    :width: 500pt
@@ -266,13 +255,14 @@ It uses the following mandatory inputs (run ``m2m_analysis workflow --help`` for
 -s file                seeds SBML file
 -t directory           targets SBML file or folder containing multiple targets SBML files
 -o directory           output directory for results
---oog file             Oog jar file
 
 Optional arguments:
 
 -q               quiet mode
 -m file                host metabolic network in SBML
 --taxon file           mpwt taxon file
+--oog file             Oog jar file
+--level LEVEL         Taxonomy level, must be: phylum, class, order, family, genus or species. By default, it is phylum.
 
 .. code:: sh
 
@@ -327,16 +317,21 @@ Optional arguments:
         GCA_003437175
         GCA_003437785
         GCA_003437345
-        --- Enumeration runtime 6.74 seconds ---
+        --- Enumeration runtime 9.18 seconds ---
 
         ######### Graph of targets_toy #########
         Number of nodes: 17
         Number of edges: 126
-        --- Graph runtime 0.02 seconds ---
+        --- Graph runtime 0.03 seconds ---
 
         ######### Graph compression: targets_toy #########
         Number of powernodes: 3
         Number of poweredges: 2
+        Compression runtime 7.43 seconds ---
+
+        ######### PowerGraph visualization: targets_toy #########
+        ######### Creation of the powergraph website accessible at output_directory/html/targets_toy #########
+        ######### Creation of the powergraph svg accessible at output_directory/svg #########
         ********************************************************************************
         *  Oog - PowerGraph Library (Matthias Reimann, c 2006-2012)                    *
         *  PowerGraph Analysis through the command line interface of Oog               *
@@ -353,7 +348,7 @@ Optional arguments:
         <II> Working directory: . (/shared/metage2metabo/test/metabolic_data/)
         <II> Graph file directories: [.]
         <II> Output directory: test_out/svg
-        <II> Loading graph (targets_toy.bbl) ... 27ms
+        <II> Loading graph (targets_toy.bbl) ... 33ms
         <II> Arrange Graph ... Exception in thread "PowerGraphArranger" java.lang.IndexOutOfBoundsException: Index 20 out of bounds for length 20
             at java.base/jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:64)
             at java.base/jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:70)
@@ -366,29 +361,55 @@ Optional arguments:
             at org.mattlab.eaglevista.graph.OogPGArranger.run(OogPGArranger.java:271)
             at java.base/java.lang.Thread.run(Thread.java:834)
         4001ms (15ms)
-        <II> Create SVG ... 469ms
+        <II> Create SVG ... 730ms
         <II> Image written (test_out/svg/targets_toy.bbl.svg)
-        --- Powergraph runtime 7.80 seconds ---
+        --- Powergraph runtime 13.05 seconds ---
 
-        --- m2m_analysis runtime 14.56 seconds ---
+        --- m2m_analysis runtime 22.27 seconds ---
 
-        --- Total runtime 21.06 seconds ---
+        --- Total runtime 22.32 seconds ---
 
 * files output
     ::
 
         output_directory
+        ├── bbl
+        │   ├── targets_toy.bbl
         ├── json
         │   ├── targets_toy.json
         ├── gml
         │   ├── targets_toy.gml
-        ├── bbl
-        │   ├── targets_toy.bbl
+        ├── html
+        │   ├── targets_toy
+        │   |   ├── js
+        │   |   |   ├── cytoscape.min.js
+        │   |   |   ├── cytoscape-cose-bilkent.js
+        │   |   |   ├── graph.js
+        │   |   ├── index.html
+        │   |   ├── style.css
+        │   ├── targets_toy_taxon
+        │   |   ├── js
+        │   |   |   ├── cytoscape.min.js
+        │   |   |   ├── cytoscape-cose-bilkent.js
+        │   |   |   ├── graph.js
+        │   |   ├── index.html
+        │   |   ├── style.css
+        │   ├── targets_toy_powergraph.html
+        │   ├── targets_toy_powergraph_taxon.html
         ├── svg
         │   ├── targets_toy.bbl.svg
+        │   ├── targets_toy_taxon.bbl.svg
+        ├── key_species.json
         ├── key_species_stats.tsv
-        ├── key_species_supdata.tsv
+        ├── m2m_analysis_workflow.log
         ├── miscoto_stats.txt
+        ├── taxon_tree.txt
+        ├── taxonomy_species.tsv
+
+This command creates the previous svg and a new svg with the nodes colored according to their taxons:
+
+.. image:: images/targets_toy_taxon.bbl.svg
+    :width: 500pt
 
 m2m_analysis output files
 -------------------------
@@ -396,20 +417,38 @@ m2m_analysis output files
 ::
 
     output_directory
+    ├── bbl
+    │   ├── targets_toy.bbl
     ├── json
     │   ├── targets_toy.json
     ├── gml
     │   ├── targets_toy.gml
-    ├── bbl
-    │   ├── targets_toy.bbl
+    ├── html
+    │   ├── targets_toy
+    │   |   ├── js
+    │   |   |   ├── cytoscape.min.js
+    │   |   |   ├── cytoscape-cose-bilkent.js
+    │   |   |   ├── graph.js
+    │   |   ├── index.html
+    │   |   ├── style.css
+    │   ├── targets_toy_taxon (with the ``--taxon`` option)
+    │   |   ├── js
+    │   |   |   ├── cytoscape.min.js
+    │   |   |   ├── cytoscape-cose-bilkent.js
+    │   |   |   ├── graph.js
+    │   |   ├── index.html
+    │   |   ├── style.css
+    │   ├── targets_toy_powergraph.html
+    │   ├── targets_toy_powergraph_taxon.html (with the ``--taxon`` option)
     ├── svg
     │   ├── targets_toy.bbl.svg
+    │   ├── targets_toy_taxon.bbl.svg (with the ``--taxon`` option)
+    ├── key_species.json
     ├── key_species_stats.tsv
-    ├── key_species_supdata.tsv
+    ├── m2m_analysis_*.log
     ├── miscoto_stats.txt
-    ├── taxon_phylum.tsv (with the ``--taxon`` option)
     ├── taxon_tree.txt (with the ``--taxon`` option)
-
+    ├── taxonomy_species.tsv (with the ``--taxon`` option)
 
 Miscoto results
 +++++++++++++++
@@ -462,7 +501,13 @@ Key species files
 
 ``key_species_stats.tsv``: for each target, this file contains the number of key species, essential and alternative symbionts. If you have used the "--taxon" option, the column corresponds to each taxonomic groups.
 
-``key_species_supdata.tsv``: for each target, this file contains the name of species in the key species, essential or alternative symbionts groups. If you have used the "--taxon" option, there will be new rows linked to each taxonomic groups.
+``key_species.json``: for each target, this json file contains the name of species in the key species, essential or alternative symbionts groups.
+
+For each target, the json contains 2 keys:
+
+* ``essential_symbionts``: a dictionary with a key ``data`` and the name of theorganisms in the essential symbionts. If you use the "--taxon" option, the dictionary keys will be the name of taxon and the values will be the essential symbionts of this taxon.
+
+* ``alternative_symbionts``: a dictionary with a key ``data`` and the name of theorganisms in the alternative symbionts. If you use the "--taxon" option, the dictionary keys will be the name of taxon and the values will be the alternative symbionts of this taxon.
 
 Solution graph
 ++++++++++++++
@@ -479,16 +524,33 @@ When you have installed Cytoscape, put the file ``CyOog.jar`` in ``path/to/cytos
 
 m2m_analysis can also create visualization of the power graph.
 
+Mini website
+++++++++++++
+
+A website like interface is created using the package `bubble-tools <https://github.com/Aluriak/bubble-tools>`__.
+
+For each target, there will a folder in ``html`` folder and a html file (named after the target).
+The folder is created by bubble-tools and contains html, css and js files with the information for the visualization.
+The html file is a merged of all the files from the folder, to ease the visualization.
+
+To view the html file, open it with a web browser (like ``Firefox``). There will be simple node (circle) in two colors (dark pink for essential symbionts and blue for alternative symbionts). And powernode will be rectangle.
+
+If you used the "--taxon" option, a new html file is created and labelled as ``*_taxon.html`` (and a corresponding folder is created). In this html file, the node will be colored according to their taxon.
+
+With the html file it is possible to interact and move the node by clicking on them.
+
 Picture of the power graph
 ++++++++++++++++++++++++++
 
-The compresed graph is then drawn using the Oog Power Graph Command line tool. A svg file is then created (``svg/*.svg``).
+The compresed graph is then drawn using the Oog Power Graph Command line tool. A svg file is then created (``svg/*.svg``). The nodes will be colored in dark pink for essential symbionts and blue for alternative symbionts.
+
+If you used the "--taxon" option, a new html file is created and labelled as ``svg/*_taxon.svg``. In this file, the node will be colored according to their taxon.
 
 Taxonomy linked files
 +++++++++++++++++++++
 
 If you have used the ``--taxon``, two new files have been created:
 
-``taxon_phylum.tsv``: it is a tsv file with 9 columns. The row corresponds to the species in your community. For each species, you will have its name in your dataset, its taxID (from taxon_id.tsv), an attributed taxonomic name (used in the power graph), then the taxonomic classification: phylum, class, order, family, genus and species.
+``taxonomy_species.tsv``: it is a tsv file with 9 columns. The row corresponds to the species in your community. For each species, you will have its name in your dataset, its taxID (from taxon_id.tsv), an attributed taxonomic name (used in the power graph), then the taxonomic classification: phylum, class, order, family, genus and species.
 
 ``taxon_tree.txt``: the topology of the taxonomic classification of your species according to the NCBI taxonomy.
