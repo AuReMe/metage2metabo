@@ -11,35 +11,35 @@ m2m workflow
 Reconstruction
 ++++++++++++++
 
-.. automodule::  metage2metabo.m2m_workflow.reconstruction
+.. automodule::  metage2metabo.m2m.reconstruction
     :members:
     :undoc-members:
 
 Individual scope
 ++++++++++++++++
 
-.. automodule::  metage2metabo.m2m_workflow.individual_scope
+.. automodule::  metage2metabo.m2m.individual_scope
     :members:
     :undoc-members:
 
 Community scope
 +++++++++++++++
 
-.. automodule::  metage2metabo.m2m_workflow.community_scope
+.. automodule::  metage2metabo.m2m.community_scope
     :members:
     :undoc-members:
 
 Cooperation potential (added-value)
 +++++++++++++++++++++++++++++++++++
 
-.. automodule::  metage2metabo.m2m_workflow.community_addedvalue
+.. automodule::  metage2metabo.m2m.community_addedvalue
     :members:
     :undoc-members:
 
 Minimal community
 +++++++++++++++++
 
-.. automodule::  metage2metabo.m2m_workflow.minimal_community
+.. automodule::  metage2metabo.m2m.minimal_community
     :members:
     :undoc-members:
 
