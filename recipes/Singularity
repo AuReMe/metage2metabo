@@ -7,8 +7,8 @@ From: ubuntu:18.04
     Description m2m Singularity recipe
 
 %files
-     pathway-tools-23.0-linux-64-tier1-install /tmp
-     Oog.jar /tmp
+     pathway-tools-23.0-linux-64-tier1-install /opt
+     Oog.jar /opt
 
 %environment
      export PATH="$PATH:/programs/pathway-tools:"
@@ -31,13 +31,13 @@ From: ubuntu:18.04
      apt-get clean; \
      apt-get purge; \
      mkdir /programs;\
-     mv /tmp/Oog.jar /programs;\
+     mv /opt/Oog.jar /programs;\
      mkdir -p /external/folder;\
-     chmod u+x /tmp/pathway-tools-23.0-linux-64-tier1-install;\
-     ./tmp/pathway-tools-23.0-linux-64-tier1-install --InstallDir /programs/pathway-tools --PTOOLS_LOCAL_PATH /external/folder --InstallDesktopShortcuts 0 --mode unattended;\
+     chmod u+x /opt/pathway-tools-23.0-linux-64-tier1-install;\
+     ./opt/pathway-tools-23.0-linux-64-tier1-install --InstallDir /programs/pathway-tools --PTOOLS_LOCAL_PATH /external/folder --InstallDesktopShortcuts 0 --mode unattended;\
      mkdir -p /opt;\
      cp -r /external/folder/ptools-local /opt;\
-     rm /tmp/pathway-tools-23.0-linux-64-tier1-install;\
+     rm /opt/pathway-tools-23.0-linux-64-tier1-install;\
      curl https://bootstrap.pypa.io/get-pip.py | python3;\
      pip install graphviz ete3 networkx;\
      pip install powergrasp;\
