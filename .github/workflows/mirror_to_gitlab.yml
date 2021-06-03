@@ -1,0 +1,24 @@
+name: PushGitlab
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with: 
+        fetch-depth: 0
+
+    - name: Push To Gitlab
+      env: 
+        token: ${{ secrets.GITLAB_ACCESS_TOKEN }}    
+      run: |
+        echo Starting to push repo to gitlab
+        git config user.name "${{ secrets.GITLAB_USERNAME }}"
+        git config user.email "${{ secrets.GITLAB_EMAIL }}"
+        git remote set-url origin https://oauth2:${token}@gitlab.inria.fr/pleiade/metage2metabo.git
+        git push origin master
