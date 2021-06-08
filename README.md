@@ -210,11 +210,14 @@ M2M relies on packages that can also be used independantly with more features:
 * [miscoto](https://github.com/cfrioux/miscoto): community selection and metabolic screening in large-scal microbiotas, with or without taking a host into account
 
 ## Citation
-Belcour* A, Frioux* C, Aite M, Bretaudeau A, Hildebrand F, Siegel A. Metage2Metabo, microbiota-scale metabolic complementarity for the identification of key species. eLife 2020;9:e61968 [https://doi.org/10.7554/eLife.61968](https://doi.org/10.7554/eLife.61968).
+
+If you use Metage2Metabo, please cite:
+
+**Belcour\* A, Frioux\* C, Aite M, Bretaudeau A, Hildebrand F, Siegel A. Metage2Metabo, microbiota-scale metabolic complementarity for the identification of key species. eLife 2020;9:e61968 [https://doi.org/10.7554/eLife.61968](https://doi.org/10.7554/eLife.61968).**
 
 Also when using ``m2m``, please cite the following articles:
 
-- ``MeneTools`` for indivudal scope computation:
+- ``MeneTools`` for individual scope computation:
 
 Aite M, Chevallier M, Frioux C, Trottier C, Got J, Cortés M P, Mendoza S N, Carrier G, Dameron O, Guillaudeux N, Latorre M, Loira N, Markov G V, Maass A, Siegel A. Traceability, reproducibility and wiki-exploration for “à-la-carte” reconstructions of genome-scale metabolic models. PLOS Computational Biology 2018;14:e1006146. [https://doi.org/10.1371/journal.pcbi.1006146](https://doi.org/10.1371/journal.pcbi.1006146).
 
