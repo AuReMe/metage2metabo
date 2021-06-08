@@ -8,7 +8,7 @@ Requirements
 
 m2m_analysis needs:
 
-* `Oog Power Graph Command line tool <http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-command-line-tool.html>`__: used to create a svg file of the power graph. It is a jar file (compiled for Java 6), so you need at least Java 6.
+* `Oog Power Graph Command line tool <https://github.com/AuReMe/metage2metabo/tree/master/external_dependencies/Oog_CommandLineTool2012>`__: used to create a svg file of the power graph. It is a jar file (``Oog.jar`` compiled for Java 6), so you need at least Java 6.
 
 * These python packages:
 

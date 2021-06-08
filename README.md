@@ -104,7 +104,7 @@ Also, m2m_analysis relies on other packages:
         echo 'export PATH="$PATH:your/install/directory/pathway-tools:"' >> ~/.bashrc
         ````
 
-* [Oog Power Graph Command line tool](http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-command-line-tool.html) to create a svg file from the compressed graph at the end of m2m_analysis. This tool is a jar file, Java is needed to use it.
+* [Oog Power Graph Command line tool](https://github.com/AuReMe/metage2metabo/tree/master/external_dependencies/Oog_CommandLineTool2012) to create a svg file from the compressed graph at the end of m2m_analysis. This tool is a jar file, Java is needed to use it.
 
 ## Installation
 
@@ -211,6 +211,47 @@ M2M relies on packages that can also be used independantly with more features:
 
 ## Citation
 Belcour* A, Frioux* C, Aite M, Bretaudeau A, Hildebrand F, Siegel A. Metage2Metabo, microbiota-scale metabolic complementarity for the identification of key species. eLife 2020;9:e61968 [https://doi.org/10.7554/eLife.61968](https://doi.org/10.7554/eLife.61968).
+
+Also when using ``m2m``, please cite the following articles:
+
+- ``MeneTools`` for indivudal scope computation:
+
+Aite M, Chevallier M, Frioux C, Trottier C, Got J, Cortés M P, Mendoza S N, Carrier G, Dameron O, Guillaudeux N, Latorre M, Loira N, Markov G V, Maass A, Siegel A. Traceability, reproducibility and wiki-exploration for “à-la-carte” reconstructions of genome-scale metabolic models. PLOS Computational Biology 2018;14:e1006146. [https://doi.org/10.1371/journal.pcbi.1006146](https://doi.org/10.1371/journal.pcbi.1006146).
+
+- ``MiSCoTo`` for community scope computation and minimal community selection:
+
+Frioux C, Fremy E, Trottier C, Siegel A. Scalable and exhaustive screening of metabolic functions carried out by microbial consortia. Bioinformatics 2018;34:i934–43. [https://doi.org/10.1093/bioinformatics/bty588](https://doi.org/10.1093/bioinformatics/bty588).
+
+If you use ``m2m recon``, please cite additionally:
+
+- ``Pathway Tools`` for the reconstruction of draft metabolic networks:
+
+Karp P D, Midford P E, Billington R, Kothari A, Krummenacker M, Latendresse M, Ong W K, Subhraveti P, Caspi R, Fulcher C, Keseler I M, Paley SM. Pathway Tools version 23.0 update: software for pathway/genome informatics and systems biology. Briefings in Bioinformatics 2021;22:109–126. [https://doi.org/10.1093/bib/bbz104](https://doi.org/10.1093/bib/bbz104).
+
+- ``padmet`` library for metabolic network storage (same article for ``MeneTools``):
+
+Aite M, Chevallier M, Frioux C, Trottier C, Got J, Cortés M P, Mendoza S N, Carrier G, Dameron O, Guillaudeux N, Latorre M, Loira N, Markov G V, Maass A, Siegel A. Traceability, reproducibility and wiki-exploration for “à-la-carte” reconstructions of genome-scale metabolic models. PLOS Computational Biology 2018;14:e1006146. [https://doi.org/10.1371/journal.pcbi.1006146](https://doi.org/10.1371/journal.pcbi.1006146).
+
+
+If you use ``m2m_analysis``, please cite additionally:
+
+- ``networkx`` for graph solution creation:
+
+Hagberg A A, Schult D A, Swart P J. Exploring Network Structure, Dynamics, and Function using NetworkX, in: Varoquaux, G., Vaught, T., Millman, J. (Eds.), . Presented at the Proceedings of the Python in Science Conference (SciPy) 2008. 11–15. [http://conference.scipy.org/proceedings/SciPy2008/paper_2/](http://conference.scipy.org/proceedings/SciPy2008/paper_2/)
+
+- ``Powergrasp`` for power graph compression:
+
+Bourneuf L, Nicolas J. FCA in a Logical Programming Setting for Visualization-Oriented Graph Compression. In: Bertet K, Borchmann D, Cellier P, Ferre´ S (Eds). ICFCA 2017: Formal Concept Analysis 2017. Springer. 89–105. [https://doi.org/10.1007/978-3-319-59271-8_6](https://doi.org/10.1007/978-3-319-59271-8_6).
+
+
+- ``Oog command line tool`` for power graph visualisation:
+
+Royer L, Reimann M, Andreopoulos B, Schroeder M, Unraveling Protein Networks with Power Graph Analysis. PLOS Computational Biology 2008;4:e1000108. [https://doi.org/10.1371/journal.pcbi.1000108](https://doi.org/10.1371/journal.pcbi.1000108).
+
+- ``ete3`` for taxonomic information used in power graphs:
+
+Huerta-Cepas J, Serra F, Bork P. ETE 3: Reconstruction, Analysis, and Visualization of Phylogenomic Data. Molecular Biology and Evolution 2016;33:1635–1638. [https://doi.org/10.1093/molbev/msw046](https://doi.org/10.1093/molbev/msw046).
+
 
 ## Article data
 
