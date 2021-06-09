@@ -104,7 +104,7 @@ Also, m2m_analysis relies on other packages:
         echo 'export PATH="$PATH:your/install/directory/pathway-tools:"' >> ~/.bashrc
         ````
 
-* [Oog Power Graph Command line tool](https://github.com/AuReMe/metage2metabo/tree/master/external_dependencies/Oog_CommandLineTool2012) to create a svg file from the compressed graph at the end of m2m_analysis. This tool is a jar file, Java is needed to use it.
+* [Oog Power Graph Command line tool](https://github.com/AuReMe/metage2metabo/tree/master/external_dependencies/Oog_CommandLineTool2012) to create a svg file from the compressed graph at the end of m2m_analysis. This tool is a jar file (``Oog.jar``) so Java is needed to use it.
 
 ## Installation
 
@@ -195,7 +195,7 @@ subcommands:
     powergraph          powergraph creation and visualization
     workflow            whole workflow
 
-Oog jar file (http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-command-line-tool.html) for powergraph svg creation.
+Optional: Oog.jar file (https://github.com/AuReMe/metage2metabo/tree/master/external_dependencies) for powergraph svg creation.
 ````
 
 ## Release Notes

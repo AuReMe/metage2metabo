@@ -56,7 +56,7 @@ MESSAGE = """
 Detection of key species among communities.
 """
 REQUIRES = """
-Oog jar file (http://www.biotec.tu-dresden.de/research/schroeder/powergraphs/download-command-line-tool.html) for powergraph svg creation.
+Optional: Oog.jar file (https://github.com/AuReMe/metage2metabo/tree/master/external_dependencies) for powergraph svg creation.
 """
 
 logger = logging.getLogger()
