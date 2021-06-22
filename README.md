@@ -43,7 +43,7 @@ The computation is made using logic solvers (Answer Set Programming). The presen
 
 ## License
 
-This project is licensed under the GNU General Public License - see the [LICENSE.md](https://github.com/AuReMe/metage2metabo/blob/master/LICENSE) file for details.
+This project is licensed under the GNU Lesser General Public License - see the [LICENSE.md](https://github.com/AuReMe/metage2metabo/blob/master/LICENSE) file for details.
 
 ## Documentation
 
