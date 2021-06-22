@@ -25,7 +25,7 @@ sys.modules['numpy'] = mock.Mock()
 now = datetime.datetime.now()
 
 project = 'metage2metabo'
-copyright = now.year + ', AuReMe'
+copyright = str(now.year) + ', AuReMe'
 author = 'AuReMe'
 
 # The short X.Y version
