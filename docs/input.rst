@@ -42,6 +42,7 @@ Seeds
 
 Seeds are a set of metabolites that define the nutritional conditions of the community.
 These metabolites can be components of the growth medium or co-factors of complex cycles (known as currency metabolites).
+Seeds must be in SBML format.
 
 For example, this is a list of common currency metabolites (from Kim et al. 2015):
 
@@ -84,7 +85,7 @@ Targets (Optional)
 ------------------
 
 Targets are a set of metabolites whose producibility by the community will be checked and for which minimal communities will be computed.
-It is possible to give targets to Metage2Metabo with any of the commands ``m2m cscope``, ``m2m mincom`` and ``m2m metacom``.
+It is possible to give targets as a SBML file to Metage2Metabo with any of the commands ``m2m cscope``, ``m2m mincom`` and ``m2m metacom``.
 Adding targets will replace the metabolites from the cooperation potential (the ``addedvalue``) as a metabolic objective whether these metabolites are producible either by individual organisms (with ``iscope``), by the community (with ``cscope``) and compute minimal communities producing these metabolites (with ``mincom``).
 
 The same conversion method than the one for the seeds is needed to create a useful targets file.
