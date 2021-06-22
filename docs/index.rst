@@ -31,6 +31,7 @@ Documentation of M2M
 
     install
     command
+    input
     tutorial
     output
     suppinformation
