@@ -23,7 +23,7 @@ sys.modules['numpy'] = mock.Mock()
 # -- Project information -----------------------------------------------------
 
 project = 'metage2metabo'
-copyright = '2019, AuReMe'
+copyright = '2021, AuReMe'
 author = 'AuReMe'
 
 # The short X.Y version
