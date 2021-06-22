@@ -1,6 +1,6 @@
-=========
-m2m input
-=========
+==========
+m2m Inputs
+==========
 
 Genomes or metabolic networks
 -----------------------------
@@ -12,16 +12,16 @@ Example:
 
 ::
 
-input_folder
-├── organism_1
-│ └── organism_1.gbk
-├── organism_2
-│ └── organism_2.gbk
-├── organism_3
-│ └── organism_3.gbk
-..
-└── organism_n
-└── organism_n.gbk
+    input_folder
+    ├── organism_1
+    │ └── organism_1.gbk
+    ├── organism_2
+    │ └── organism_2.gbk
+    ├── organism_3
+    │ └── organism_3.gbk
+    ..
+    └── organism_n
+      └── organism_n.gbk
 
 
 If you already have metabolic networks, you can analyse them with the command ``m2m metacom`` that will perform the whole workflow except for the metabolic reconstruction part.
@@ -30,12 +30,12 @@ Example:
 
 ::
 
-input_folder
-├── organism_1.sbml
-├── organism_2.sbml
-├── organism_3.sbml
-..
-└── organism_n.sbml
+    input_folder
+    ├── organism_1.sbml
+    ├── organism_2.sbml
+    ├── organism_3.sbml
+    ..
+    └── organism_n.sbml
 
 Seeds
 -----
@@ -45,30 +45,32 @@ These metabolites can be components of the growth medium or co-factors of comple
 
 For example, this is a list of common currency metabolites (from Kim et al. 2015):
 
-- proton
-- water
-- oxygen molecule
-- NADP+
-- NADPH
-- ATP
-- diphosphate
-- carbon dioxide
-- phosphate
-- ADP
-- coA
-- UDP
-- NAD+
-- NADH
-- AMP
-- ammonia
-- hydrogen peroxide
-- oxidized electron acceptor
-- reduced electron acceptor
-- 3-5-ADP
-- GDP
-- carbon monoxide
-- GTP
-- FAD
+::
+
+    * proton
+    * water
+    * oxygen molecule
+    * NADP+
+    * NADPH
+    * ATP
+    * diphosphate
+    * carbon dioxide
+    * phosphate
+    * ADP
+    * coA
+    * UDP
+    * NAD+
+    * NADH
+    * AMP
+    * ammonia
+    * hydrogen peroxide
+    * oxidized electron acceptor
+    * reduced electron acceptor
+    * 3-5-ADP
+    * GDP
+    * carbon monoxide
+    * GTP
+    * FAD
 
 The seed metabolites can be found in the literature.
 They can be also found from metabolic databases, for example metaboltites from `nutrition in the VMH <https://www.vmh.life/#nutrition>`__ or `growth media from MetaCyc <https://metacyc.org/META/new-image?object=Growth-Media>`__ (in this latter case, one should used the metabolites in the ``Constituents`` column).
