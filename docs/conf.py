@@ -12,6 +12,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import datetime
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
@@ -21,9 +22,10 @@ import mock
 sys.modules['numpy'] = mock.Mock()
 
 # -- Project information -----------------------------------------------------
+now = datetime.datetime.now()
 
 project = 'metage2metabo'
-copyright = '2021, AuReMe'
+copyright = now.year + ', AuReMe'
 author = 'AuReMe'
 
 # The short X.Y version
