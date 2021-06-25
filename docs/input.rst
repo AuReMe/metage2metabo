@@ -6,7 +6,7 @@ Genomes or metabolic networks
 -----------------------------
 
 If you have annotated genomes and no metabolic networks, you can reconstruct draft metabolic networks using ``m2m`` with the ``m2m workflow`` or the ``m2m recon`` commands.
-The genomes are expected to be in GenBank format and the input is the directory containing subdirectories with the corresponding files.
+The genomes are expected to be in GenBank format (``.gbk`` or ``.gbff``) and the input is the directory containing subdirectories with the corresponding files.
 In addition, the name of the directory must match the name of the genbank file.
 Example:
 
@@ -14,14 +14,14 @@ Example:
 
     input_folder
     ├── organism_1
-    │ └── organism_1.gbk
+    │ └── organism_1.gbff
     ├── organism_2
-    │ └── organism_2.gbk
+    │ └── organism_2.gbff
     ├── organism_3
-    │ └── organism_3.gbk
+    │ └── organism_3.gbff
     ..
     └── organism_n
-      └── organism_n.gbk
+      └── organism_n.gbff
 
 
 If you already have metabolic networks, you can analyse them with the command ``m2m metacom`` that will perform the whole workflow except for the metabolic reconstruction part.

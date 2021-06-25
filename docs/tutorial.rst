@@ -57,7 +57,7 @@ By extracting this file, you will find the
         ├── GCA_003433675
         │   └── GCA_003433675.gbk
 
-In addition, the genbank files also follow the strict requirements of Pathway Tools.
+In addition, the genbank files (``.gbk`` or ``.gbff``) also follow the strict requirements of Pathway Tools.
 Please go check the `documentation of mpwt <https://github.com/AuReMe/mpwt#genbank>`__ for more details, especially if you get errors from Pathway Tools at the ``recon`` step.
 
 .. code:: sh
