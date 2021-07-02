@@ -34,7 +34,7 @@ There is also a complete refactoring on the structure of m2m repository: the two
 
 * Clarified logs when some target metabolites are also part of the seeds. Indications to which file one must refer in order to check the individual producibility of such seeds by organisms.
 
-## Metage2Metabo v1.4.0 (2020-12-14)
+# Metage2Metabo v1.4.0 (2020-12-14)
 
 **Warning**: the version 1.4.0 of m2m needs updated version of its dependencies:
 - menetools >= 3.1.0.
