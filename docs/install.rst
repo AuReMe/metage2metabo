@@ -189,7 +189,7 @@ With some versions of Singularity (superior to 3.6) running ``singularity exec m
 
     /bin/bash: /cluster/myspace/m2m.sh: No such file or directory
 
-This error comes from modifications in Singularity linked to security issue. Especially the path accessible to a container have been reduced.
+This error comes from modifications in Singularity linked to security issue. Especially the paths accessible to a container have been reduced.
 To fix this the ``-B`` option can be used to give access to Singularity to a specific path, for example:
 
 .. code:: sh
