@@ -192,7 +192,9 @@ With some versions of Singularity (superior to 3.6) running ``singularity exec m
 This error comes from modifications in Singularity linked to security issue. Especially the path accessible to a container have been reduced.
 To fix this the ``-B`` option can be used to give access to Singularity to a specific path, for example:
 
-``singularity exec -B /cluster/myspace/m2m:/cluster/myspace/m2m m2m.sif bash /cluster/myspace/m2m.sh``
+.. code:: sh
+
+    singularity exec -B /cluster/myspace/m2m:/cluster/myspace/m2m m2m.sif bash /cluster/myspace/m2m.sh
 
 The first path after ``-B`` option corresponds to the local/cluster path and the second path corresponds to the path inside the Singularity container.
 
