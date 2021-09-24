@@ -227,7 +227,7 @@ Frioux C, Fremy E, Trottier C, Siegel A. Scalable and exhaustive screening of me
 
 If you use ``m2m recon``, please cite additionally:
 
-- ``Pathway Tools`` for the reconstruction of draft metabolic networks:
+- ``Pathway Tools`` for the reconstruction of draft metabolic networks (the article can be not up-to-date, look at the [Publications](https://biocyc.org/publications.shtml) on the BioCyc site):
 
 Karp P D, Midford P E, Billington R, Kothari A, Krummenacker M, Latendresse M, Ong W K, Subhraveti P, Caspi R, Fulcher C, Keseler I M, Paley SM. Pathway Tools version 23.0 update: software for pathway/genome informatics and systems biology. Briefings in Bioinformatics 2021;22:109–126. [https://doi.org/10.1093/bib/bbz104](https://doi.org/10.1093/bib/bbz104).
 
