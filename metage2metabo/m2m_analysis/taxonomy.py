@@ -75,8 +75,6 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_
             taxon = taxon.replace(' ', '_').replace('.', '')
             if taxon not in taxon_count:
                 taxon_count[taxon] = 1
-            elif taxon == "unknown":
-                taxon_count[taxon] = ""
             else:
                 taxon_count[taxon] += 1
 

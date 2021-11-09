@@ -163,7 +163,7 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
 
         # Check if all the nodes of G are not isolates.
         if len(G.nodes) == nx.number_of_isolates(G):
-            logger.critical(r'/!\ Warning: All the nodes of the solution graph are isolated (they are not connected to other nodes). This lead to powergrasp creating san empty powergraph.')
+            logger.critical(r'/!\ Warning: All the nodes of the solution graph are isolated (they are not connected to other nodes). This lead to powergrasp creating an empty powergraph.')
             logger.critical('So m2m_analysis stops at the solution graph step.')
             sys.exit(1)
 
