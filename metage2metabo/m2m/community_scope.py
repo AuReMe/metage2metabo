@@ -30,7 +30,7 @@ logging.getLogger("miscoto").setLevel(logging.CRITICAL)
 
 
 def cscope(sbmldir, seeds, out_dir, targets_file=None, host=None):
-    """Run community scope.
+    """Run community scope
     
     Args:
         sbmldir (str): SBML files directory
@@ -54,7 +54,7 @@ def cscope(sbmldir, seeds, out_dir, targets_file=None, host=None):
 
 
 def instance_community(sbml_dir, seeds, output_dir, targets_file=None, host_mn=None):
-    """Create ASP instance for community analysis.
+    """Create ASP instance for community analysis
     
     Args:
         sbml_dir (str): directory of symbionts SBML files
