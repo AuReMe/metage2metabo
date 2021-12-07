@@ -5,7 +5,7 @@ name: Python package
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master , m2m_1.5.1 ]
     paths-ignore:
       - 'article_data/**'
       - 'docs/**'
@@ -16,7 +16,7 @@ on:
       - 'tutorials/**'
       - 'external_dependencies/**'
   pull_request:
-    branches: [ master ]
+    branches: [ master , m2m_1.5.1 ]
     paths-ignore:
       - 'article_data/**'
       - 'docs/**'
