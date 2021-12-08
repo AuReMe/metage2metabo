@@ -210,7 +210,8 @@ def main():
             parent_parser_xml
         ],
         description=
-        "Run metabolic network reconstruction for each annotated genome of the input directory, using Pathway Tools"
+        "Run metabolic network reconstruction for each annotated genome of the input directory, using Pathway Tools",
+        allow_abbrev=False
     )
     indivscope_parser = subparsers.add_parser(
         "iscope",
@@ -219,7 +220,8 @@ def main():
             parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_q, parent_parser_c
         ],
         description=
-        "Compute individual scopes (reachable metabolites from seeds) for each metabolic network of the input directory"
+        "Compute individual scopes (reachable metabolites from seeds) for each metabolic network of the input directory",
+        allow_abbrev=False
     )
     comscope_parser = subparsers.add_parser(
         "cscope",
@@ -228,7 +230,8 @@ def main():
             parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m,
             parent_parser_q, parent_parser_t_optional
         ],
-        description="Compute the community scope of all metabolic networks")
+        description="Compute the community scope of all metabolic networks",
+        allow_abbrev=False)
     added_value_parser = subparsers.add_parser(
         "addedvalue",
         help="added value of microbiota's metabolism over individual's",
@@ -237,7 +240,8 @@ def main():
             parent_parser_q
         ],
         description=
-        "Compute metabolites that are reachable by the community/microbiota and not by individual organisms"
+        "Compute metabolites that are reachable by the community/microbiota and not by individual organisms",
+        allow_abbrev=False
     )
     mincom_parser = subparsers.add_parser(
         "mincom",
@@ -247,13 +251,15 @@ def main():
             parent_parser_q, parent_parser_t_required
         ],
         description=
-        "Select minimal-size community to make reachable a set of metabolites")
+        "Select minimal-size community to make reachable a set of metabolites",
+        allow_abbrev=False)
     seeds_parser = subparsers.add_parser(
         "seeds",
         help="creation of seeds SBML file",
         parents=[parent_parser_o, parent_parser_q],
         description=
-        "Create a SBML file starting for a simple text file with metabolic compounds identifiers"
+        "Create a SBML file starting for a simple text file with metabolic compounds identifiers",
+        allow_abbrev=False
     )
     seeds_parser.add_argument(
         "--metabolites",
@@ -269,7 +275,8 @@ def main():
             parent_parser_t_optional, parent_parser_cl, parent_parser_xml
         ],
         description=
-        "Run the whole workflow: metabolic network reconstruction, individual and community scope analysis and community selection"
+        "Run the whole workflow: metabolic network reconstruction, individual and community scope analysis and community selection",
+        allow_abbrev=False
     )
     metacom_parser = subparsers.add_parser(
         "metacom",
@@ -279,7 +286,8 @@ def main():
             parent_parser_t_optional, parent_parser_q, parent_parser_c
         ],
         description=
-        "Run the whole metabolism community analysis: individual and community scope analysis and community selection"
+        "Run the whole metabolism community analysis: individual and community scope analysis and community selection",
+        allow_abbrev=False
     )
     test_parser = subparsers.add_parser(
         "test",
@@ -288,7 +296,8 @@ def main():
             parent_parser_q, parent_parser_c, parent_parser_o
         ],
         description=
-        "Test the whole workflow on a data sample")
+        "Test the whole workflow on a data sample",
+        allow_abbrev=False)
 
     args = parser.parse_args()
 
