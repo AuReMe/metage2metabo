@@ -49,13 +49,19 @@ m2m uses Pathway Tools for the reconstruction of draft metabolic networks from a
 
         /!\\ For all OS, Pathway-Tools must be in ``$PATH``.
 
-        On Linux and MacOS: ``export PATH=$PATH:your/install/directory/pathway-tools``.
+        On Linux and MacOS: ``export PATH=$PATH:/your/install/directory/pathway-tools``.
 
         Consider adding Pathway Tools in ``$PATH`` permanently by running
 
         .. code:: sh
 
-            echo 'export PATH="$PATH:your/install/directory/pathway-tools:"' >> ~/.bashrc
+            echo 'export PATH="$PATH:/your/install/directory/pathway-tools:"' >> ~/.bashrc
+
+        Then source bashrc file:
+
+        .. code:: sh
+
+            source ~/.bashrc
 
 m2m relies on several Python packages:
 

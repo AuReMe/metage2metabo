@@ -98,10 +98,14 @@ Also, m2m_analysis relies on other packages:
         * **Warning** 
     
         /!\ For all OS, Pathway Tools must be in ```$PATH```. 
-        On Linux and MacOS: ```export PATH=$PATH:your/install/directory/pathway-tools```. 
+        On Linux and MacOS: ```export PATH=$PATH:/your/install/directory/pathway-tools```.
         Consider adding Pathway Tools in ```$PATH``` permanently by running
         ````sh
-        echo 'export PATH="$PATH:your/install/directory/pathway-tools:"' >> ~/.bashrc
+        echo 'export PATH="$PATH:/your/install/directory/pathway-tools:"'
+        ````
+        Then source the bashrc file:
+        ````sh
+        source ~/.bashrc
         ````
 
 * [Oog Power Graph Command line tool](https://github.com/AuReMe/metage2metabo/tree/master/external_dependencies/Oog_CommandLineTool2012) to create a svg file from the compressed graph at the end of m2m_analysis. This tool is a jar file (``Oog.jar``) so Java is needed to use it.
