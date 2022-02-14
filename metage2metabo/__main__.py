@@ -31,6 +31,7 @@ from metage2metabo.m2m.community_scope import cscope, instance_community
 from metage2metabo.m2m.community_addedvalue import addedvalue
 from metage2metabo.m2m.minimal_community import mincom
 from metage2metabo.m2m.m2m_workflow import run_workflow, metacom_analysis
+from metage2metabo.m2m.cofactors import cofactors
 
 from metage2metabo import sbml_management, utils
 
@@ -195,6 +196,12 @@ def main():
         help="Optional targets for metabolic analysis, if not used metage2metabo will use the addedvalue of the community",
         required=False
         )
+    parent_parser_cofactor = argparse.ArgumentParser(add_help=False)
+    parent_parser_cofactor.add_argument(
+        "--cofactors",
+        help="Path to a tsv file containing one pair of cofactor by line.",
+        required=True
+        )
 
     # subparsers
     subparsers = parser.add_subparsers(
@@ -298,6 +305,17 @@ def main():
         description=
         "Test the whole workflow on a data sample",
         allow_abbrev=False)
+    metacom_parser = subparsers.add_parser(
+        "cofactors",
+        help="Create new sbml files with mock cofactors identified by moped using a folder of sbml and a tsv file with cofactor pairs.",
+        parents=[
+            parent_parser_n, parent_parser_cofactor, parent_parser_o,
+            parent_parser_c, parent_parser_q
+        ],
+        description=
+        "Run the whole metabolism community analysis: individual and community scope analysis and community selection",
+        allow_abbrev=False
+    )
 
     args = parser.parse_args()
 
@@ -352,7 +370,7 @@ def main():
     if args.cmd == "workflow":
         main_workflow(args.genomes, args.out, args.cpu, args.clean, args.seeds,
                       args.noorphan, args.padmet, new_arg_modelhost, args.targets, args.pwt_xml)
-    elif args.cmd in ["iscope", "cscope", "addedvalue", "mincom", "metacom"]:
+    elif args.cmd in ["iscope", "cscope", "addedvalue", "mincom", "metacom", "cofactors"]:
         if not os.path.isdir(args.networksdir):
             logger.critical(args.networksdir + " is not a correct directory path")
             sys.exit(1)
@@ -376,6 +394,8 @@ def main():
             main_mincom(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
         elif args.cmd == "metacom":
             main_metacom(network_dir, args.out, args.seeds, new_arg_modelhost, args.targets, args.cpu)
+        elif args.cmd == "cofactors":
+            main_cofactors(network_dir, args.cofactors, args.out, args.cpu)
     elif args.cmd == "recon":
         main_recon(args.genomes, args.out, args.noorphan, args.padmet, args.level, args.cpu,
                    args.clean, args.pwt_xml)
@@ -468,6 +488,12 @@ def main_mincom(sbmldir, seedsfiles, outdir, targets, host):
     mincom(instance, outdir)
     #delete intermediate file
     os.unlink(instance)
+
+
+def main_cofactors(*allargs):
+    """Run cofactors command.
+    """
+    cofactors(*allargs)
 
 
 def main_seeds(metabolites_file, outdir):

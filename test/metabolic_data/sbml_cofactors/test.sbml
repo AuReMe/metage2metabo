@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbml xmlns="http://www.sbml.org/sbml/level2" level="2" version="1">
+  <model id="metabolites">
+    <listOfSpecies>
+      <species id="M_ADP_c" name="ADP" compartment="c"/>
+      <species id="M_ATP_c" name="ATP" compartment="c"/>
+      <species id="M_metabolite_A_c" name="A" compartment="c"/>
+      <species id="M_metabolite_B_c" name="B" compartment="c"/>
+      <species id="M_PROTON_c" name="Proton" compartment="c"/>
+    </listOfSpecies>
+    <listOfReactions>
+      <reaction id="R_reaction" name="Test-reaction" reversible="true" fast="false">
+        <listOfReactants>
+          <speciesReference species="M_metabolite_A_c" stoichiometry="1" constant="false"/>
+          <speciesReference species="M_ATP_c" stoichiometry="1" constant="false"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_PROTON_c" stoichiometry="1" constant="false"/>
+          <speciesReference species="M_metabolite_B_c" stoichiometry="1" constant="false"/>
+          <speciesReference species="M_ADP_c" stoichiometry="1" constant="false"/>
+        </listOfProducts>
+      </reaction>
+    </listOfReactions>
+  </model>
+</sbml>
