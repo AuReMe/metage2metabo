@@ -38,5 +38,5 @@ More information on usage and troubleshooting on Github: https://github.com/aure
             'm2m_analysis = metage2metabo.__main_analysis__:main',
         ]
     },
-    install_requires=['miscoto', 'menetools', 'mpwt', 'padmet'],
+    install_requires=['miscoto', 'menetools', 'mpwt', 'padmet', 'moped'],
 )
