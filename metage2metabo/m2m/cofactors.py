@@ -47,11 +47,15 @@ def create_mock_cofactors(input_sbml_path, pair_cofactors, output_sbml_path):
     rxn_cofactors = {}
     metabolite_cofactors = []
     reversibility_reactions = {}
+    compartment_metabolites = {}
+    name_metabolites = {}
     for reaction in m.reactions:
         products = []
         reactants = []
         if '__cof__' in reaction:
             for metabolite in m.reactions[reaction].stoichiometries:
+                name_metabolites[convert_to_coded_id(metabolite)] = m.compounds[metabolite].name
+                compartment_metabolites[convert_to_coded_id(metabolite)] = m.compounds[metabolite].compartment
                 if m.reactions[reaction].stoichiometries[metabolite] > 0:
                     products.append(convert_to_coded_id(metabolite))
                 elif m.reactions[reaction].stoichiometries[metabolite] < 0:
@@ -62,31 +66,30 @@ def create_mock_cofactors(input_sbml_path, pair_cofactors, output_sbml_path):
             reversibility_reactions[reaction] = m.reactions[reaction].reversible
 
     metabolite_cofactors = set(metabolite_cofactors)
-
     # Add them to the sbml in a very ugly way.
     # If I believed in hell, I think that lines of code would guarantee me an access to that place.
     # This add the cofactor metabolites at the end of the listOfSpecies and the cofactors reactions at the end of the listOfReactions.
     sbml_text = ''
 
-    metabolite_sbml = '			<species id="{0}"/>'
+    metabolite_sbml = '			<species id="{0}" name="{0}" compartment="{1}"/>'
     reaction_sbml = '      <reaction id="{0}"  reversible="{1}" >'
-    species_ref_sbml = '          <speciesReference species="{0}" stoichiometry="1" constant="true"/>'
+    species_ref_sbml = '          <speciesReference species="{0}" name="{0}" compartment="{1}" stoichiometry="1" constant="true"/>'
 
     with open(input_sbml_path, 'r') as sbml_input_file:
         for line in sbml_input_file:
             if '/listOfSpecies' in line:
                 for metabolite_cof in metabolite_cofactors:
-                    sbml_text += metabolite_sbml.format(metabolite_cof)+'\n'
+                    sbml_text += metabolite_sbml.format(metabolite_cof, compartment_metabolites[metabolite_cof])+'\n'
             if '/listOfReactions' in line:
                 for reaction in rxn_cofactors:
                     sbml_text += reaction_sbml.format(convert_to_coded_id(reaction), str(reversibility_reactions[reaction]).lower())+'\n'
                     sbml_text += '        <listOfReactants>'+'\n'
                     for reactant in rxn_cofactors[reaction][0]:
-                        sbml_text += species_ref_sbml.format(reactant)+'\n'
+                        sbml_text += species_ref_sbml.format(reactant, compartment_metabolites[metabolite_cof])+'\n'
                     sbml_text += '        </listOfReactants>'+'\n'
                     sbml_text += '        <listOfProducts>'+'\n'
                     for product in rxn_cofactors[reaction][1]:
-                        sbml_text += species_ref_sbml.format(product)+'\n'
+                        sbml_text += species_ref_sbml.format(product, compartment_metabolites[metabolite_cof])+'\n'
                     sbml_text += '        </listOfProducts>\n      </reaction>\n'
             sbml_text += line
 
