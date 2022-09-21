@@ -237,6 +237,15 @@ def main():
         parser.print_help()
         sys.exit()
 
+    if "seeds" in args and args.seeds is not None:
+        if not utils.is_valid_file(args.seeds):
+            logger.critical('Error: ' + args.seeds + " is not a correct filepath")
+            sys.exit(1)
+    if "targets" in args and args.targets is not None:
+        if not utils.is_valid_file(args.targets):
+            logger.critical('Error: ' + args.targets + " is not a correct filepath")
+            sys.exit(1)
+
     # add logger in file
     formatter = logging.Formatter('%(message)s')
     log_file_path = os.path.join(args.out, f'm2m_analysis_{args.cmd}.log')
