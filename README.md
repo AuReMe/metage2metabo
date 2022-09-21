@@ -5,9 +5,19 @@ Metage2metabo is a Python3 (Python >= 3.6, tested with 3.6 and 3.7) tool to perf
 
 m2m can be used as a whole workflow (``` m2m workflow ```, ``` m2m metacom ```) or steps can be performed individually (``` m2m recon ``` , ``` m2m iscope ``` , ``` m2m cscope ```, ``` m2m addedvalue ```, ``` m2m mincom ```, ``` m2m seeds ```).
 
-**If you use M2M, please cite**
+A dedicated pipeline for the analysis of minimal community solution and their visualisation in power graphs is available with `m2m analysis`. More details in the [documentation](https://metage2metabo.readthedocs.io/en/latest/m2m_analysis.html).
 
-Belcour* A, Frioux* C, Aite M, Bretaudeau A, Hildebrand F, Siegel A. Metage2Metabo, microbiota-scale metabolic complementarity for the identification of key species. eLife 2020;9:e61968 [https://doi.org/10.7554/eLife.61968](https://doi.org/10.7554/eLife.61968).
+**If you use M2M, please cite:**
+
+* Belcour* A, Frioux* C, Aite M, Bretaudeau A, Hildebrand F, Siegel A. (2020). Metage2Metabo, microbiota-scale metabolic complementarity for the identification of key species. eLife 2020;9:e61968 [https://doi.org/10.7554/eLife.61968](https://doi.org/10.7554/eLife.61968).
+
+* Frioux, C., Fremy, E., Trottier, C., & Siegel, A. (2018). Scalable and exhaustive screening of metabolic functions carried out by microbial consortia. Bioinformatics, 34(17), i934–i943. [https://doi.org/10.1093/bioinformatics/bty588](https://doi.org/10.1093/bioinformatics/bty588).
+
+**If you use m2m_analysis, please cite <ins>additionally</ins>:**
+
+* Bourneuf, L., & Nicolas, J. (2017). FCA in a Logical Programming Setting for Visualization-Oriented Graph Compression. Formal Concept Analysis, 14th International Conference, ICFCA 2017, Rennes, France, June 13-16, 2017, Proceedings. 89–105. [https://doi.org/10.1007/978-3-319-59271-8_6](https://doi.org/10.1007/978-3-319-59271-8_6).
+
+**If you use m2m recon, please cite the appropriate Pathway Tools paper, in addition to the first two references.**
 
 For a summary of M2M and its applications, you can take a look at these [poster-slides](https://hal.inria.fr/hal-03151934/document), presented during the [JOBIM 2020 conference](https://jobim2020.sciencesconf.org/?forward-action=index&forward-controller=index&lang=en).
 
