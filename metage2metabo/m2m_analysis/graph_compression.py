@@ -26,6 +26,11 @@ from bubbletools import convert
 from metage2metabo import utils
 from metage2metabo.m2m_analysis.taxonomy import extract_taxa, get_taxon
 
+# Deactivate clingo module to avoid issue like this one:
+# https://github.com/Aluriak/PowerGrASP/issues/1
+import clyngor
+clyngor.deactivate_clingo_module()
+
 logger = logging.getLogger(__name__)
 
 
