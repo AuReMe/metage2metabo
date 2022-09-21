@@ -1,5 +1,12 @@
 # Changelog
 
+# Metage2Metabo v1.5.1 (2022-09-21)
+
+## Fix
+
+* issue in m2m_analysis where clyngor module uses the clingo module producing [ValueError](https://github.com/Aluriak/PowerGrASP/issues/1).
+* issue in m2m_analysis when incorrect paths for seed and/or target files were given as input. 
+
 # Metage2Metabo v1.5.0 (2021-03-17)
 
 This release focuses on `m2m_analysis` by adding new option, new output files,more documentation and refactoring some functions and output files.
