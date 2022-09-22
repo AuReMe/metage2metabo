@@ -61,7 +61,7 @@ A more detailled documentation is available at: [https://metage2metabo.readthedo
 
 ## Technologies
 
-Python 3 (Python 3.6 is tested). M2M uses a certain number of Python dependencies. An example of all these dependencies working for Ubuntu 18.04 is available in [requirements.txt](https://github.com/AuReMe/metage2metabo/blob/master/requirements.txt).
+Python 3 (Python 3.7 and 3.8 is tested). M2M uses a certain number of Python dependencies. An example of all these dependencies working for Ubuntu 18.04 is available in [requirements.txt](https://github.com/AuReMe/metage2metabo/blob/master/requirements.txt).
 They can be installed with:
 ````sh
 pip install -r requirements.txt --no-cache-dir
