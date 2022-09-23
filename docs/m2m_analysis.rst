@@ -533,9 +533,17 @@ For each target, there will a folder in ``html`` folder and a html file (named a
 The folder is created by bubble-tools and contains html, css and js files with the information for the visualization.
 The html file is a merged of all the files from the folder, to ease the visualization.
 
-To view the html file, open it with a web browser (like ``Firefox``). There will be simple node (circle) in two colors (dark pink for essential symbionts and blue for alternative symbionts). And powernode will be rectangle.
+To view the html file, open it with a web browser (like ``Firefox``).
+There will be nodes (circle and rectangle) in two ahpes and colors (dark pink circle for essential symbionts and blue rectangle for alternative symbionts). And powernode will be rectangle.
 
-If you used the "--taxon" option, a new html file is created and labelled as ``*_taxon.html`` (and a corresponding folder is created). In this html file, the node will be colored according to their taxon.
+.. image:: images/html_powergraph.png
+    :width: 500pt
+
+If you used the "--taxon" option, a new html file is created and labelled as ``*_taxon.html`` (and a corresponding folder is created).
+In this html file, the node will be colored according to their taxon and the shape indicated if it is an essential symbiont (circle) or an alternative symbiont (rectangle).
+
+.. image:: images/html_powergraph_taxon.png
+    :width: 500pt
 
 With the html file it is possible to interact and move the node by clicking on them.
 

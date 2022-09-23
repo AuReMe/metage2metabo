@@ -133,16 +133,6 @@ def powergraph_analysis(gml_input_file_folder, output_folder, oog_jar=None, taxo
 
         taxon_species, all_taxons = get_taxon(taxonomy_output_file)
 
-        taxon_colors = {}
-
-        if len(all_taxons) <= 26:
-            used_colors = alphabet_project_distinct_hex_colors
-        else:
-            used_colors = hex_colors
-
-        for index, taxon in enumerate(all_taxons):
-            taxon_colors[taxon] = used_colors[index]
-
     for target_name in gml_paths:
         bbl_output = os.path.join(bbl_path, target_name + '.bbl')
         svg_file = os.path.join(svg_path, target_name + '.bbl.svg')
@@ -164,17 +154,33 @@ def powergraph_analysis(gml_input_file_folder, output_folder, oog_jar=None, taxo
         alternatives = [organism for organism in graph.nodes if graph.nodes[organism]['note'] == 'AS']
         if taxon_file:
             key_species = essentials + alternatives
-            taxon_key_species = [organism.split('__')[0] for organism in key_species]
-            if len(set(all_taxons).intersection(set(taxon_key_species))) == 0:
+            taxon_key_species = set([organism.split('__')[0] for organism in key_species])
+            if len(set(all_taxons).intersection(taxon_key_species)) == 0:
                 logger.critical('Difference of taxonomy level between gml file ('+gml_input_path+') compared to '+taxonomy_output_file+'.')
                 sys.exit(1)
+
+            # For each taxon in the key species, create a color.
+            if len(taxon_key_species) <= len(alphabet_project_distinct_hex_colors):
+                used_colors = alphabet_project_distinct_hex_colors
+            elif len(hex_colors) >= len(taxon_key_species) > len(alphabet_project_distinct_hex_colors):
+                used_colors = hex_colors
+            else:
+                logger.critical('Too many taxa in key species (superior to 269) and not enough colors in palette to color the powergraph.')
+                sys.exit(1)
+
+            taxon_colors = {}
+            a = 0
+            for index, taxon in enumerate(all_taxons):
+                if taxon in taxon_key_species:
+                    a +=1
+                    taxon_colors[taxon] = used_colors[index]
 
         bbl_to_html(bbl_output, html_target)
         if taxon_file:
             if os.path.exists(html_target +'_taxon'):
                 shutil.rmtree(html_target +'_taxon')
             shutil.copytree(html_target, html_target +'_taxon')
-            update_js_taxonomy(html_target +'_taxon', taxon_colors)
+            update_js_taxonomy(html_target +'_taxon', taxon_colors, essentials, alternatives)
             output_html_merged = os.path.join(html_output, target_name + '_powergraph_taxon.html')
             merge_html_css_js(html_target +'_taxon', output_html_merged)
 
@@ -304,8 +310,8 @@ def update_js(html_output, essentials, alternatives):
         alternatives (list): list of alternative symbionts
     """
     # Add selector to color node according to the type if node:
-    # #D41159 for essential symbiont
-    # #1A85FF for alternative symbiont
+    # circle #D41159 for essential symbiont
+    # round rectangle #1A85FF for alternative symbiont
     selector_color = '''
     {
         selector: 'node[type="essential"]',
@@ -319,6 +325,7 @@ def update_js(html_output, essentials, alternatives):
         css: {
             'background-color': '#1A85FF',
             'width': '30px',
+            'shape':'rectangle'
         }
     },
     '''
@@ -342,15 +349,18 @@ def update_js(html_output, essentials, alternatives):
         input_js.write(new_graph_sj)
 
 
-def update_js_taxonomy(html_output, taxon_colors):
+def update_js_taxonomy(html_output, taxon_colors, essentials, alternatives):
     """Update graph.js to add colors according to taxon.
 
     Args:
         html_output (str): path to html folder (containing js subfolder with gaph.js)
         taxon_colors (dict): dictionary {taxon_name: associated_color}
+        essentials (list): list of essential symbionts
+        alternatives (list): list of alternative symbionts
     """
     # Add selector to color node according to the type of node:
     # link a color to each taxon
+
     selector_color = ''
     for taxon in taxon_colors:
         taxon_color = taxon_colors[taxon]
@@ -369,9 +379,13 @@ def update_js_taxonomy(html_output, taxon_colors):
     with open(graph_js, 'r') as input_js:
         for line in input_js:
             if "data: { 'id'" in line:
-                species_taxon_id = line.split("'id':")[1].split(',')[0].strip("'| ").split('__')[0]
+                species_names = line.split("'id':")[1].split(',')[0].strip("'| ")
+                species_taxon_id = species_names.split('__')[0]
                 if species_taxon_id in taxon_colors:
-                    line = line.replace(" } },", ", 'type': '"+species_taxon_id+"' } },")
+                    if species_names in essentials:
+                        line = line.replace(" } },", ", 'type': '"+species_taxon_id+"' } },")
+                    if species_names in alternatives:
+                        line = line.replace(" } },", ", 'type': '"+species_taxon_id+"' }, css: {'shape': 'rectangle'} },")
 
             new_graph_sj += line
             if 'style: [' in line:
