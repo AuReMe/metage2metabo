@@ -1,5 +1,15 @@
 # Changelog
 
+# Metage2Metabo v1.5.2 (2022-09-23)
+
+## Modify
+
+* Change the shapes of the nodes in the html output of `m2m_analysis`: circle for essential symbionts and square for alternative symbionts.
+
+## Fix
+
+* Issue with the number of colors used to color the taxon in the powergraph.
+
 # Metage2Metabo v1.5.1 (2022-09-21)
 
 ## Fix
