@@ -1,5 +1,11 @@
 # Changelog
 
+# Metage2Metabo v1.5.3 (2022-09-26)
+
+## Fix
+
+* Correctly fix the issue with the colors used for the powergraph.
+
 # Metage2Metabo v1.5.2 (2022-09-23)
 
 ## Modify

@@ -169,11 +169,8 @@ def powergraph_analysis(gml_input_file_folder, output_folder, oog_jar=None, taxo
                 sys.exit(1)
 
             taxon_colors = {}
-            a = 0
-            for index, taxon in enumerate(all_taxons):
-                if taxon in taxon_key_species:
-                    a +=1
-                    taxon_colors[taxon] = used_colors[index]
+            for index, taxon in enumerate(taxon_key_species):
+                taxon_colors[taxon] = used_colors[index]
 
         bbl_to_html(bbl_output, html_target)
         if taxon_file:
