@@ -43,7 +43,6 @@ From: ubuntu:20.04
      mkdir -p /opt;\
      cp -r /external/folder/ptools-local /opt;\
      rm /opt/pathway-tools-23.0-linux-64-tier1-install;\
-     curl https://bootstrap.pypa.io/get-pip.py | python3;\
      pip install graphviz ete3 networkx;\
      pip install powergrasp;\
      pip install Metage2Metabo
