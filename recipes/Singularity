@@ -1,9 +1,9 @@
 Bootstrap: docker
-From: ubuntu:18.04
+From: ubuntu:20.04
 
 %labels
     Maintainer Belcour A.
-    Version v1.1.6
+    Version v1.5.3
     Description m2m Singularity recipe
 
 %files
@@ -19,17 +19,20 @@ From: ubuntu:18.04
 
 %post
      apt-get -y update && \
+     echo "deb http://security.ubuntu.com/ubuntu bionic-security main" >> /etc/apt/sources.list ;\
+     apt-get -y update && \
      DEBIAN_FRONTEND=noninteractive apt-get install -y \
+     ssh-client \
      curl \
      csh \
      git \
      ncbi-blast+ \
+     python3-pip \
      libxm4 \
-     python3.6-dev \
-     python3.6-distutils \
      default-jre \
+     libssl1.0-dev \
      iputils-ping \
-     gnome-terminal;\
+     gnome-terminal ;\
      apt-get clean; \
      apt-get purge; \
      mkdir /programs;\
@@ -40,7 +43,6 @@ From: ubuntu:18.04
      mkdir -p /opt;\
      cp -r /external/folder/ptools-local /opt;\
      rm /opt/pathway-tools-23.0-linux-64-tier1-install;\
-     curl https://bootstrap.pypa.io/get-pip.py | python3;\
      pip install graphviz ete3 networkx;\
      pip install powergrasp;\
      pip install Metage2Metabo

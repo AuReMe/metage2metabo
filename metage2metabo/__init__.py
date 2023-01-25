@@ -14,6 +14,6 @@
 
 from metage2metabo import m2m, m2m_analysis
 
-__version__ = '1.5.1'
+__version__ = '1.5.3'
 """ version of the package
 """ 

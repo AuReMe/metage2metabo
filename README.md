@@ -61,7 +61,7 @@ A more detailled documentation is available at: [https://metage2metabo.readthedo
 
 ## Technologies
 
-Python 3 (Python 3.6 is tested). M2M uses a certain number of Python dependencies. An example of all these dependencies working for Ubuntu 18.04 is available in [requirements.txt](https://github.com/AuReMe/metage2metabo/blob/master/requirements.txt).
+Python 3 (Python 3.7 and 3.8 is tested). M2M uses a certain number of Python dependencies. An example of all these dependencies working for Ubuntu 18.04 is available in [requirements.txt](https://github.com/AuReMe/metage2metabo/blob/master/requirements.txt).
 They can be installed with:
 ````sh
 pip install -r requirements.txt --no-cache-dir
@@ -79,7 +79,7 @@ Also, m2m_analysis relies on other packages:
 
 ## Requirements
 
-* [Pathway Tools](http://bioinformatics.ai.sri.com/ptools/) version 23.0 or higher (free for [academic users](https://biocyc.org/download-bundle.shtml)) is **required for m2m workflow and m2m recon**
+* [Pathway Tools](http://bioinformatics.ai.sri.com/ptools/) version 23.0 or higher (free for [academic users](https://biocyc.org/download-bundle.shtml)) is **required for m2m workflow and m2m recon**.  Metage2Metabo uses mpwt for multiprocessing and mpwt is not usable on Windows. Therefore, the reconstruction step of Metage2Metabo **is not available on Windows**.
     * Pathway Tools requirements
         * **Linux**: Gnome terminal and Libxm4
         ```sh

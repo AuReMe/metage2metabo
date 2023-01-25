@@ -1,3 +1,4 @@
+bubbletools>=0.6.10
 clyngor>=0.3.31
 clyngor-with-clingo>=5.3.post1
 ete3==3.1.1
