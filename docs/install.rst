@@ -127,6 +127,14 @@ To create a container named m2m.sif:
 
     sudo singularity build m2m.sif Singularity
 
+If you have issue with disk space in the temporary folder used by Singularity, it is possible to specify another temporary folder with ``SINGULARITY_TMPDIR``, such as:
+
+.. code:: sh
+
+    sudo SINGULARITY_TMPDIR=/another/tmp/folder singularity build m2m.sif Singularity
+
+Warning, this command will fail if folder ``another/tmp/folder`` does not exist.
+
 To use Pathway-Tools, a .ncbirc file is required in the home directory, containing the path to Blast:
 
 .. code:: sh

@@ -79,7 +79,7 @@ Also, m2m_analysis relies on other packages:
 
 ## Requirements
 
-* [Pathway Tools](http://bioinformatics.ai.sri.com/ptools/) version 23.0 or higher (free for [academic users](https://biocyc.org/download-bundle.shtml)) is **required for m2m workflow and m2m recon**
+* [Pathway Tools](http://bioinformatics.ai.sri.com/ptools/) version 23.0 or higher (free for [academic users](https://biocyc.org/download-bundle.shtml)) is **required for m2m workflow and m2m recon**.  Metage2Metabo uses mpwt for multiprocessing and mpwt is not usable on Windows. Therefore, the reconstruction step of Metage2Metabo **is not available on Windows**.
     * Pathway Tools requirements
         * **Linux**: Gnome terminal and Libxm4
         ```sh
