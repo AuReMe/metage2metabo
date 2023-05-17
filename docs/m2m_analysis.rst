@@ -534,7 +534,7 @@ The folder is created by bubble-tools and contains html, css and js files with t
 The html file is a merged of all the files from the folder, to ease the visualization.
 
 To view the html file, open it with a web browser (like ``Firefox``).
-There will be nodes (circle and rectangle) in two ahpes and colors (dark pink circle for essential symbionts and blue rectangle for alternative symbionts). And powernode will be rectangle.
+There will be nodes in two shapes (circle for essential symbionts and rectangle for alternative symbionts) and colors (dark pink circle for essential symbionts and blue rectangle for alternative symbionts). And powernode will be rectangle.
 
 .. image:: images/html_powergraph.png
     :width: 500pt
