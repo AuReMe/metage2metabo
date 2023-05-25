@@ -4,7 +4,7 @@
 
 ## Fix
 
-* Issues in html powergrpah creation:
+* Issues in html powergraph creation:
   * some nodes are not indicated as alternative symbionts.
   * colors are not applied to some nodes.
   * the names of the nodes contain unicode ints.
