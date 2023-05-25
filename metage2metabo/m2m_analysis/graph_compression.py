@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade
+# Copyright (C) 2019-2023 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -12,10 +12,10 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>
 
-import csv
 import logging
 import networkx as nx
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -152,6 +152,7 @@ def powergraph_analysis(gml_input_file_folder, output_folder, oog_jar=None, taxo
         graph = nx.read_gml(gml_input_path)
         essentials = [organism for organism in graph.nodes if graph.nodes[organism]['note'] == 'ES']
         alternatives = [organism for organism in graph.nodes if graph.nodes[organism]['note'] == 'AS']
+
         if taxon_file:
             key_species = essentials + alternatives
             taxon_key_species = set([organism.split('__')[0] for organism in key_species])
@@ -213,6 +214,7 @@ def compression(gml_input, bbl_output):
     with open('powergrasp.cfg', 'w') as config_file:
         config_file.write('[powergrasp options]\n')
         config_file.write('SHOW_STORY = no\n')
+        config_file.write('SHOW_DEBUG = no\n')
 
     import powergrasp
     from bubbletools import BubbleTree
@@ -298,6 +300,25 @@ def bbl_to_svg(oog_jar, bbl_input, svg_output):
         subproc.wait()
 
 
+def convert_taxon_id(taxon_id):
+    """Some taxon IDs are converted by powergrasp.
+    Especially some strings are replaced by their Unicode ints.
+    This function replaces these codes by the corresponding string.
+
+    Args:
+        taxon_id (str): taxon ID with potential Unicode int.
+
+    Returns:
+        taxon_id (str): converted taxon ID
+    """
+    matches = re.findall('_c\d*_', taxon_id)
+    for match in matches:
+        convert_match = chr(int(match.strip('_c').strip('_')))
+        taxon_id = taxon_id.replace(match, convert_match)
+
+    return taxon_id
+
+
 def update_js(html_output, essentials, alternatives):
     """Update graph.js to add colors for essential and alternative symbionts.
 
@@ -333,7 +354,14 @@ def update_js(html_output, essentials, alternatives):
     with open(graph_js, 'r') as input_js:
         for line in input_js:
             if "data: { 'id'" in line:
-                species_id = line.split("'id':")[1].split(',')[0].split("'")[1]
+                species_id = line.split("'id':")[1].split("'")[1].strip("'| ")
+
+                # Fix issue with converted str into Unicode int.
+                if '_c' in species_id:
+                    unconvert_species_id = species_id
+                    species_id = convert_taxon_id(species_id)
+                    line = line.replace(unconvert_species_id, species_id)
+
                 if species_id in essentials:
                     line = line.replace(" } },", ", 'type': 'essential' } },")
                 if species_id in alternatives:
@@ -376,8 +404,15 @@ def update_js_taxonomy(html_output, taxon_colors, essentials, alternatives):
     with open(graph_js, 'r') as input_js:
         for line in input_js:
             if "data: { 'id'" in line:
-                species_names = line.split("'id':")[1].split(',')[0].strip("'| ")
+                species_names = line.split("'id':")[1].split("'")[1].strip("'| ")
+
+                # Fix issue with converted str into Unicode int.
+                if '_c' in species_names:
+                    unconvert_species_names = species_names
+                    species_names = convert_taxon_id(species_names)
+                    line = line.replace(unconvert_species_names, species_names)
                 species_taxon_id = species_names.split('__')[0]
+
                 if species_taxon_id in taxon_colors:
                     if species_names in essentials:
                         line = line.replace(" } },", ", 'type': '"+species_taxon_id+"' } },")
