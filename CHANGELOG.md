@@ -1,5 +1,18 @@
 # Changelog
 
+# Metage2Metabo v1.5.4 (2023-05-25)
+
+## Fix
+
+* Issues in html powergrpah creation:
+  * some nodes are not indicated as alternative symbionts.
+  * colors are not applied to some nodes.
+  * the names of the nodes contain unicode ints.
+
+## Modify
+
+* Update license year.
+
 # Metage2Metabo v1.5.3 (2022-09-26)
 
 ## Fix
