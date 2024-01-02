@@ -52,13 +52,14 @@ def iscope(sbmldir, seeds, out_dir, cpu_number=1):
             name for name in os.listdir(sbmldir) if os.path.isfile(os.path.join(sbmldir, name))
             and utils.get_extension(os.path.join(sbmldir, name)).lower() in ["xml", "sbml"]
     ]) > 1:
-        scope_json = indiv_scope_run(sbmldir, seeds, out_dir, cpu_number)
-        logger.info("Individual scopes for all metabolic networks available in " + scope_json)
+        scope_dict, seeds_dict, scope_json, seeds_status_path = indiv_scope_run(sbmldir, seeds, out_dir, cpu_number)
+        logger.info(f'\nIndividual scopes for all metabolic networks available in {scope_json}. The scopes have been filtered a way that if a seed is in a scope, it means the corresponding species is predicted to be able to produce it.')
+        logger.info(f'\nInformation regarding the producibility of seeds, and the possible absence of seeds in some metabolic networks is stored in {seeds_status_path}.\n')        
         # Analyze the individual scopes results (json file)
-        reachable_metabolites_union = analyze_indiv_scope(scope_json, seeds)
+        reachable_metabolites_union = analyze_indiv_scope(scope_dict, seeds_dict, seeds)
         # Compute the reverse iscopes (who produces each metabolite)
-        reverse_scope_json, reverse_scope_tsv = reverse_scope(scope_json, out_dir)
-        logger.info(f"Analysis of functional redundancy (producers of all metabolites) is computed as a dictionary in {reverse_scope_json} and as a matrix in {reverse_scope_tsv}.")
+        reverse_scope_json, reverse_scope_tsv = reverse_scope(scope_dict, out_dir)
+        logger.info(f"\nAnalysis of functional redundancy (producers of all metabolites) is computed as a dictionary in {reverse_scope_json} and as a matrix in {reverse_scope_tsv}.")
         logger.info("--- Indiv scopes runtime %.2f seconds ---\n" %
                     (time.time() - starttime))
         return reachable_metabolites_union
@@ -83,7 +84,7 @@ def indiv_scope_run(sbml_dir, seeds, output_dir, cpu_number=1):
 
     menetools_dir = os.path.join(output_dir, 'indiv_scopes')
     indiv_scopes_path = os.path.join(menetools_dir, 'indiv_scopes.json')
-    produced_seeds_path = os.path.join(menetools_dir, 'indiv_produced_seeds.json')
+    produced_seeds_path = os.path.join(menetools_dir, 'seeds_in_indiv_scopes.json')
 
     if not utils.is_valid_dir(menetools_dir):
         logger.critical('Impossible to access/create output directory')
@@ -96,6 +97,8 @@ def indiv_scope_run(sbml_dir, seeds, output_dir, cpu_number=1):
     ]
     all_scopes = {}
     all_produced_seeds = {}
+    all_absent_seeds = {}
+    all_non_produced_seeds = {}
     multiprocessing_indiv_scopes = []
     for f in all_files:
         bname = utils.get_basename(f)
@@ -115,17 +118,32 @@ def indiv_scope_run(sbml_dir, seeds, output_dir, cpu_number=1):
         menescope_results = result[2]
         all_scopes[bname] = menescope_results['scope']
         all_produced_seeds[bname] = menescope_results['produced_seeds']
+        all_absent_seeds[bname] = menescope_results['absent_seeds']
+        all_non_produced_seeds[bname] = menescope_results['non_produced_seeds']
 
     menescope_pool.close()
     menescope_pool.join()
+
+    seeds_status = {}
+    seeds_status['individually_producible_seeds'] = all_produced_seeds
+    seeds_status['seeds_absent_in_metabolic_network'] = all_absent_seeds
+    seeds_status['individually_non_producible_seeds'] = all_non_produced_seeds
+
+    # Some seeds might be producible by some metabolic networks. By default, menescope include all seeds in the scope, regardless of their real producibility by the network. seed_status_dict holds this information.
+    # We'll remove them here
+    # remove from each scope the seeds that are not producible by the corresponding species. 
+    for species in all_scopes:
+        # non producible seeds are in seeds_status_dict['individually_non_producible_seeds'][species]
+        all_scopes[species] = list(set(all_scopes[species]) - set(seeds_status['individually_non_producible_seeds'][species]))
+
 
     with open(indiv_scopes_path, 'w') as dumpfile:
         json.dump(all_scopes, dumpfile, indent=4)
 
     with open(produced_seeds_path, 'w') as dumpfile:
-        json.dump(all_produced_seeds, dumpfile, indent=4)
+        json.dump(seeds_status, dumpfile, indent=4, sort_keys=True)
 
-    return indiv_scopes_path
+    return all_scopes, seeds_status, indiv_scopes_path, produced_seeds_path
 
 
 def indiv_scope_on_species(sbml_path, bname, seeds_path):
@@ -155,33 +173,33 @@ def indiv_scope_on_species(sbml_path, bname, seeds_path):
     return [error, bname, menescope_results]
 
 
-def analyze_indiv_scope(jsonfile, seeds):
-    """Analyze the output of Menescope, stored in a json
+def analyze_indiv_scope(scope_dict, seeds_status_dict, seeds):
+    """Analyze the output of Menescope, stored in two dictionaries
     
     Args:
-        jsonfile (str): output of menescope
+        scope_dict (dict): output of all menescope runs
+        seeds_status_dict (dict): production status of seeds in all menescope runs
         seeds (str): SBML seeds file
 
     Returns:
         set: union of all the individual scopes
     """
-    with open(jsonfile) as json_data:
-        d = json.load(json_data)
-        if not d:
-            logger.critical('Json file is empty. Individual scopes calculation failed. Please fill an issue on Github')
-            sys.exit(1)
-    d_set = {}
+    scope_dict_set = {}
+    individually_producible_seeds_set = {}
 
-    for elem in d:
-        d_set[elem] = set(d[elem])
+    for elem in scope_dict:
+        scope_dict_set[elem] = set(scope_dict[elem])
+
+    for elem in seeds_status_dict['individually_producible_seeds']:
+        individually_producible_seeds_set[elem] = set(seeds_status_dict['individually_producible_seeds'][elem])
 
     try:
         seed_metabolites = readSBMLspecies_clyngor(seeds, 'seeds')
     except FileNotFoundError:
-        logger.critical('File not found: '+seeds)
+        logger.critical('File not found: '+ seeds)
         sys.exit(1)
     except etree.ParseError:
-        logger.critical('Invalid syntax in SBML file: '+seeds)
+        logger.critical(f'Invalid syntax in SBML file: {seeds}')
         sys.exit(1)
     except:
         traceback_str = traceback.format_exc()
@@ -191,29 +209,31 @@ def analyze_indiv_scope(jsonfile, seeds):
         logger.critical('---------------Something went wrong running Menetools on " + seeds + "---------------')
         sys.exit(1)
 
-    logger.info('%i metabolic models considered.' %(len(d_set)))
-    intersection_scope = set.intersection(*list(d_set.values()))
+    logger.info('%i metabolic models considered.' %(len(scope_dict_set)))
+    intersection_scope = set.intersection(*list(scope_dict_set.values()))
     logger.info('\n' + str(len(intersection_scope)) + ' metabolites in core reachable by all organisms (intersection) \n')
     logger.info("\n".join(intersection_scope))
 
-    union_scope = set.union(*list(d_set.values()))
-    logger.info('\n' + str(len(union_scope)) + ' metabolites reachable by individual organisms altogether (union), among which ' + str(len(seed_metabolites)) + ' seeds (growth medium) \n')
+    union_scope = set.union(*list(scope_dict_set.values()))
+    union_producible_seeds = set.union(*list(individually_producible_seeds_set.values()))
+    logger.info('\n' + str(len(union_scope)) + ' metabolites reachable by individual organisms altogether (union), among which ' + str(len(union_producible_seeds)) + ' metabolites that are also part of the seeds (growth medium) \n')
     logger.info("\n".join(union_scope))
-    len_scope = [len(d[elem]) for elem in d]
-    logger.info('\nintersection of scope ' + str(len(intersection_scope)))
-    logger.info('union of scope ' + str(len(union_scope)))
-    logger.info('max metabolites in scope ' + str(max(len_scope)))
-    logger.info('min metabolites in scope ' + str(min(len_scope)))
-    logger.info('average number of metabolites in scope %.2f (+/- %.2f)' %
+    len_scope = [len(scope_dict[elem]) for elem in scope_dict]
+    logger.info('\nSummary:')
+    logger.info('- intersection of scope ' + str(len(intersection_scope)))
+    logger.info('- union of scope ' + str(len(union_scope)))
+    logger.info('- max metabolites in scope ' + str(max(len_scope)))
+    logger.info('- min metabolites in scope ' + str(min(len_scope)))
+    logger.info('- average number of metabolites in scope %.2f (+/- %.2f)' %
                 (statistics.mean(len_scope), statistics.stdev(len_scope)))
     return union_scope
 
 
-def reverse_scope(json_scope, output_dir):
+def reverse_scope(scope_dict, output_dir):
     """Reverse a scope dictionary by focusing on metabolite producers.
 
     Args:
-        json_scope (str): path to JSON dict of scope
+        scope_dict (dict): path to JSON dict of scope
         output_dir (str): path to output directory
     
     Returns:
@@ -222,11 +242,8 @@ def reverse_scope(json_scope, output_dir):
     rev_indiv_scopes_json_path = os.path.join(*[output_dir, 'indiv_scopes', 'rev_iscope.json'])
     rev_indiv_scopes_tsv_path = os.path.join(*[output_dir, 'indiv_scopes', 'rev_iscope.tsv'])
 
-    with open(json_scope, 'r') as f:
-        initial_dict = json.load(f)
-
     new_dic = {}
-    for k,v in initial_dict.items():
+    for k,v in scope_dict.items():
         for x in v:
             new_dic.setdefault(x,[]).append(k)
 
@@ -234,7 +251,7 @@ def reverse_scope(json_scope, output_dir):
         json.dump(new_dic, g, indent=True, sort_keys=True)
 
     all_compounds = [compound for compound in new_dic]
-    all_species = [species for species in initial_dict]
+    all_species = [species for species in scope_dict]
 
     # For each species get the possibility of production of each compounds.
     with open(rev_indiv_scopes_tsv_path, 'w') as output_file:
