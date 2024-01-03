@@ -80,7 +80,11 @@ def indiv_scope_run(sbml_dir, seeds, output_dir, cpu_number=1):
     Returns:
         str: path to output file for scope from Menetools analysis
     """
-    logger.info('######### Running individual metabolic scopes #########')
+    logger.info('\n###############################################')
+    logger.info('#                                             #')
+    logger.info('#       Individual metabolic potentials       #')
+    logger.info('#                                             #')
+    logger.info('###############################################\n')
 
     menetools_dir = os.path.join(output_dir, 'indiv_scopes')
     indiv_scopes_path = os.path.join(menetools_dir, 'indiv_scopes.json')

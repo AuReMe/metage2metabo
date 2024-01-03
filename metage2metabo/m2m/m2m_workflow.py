@@ -81,10 +81,10 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, cpu_number
             logger.info("\n".join(individually_producible_targets))
         commonly_producible_targets = user_targets.intersection(addedvalue_targets)
         if len(commonly_producible_targets) > 0:
-            logger.info('\n The following ' + str(len(commonly_producible_targets)) + " targets are additionally reachable through putative cooperation events: \n")
+            logger.info('\n The following ' + str(len(commonly_producible_targets)) + " targets are additionally reachable through putative cross-feeding events: \n")
             logger.info("\n".join(commonly_producible_targets))
         else:
-            logger.info("Cooperation events do not enable the producibility of additional targets")
+            logger.info("Cross feeding interactions do not enable the producibility of additional targets")
     else:
         user_targets = None
         newtargets = addedvalue_targets
@@ -103,7 +103,7 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, cpu_number
         sbml_management.create_species_sbml(newtargets, target_file_path)
 
         # Add these targets to the instance
-        logger.info("Setting " + str(len(newtargets)) + " compounds as targets. WARNING: if one or several seeds exist among these metabolites, they will not be considered as targets during the computation of minimal communities: they will be considered as already reachable. \n")
+        logger.info("Setting " + str(len(newtargets)) + " compounds as targets. \n")
         # if len(newtargets) != len(addedvalue_targets):
         #     logger.info("\n".join(newtargets))
 
@@ -111,7 +111,7 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, cpu_number
             instance_com, out_dir,
             newtargets)
         # MINCOM
-        mincom(instance_w_targets, out_dir)
+        mincom(instance_w_targets, seeds, newtargets, out_dir)
         # remove intermediate files
         os.unlink(instance_com)
         os.unlink(instance_w_targets)

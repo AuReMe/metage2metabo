@@ -32,6 +32,12 @@ def addedvalue(iscope_rm, cscope_rm, out_dir):
     Returns:
         set: set of metabolites that can only be reached by a community
     """
+    logger.info('\n###############################################')
+    logger.info('#                                             #')
+    logger.info('#    Added-value of metabolic interactions    #')
+    logger.info('#                                             #')
+    logger.info('###############################################\n')
+
     # Community targets = what can be produced only if cooperation occurs between species
     newtargets = cscope_rm - iscope_rm
     logger.info("\nAdded value of cooperation over individual metabolism: " +
