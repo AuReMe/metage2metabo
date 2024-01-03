@@ -86,6 +86,14 @@
           <speciesReference species="M_N_c" stoichiometry="1" constant="true"/>
         </listOfProducts>
       </reaction>
+      <reaction id="R_R13" name="R13" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+        <listOfReactants>
+          <speciesReference species="M_K_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_S1_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+      </reaction>
     </listOfReactions>
     <fbc:listOfObjectives fbc:activeObjective="obj">
       <fbc:objective fbc:id="obj" fbc:type="maximize"/>

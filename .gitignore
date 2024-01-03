@@ -92,3 +92,9 @@ ENV/
 
 # Data directories
 .vscode
+
+# m2m output directories
+test/addedvalue_output/
+test/metabolic_data/toy_bact/
+tutorials/method_tutorial/output_folder/
+

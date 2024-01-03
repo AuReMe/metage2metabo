@@ -220,11 +220,11 @@ def analyze_indiv_scope(scope_dict, seeds_status_dict, seeds):
     logger.info("\n".join(union_scope))
     len_scope = [len(scope_dict[elem]) for elem in scope_dict]
     logger.info('\nSummary:')
-    logger.info('- intersection of scope ' + str(len(intersection_scope)))
-    logger.info('- union of scope ' + str(len(union_scope)))
-    logger.info('- max metabolites in scope ' + str(max(len_scope)))
-    logger.info('- min metabolites in scope ' + str(min(len_scope)))
-    logger.info('- average number of metabolites in scope %.2f (+/- %.2f)' %
+    logger.info('- intersection of scopes ' + str(len(intersection_scope)))
+    logger.info('- union of scopes ' + str(len(union_scope)))
+    logger.info('- max metabolites in scopes ' + str(max(len_scope)))
+    logger.info('- min metabolites in scopes ' + str(min(len_scope)))
+    logger.info('- average number of metabolites in scopes %.2f (+/- %.2f)' %
                 (statistics.mean(len_scope), statistics.stdev(len_scope)))
     return union_scope
 
@@ -233,7 +233,7 @@ def reverse_scope(scope_dict, output_dir):
     """Reverse a scope dictionary by focusing on metabolite producers.
 
     Args:
-        scope_dict (dict): path to JSON dict of scope
+        scope_dict (dict): dict of scope
         output_dir (str): path to output directory
     
     Returns:
@@ -260,4 +260,4 @@ def reverse_scope(scope_dict, output_dir):
         for species in all_species:
              csvwriter.writerow([species, *[1 if species in new_dic[compound] else 0 for compound in all_compounds]])
 
-    return(rev_indiv_scopes_json_path, rev_indiv_scopes_tsv_path)
+    return rev_indiv_scopes_json_path, rev_indiv_scopes_tsv_path
