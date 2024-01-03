@@ -44,6 +44,12 @@ def cscope(sbmldir, seeds, out_dir, targets_file=None, host=None):
         tuple: instance file (str) and community scope (set)
     """
     starttime = time.time()
+    logger.info('\n###############################################')
+    logger.info('#                                             #')
+    logger.info('#    Metabolic potential of the community     #')
+    logger.info('#                                             #')
+    logger.info('###############################################\n')
+
     # Create instance for community analysis
     instance_com = instance_community(sbmldir, seeds, out_dir, targets_file, host)
     # Run community scope
