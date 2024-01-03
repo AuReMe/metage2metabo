@@ -171,7 +171,7 @@ def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, add
     prod_targets['indiv_producible'] = list(indiv_producible)
 
     indiv_scopes_path = os.path.join(*[m2m_out_dir, 'indiv_scopes', 'indiv_scopes.json'])
-    produced_seeds_path = os.path.join(*[m2m_out_dir, 'indiv_scopes', 'indiv_produced_seeds.json'])
+    produced_seeds_path = os.path.join(*[m2m_out_dir, 'indiv_scopes', 'seeds_in_indiv_scopes.json'])
     comm_scopes_path = os.path.join(*[m2m_out_dir, 'community_analysis', 'comm_scopes.json'])
     contrib_microbes_path = os.path.join(*[m2m_out_dir, 'community_analysis', 'contributions_of_microbes.json'])
     mincom_path = os.path.join(*[m2m_out_dir, 'community_analysis', 'mincom.json'])

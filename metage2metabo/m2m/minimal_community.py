@@ -35,7 +35,7 @@ def mincom(instance_w_targets, seeds, targets, out_dir):
     Args:
         instance_w_targets (str): ASP instance filepath
         seeds (str): seeds filepath
-        targets (str): targets list
+        targets (str): targets set
         out_dir (str): results directory
     """
     starttime = time.time()
