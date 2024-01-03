@@ -3,7 +3,7 @@
 
 """
 Description:
-Test m2m addedvalue on 17 metabolic networks and a file representing growth medium (seeds).
+Test m2m cscope on 17 metabolic networks and a file representing growth medium (seeds).
 """
 
 import os
