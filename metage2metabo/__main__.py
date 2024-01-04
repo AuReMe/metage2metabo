@@ -19,7 +19,6 @@ import pkg_resources
 import re
 import subprocess
 import sys
-import tarfile
 import time
 import traceback
 
@@ -498,9 +497,7 @@ def main_test(outdir, cpu):
     seeds_sbml_file = os.path.join(workflow_data_path, 'seeds_workflow.sbml')
 
     logger.info("Uncompressing test data to " + outdir)
-    tar = tarfile.open(genome_file, "r:gz")
-    tar.extractall(outdir)
-    tar.close()
+    utils.safe_tar_extract_all(genome_file, outdir)
 
     logger.info("Launching workflow on test data")
     input_genome = os.path.join(outdir, 'workflow_genomes')
