@@ -214,7 +214,7 @@ def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, add
                         reverse_contrib[compound] = [species]
             # export the reverse cscope to json and tsv
             rev_cscopes_json_path, rev_cscopes_tsv_path = reverse_cscope(contrib_microbes, reverse_contrib, m2m_out_dir)
-            logger.info('Reverse community scopes for all metabolic networks available in ' + rev_cscopes_json_path + ' and ' + rev_cscopes_tsv_path)
+            logger.info('Reverse community scopes for all metabolic networks available in ' + rev_cscopes_json_path + ' and ' + rev_cscopes_tsv_path + '. They higlight the producibility of metabolites by species in the community.')
             for target in selected_targets:
                 if target in reverse_contrib:
                     if target in prod_targets['individual_producers']:
