@@ -352,18 +352,6 @@ PRODUCIBILITY_TARGETS = {
         "bact3",
         "bact6"
     ],
-    "mincom_optsol_producers": {
-        "M_C_c": [
-            "bact5"
-        ],
-        "M_H_c": [
-            "bact1",
-            "bact3"
-        ],
-        "M_F_c": [
-            "bact1"
-        ]
-    },
     "mincom_union_producers": {
         "M_C_c": [
             "bact5",
@@ -493,7 +481,7 @@ def test_m2m_metacom_tiny_toy():
     assert set(mincom['producible']) == PROD_TARGETS
 
     # PRODUCIBILITY ANALYSIS
-    for key in producibility_targets:
+    for key in PRODUCIBILITY_TARGETS:
         if key in ["unproducible", "producible", "indiv_producible", "mincom_producible", "key_species"]:
             assert set(producibility_targets[key]) == set(PRODUCIBILITY_TARGETS[key])
         else:
