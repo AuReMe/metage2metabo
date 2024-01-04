@@ -55,6 +55,19 @@ def cscope(sbmldir, seeds, out_dir, targets_file=None, host=None):
     # Run community scope
     logger.info("Running whole-community metabolic scopes...")
     community_reachable_metabolites, contributions_of_microbes = comm_scope_run(instance_com, out_dir, host)
+    # compute the reverse cscope
+    contrib_microbes_path = os.path.join(*[out_dir, 'community_analysis', 'contributions_of_microbes.json'])
+    # reverse the dict to have compounds as keys, and species as values
+    reverse_contrib = {}
+    for species in contributions_of_microbes:
+        for compound in contributions_of_microbes[species]['produced_in_community']:
+            if compound in reverse_contrib:
+                reverse_contrib[compound].append(species)
+            else:
+                reverse_contrib[compound] = [species]
+    # export the reverse cscope to json and tsv
+    rev_cscopes_json_path, rev_cscopes_tsv_path = reverse_cscope(contributions_of_microbes, reverse_contrib, out_dir)
+    logger.info('Reverse community scopes for all metabolic networks available in ' + rev_cscopes_json_path + ' and ' + rev_cscopes_tsv_path + '. They higlight the producibility of metabolites by species in the community.\n')
     logger.info("--- Community scope runtime %.2f seconds ---\n" %
                 (time.time() - starttime))
     return instance_com, community_reachable_metabolites
@@ -105,6 +118,7 @@ def comm_scope_run(instance, output_dir, host_mn=None):
     
     Returns:
         set: microbiota scope
+        dict: contribution of microbes to the scope
     """
     miscoto_dir = os.path.join(output_dir, 'community_analysis')
     com_scopes_path = os.path.join(miscoto_dir, 'comm_scopes.json')

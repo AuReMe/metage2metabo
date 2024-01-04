@@ -173,7 +173,7 @@ def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, add
     indiv_scopes_path = os.path.join(*[m2m_out_dir, 'indiv_scopes', 'indiv_scopes.json'])
     produced_seeds_path = os.path.join(*[m2m_out_dir, 'indiv_scopes', 'seeds_in_indiv_scopes.json'])
     comm_scopes_path = os.path.join(*[m2m_out_dir, 'community_analysis', 'comm_scopes.json'])
-    contrib_microbes_path = os.path.join(*[m2m_out_dir, 'community_analysis', 'contributions_of_microbes.json'])
+    reverse_cscope_path = os.path.join(*[m2m_out_dir, 'community_analysis', 'rev_cscope.json'])
     mincom_path = os.path.join(*[m2m_out_dir, 'community_analysis', 'mincom.json'])
     producibility_targets_path = os.path.join(m2m_out_dir, 'producibility_targets.json')
 
@@ -201,26 +201,15 @@ def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, add
 
     if os.path.exists(comm_scopes_path):
         prod_targets['com_only_producers'] = {}
-        if os.path.exists(contrib_microbes_path):
-            with open(contrib_microbes_path) as json_data:
-                contrib_microbes = json.load(json_data)
-            # reverse the dict to have compounds as keys, and species as values
-            reverse_contrib = {}
-            for species in contrib_microbes:
-                for compound in contrib_microbes[species]['produced_in_community']:
-                    if compound in reverse_contrib:
-                        reverse_contrib[compound].append(species)
-                    else:
-                        reverse_contrib[compound] = [species]
-            # export the reverse cscope to json and tsv
-            rev_cscopes_json_path, rev_cscopes_tsv_path = reverse_cscope(contrib_microbes, reverse_contrib, m2m_out_dir)
-            logger.info('Reverse community scopes for all metabolic networks available in ' + rev_cscopes_json_path + ' and ' + rev_cscopes_tsv_path + '. They higlight the producibility of metabolites by species in the community.')
+        if os.path.exists(reverse_cscope_path):
+            with open(reverse_cscope_path) as json_data:
+                rev_cscope = json.load(json_data)
             for target in selected_targets:
-                if target in reverse_contrib:
+                if target in rev_cscope:
                     if target in prod_targets['individual_producers']:
-                        only_com_producing_species = list(set(reverse_contrib[target]) - set(prod_targets['individual_producers'][target]))
+                        only_com_producing_species = list(set(rev_cscope[target]) - set(prod_targets['individual_producers'][target]))
                     else:
-                        only_com_producing_species = reverse_contrib[target]
+                        only_com_producing_species = rev_cscope[target]
                     prod_targets['com_only_producers'][target] = only_com_producing_species
         else:
             with open(comm_scopes_path) as json_data:
