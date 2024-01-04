@@ -16,7 +16,6 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>
 
 import logging
-import os
 import time
 
 from metage2metabo.m2m_analysis.enumeration import enumeration_analysis
@@ -39,6 +38,7 @@ def run_analysis_workflow(sbml_folder, target_folder_file, seed_file, output_dir
         host_file (str): metabolic network file for host
         taxonomy_level (str): taxonomy level, must be: phylum, class, order, family, genus or species.
     """
+    logger.info('######### Start m2m_analysis workflow. #########')
     starttime = time.time()
 
     json_file_folder = enumeration_analysis(sbml_folder, target_folder_file, seed_file, output_dir, host_file)
@@ -48,4 +48,4 @@ def run_analysis_workflow(sbml_folder, target_folder_file, seed_file, output_dir
     powergraph_analysis(gml_output, output_dir, oog_jar, taxon_file, taxonomy_level)
 
     logger.info(
-        "--- m2m_analysis runtime %.2f seconds ---\n" % (time.time() - starttime))
+        '--- m2m_analysis runtime %.2f seconds ---\n' % (time.time() - starttime))
