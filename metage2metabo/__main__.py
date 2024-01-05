@@ -417,7 +417,7 @@ def main_cscope(*allargs):
     """Run cscope command.
     """
     instance_com, comscope = cscope(*allargs)
-    logger.info("\n" + str(len(comscope)) + " metabolites (excluding the seeds) reachable by the whole community/microbiota: \n")
+    logger.info("\n" + str(len(comscope)) + " metabolites reachable by the whole community/microbiota: \n")
     logger.info('\n'.join(comscope))
     #delete intermediate file
     os.unlink(instance_com)

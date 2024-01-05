@@ -66,6 +66,11 @@ Please go check the `documentation of mpwt <https://github.com/AuReMe/mpwt#genba
 
 * standard output
     .. code:: 
+        ###############################################
+        #                                             #
+        #      Metabolic network reconstruction       #
+        #                                             #
+        ###############################################
 
         ######### Running metabolic network reconstruction with Pathway Tools #########
         ~~~~~~~~~~Creation of input data from Genbank/GFF/PF~~~~~~~~~~
@@ -220,37 +225,49 @@ Optional argument
 
 .. code:: sh
 
-    m2m iscope -n toy_bact -s metabolic_data/seeds_toy.sbml -o output_directory/
+    m2m iscope -n toy_bact -s seeds_toy.sbml -o output_directory/
 
 * standard output
     .. code:: 
 
-        ######### Running individual metabolic scopes #########
-        Individual scopes for all metabolic networks available in output_directory//indiv_scopes/indiv_scopes.json
+        ###############################################
+        #                                             #
+        #       Individual metabolic potentials       #
+        #                                             #
+        ###############################################
+
+
+        Individual scopes for all metabolic networks available in output_directory/indiv_scopes/indiv_scopes.json. The scopes have been filtered a way that if a seed is in a scope, it means the corresponding species is predicted to be able to produce it.
+
+        Information regarding the producibility of seeds, and the possible absence of seeds in some metabolic networks is stored in output_directory/indiv_scopes/seeds_in_indiv_scopes.json.
+
         17 metabolic models considered.
 
-        135 metabolites in core reachable by all organisms (intersection) 
+        50 metabolites in core reachable by all organisms (intersection)
+        
+        ...
+
+        576 metabolites reachable by individual organisms altogether (union), among which 44 metabolites that are also part of the seeds (growth medium)
 
         ...
 
-        625 metabolites reachable by individual organisms altogether (union), among which 93 seeds (growth medium) 
+        Summary:
+        - intersection of scopes 50
+        - union of scopes 576
+        - max metabolites in scopes 422
+        - min metabolites in scopes 116
+        - average number of metabolites in scopes 239.06 (+/- 89.51)
 
-        ...
+        Analysis of functional redundancy (producers of all metabolites) is computed as a dictionary in output_directory/indiv_scopes/rev_iscope.json and as a matrix in output_directory/indiv_scopes/rev_iscope.tsv.
+        --- Indiv scopes runtime 21.46 seconds ---
 
-        intersection of scope 135
-        union of scope 625
-        max metabolites in scope 477
-        min metabolites in scope 195
-        average number of metabolites in scope 308.71 (+/- 82.59)
-        Analysis of functional redundancy (producers of all metabolites) is computed as a dictionary in output_directory//indiv_scopes/rev_iscope.json and as a matrix in output_directory//indiv_scopes/rev_iscope.tsv.
-        --- Indiv scopes runtime 9.07 seconds ---
+        --- Total runtime 21.47 seconds ---
+        --- Logs written in output_directory/m2m_iscope.log --
+    
 
-        --- Total runtime 9.08 seconds ---
-        --- Logs written in output_directory//m2m_iscope.log ---
-
-    These results mean that 135 metabolites can be reached by all organisms. When gathering reachable metabolites for all organisms, the union consists of 625 metabolites (including the seeds). Finally metrics show the min, max and arithmetic mean number of compounds in all scopes.
+    These results mean that 50 metabolites can be reached by all organisms. When gathering reachable metabolites for all organisms, the union consists of 576 metabolites. Some of the reachable metabolites can also be part of the seeds, meaning that there would be a possibility to renew the reservoir of seed molecules by some species. Finally metrics show the min, max and arithmetic mean number of compounds in all scopes.
 * files outputs
-    * In ``output_directory/indiv_scopes/indiv_scopes.json``: a json file that can be easily loaded as a dictionary (or humanly read as it it) that contains the set of reachable metabolites for each organism. /!\\ Warning: the seeds are included in the scopes, hence they will never be empty. Logs are written in ``output_directory/m2m_iscope.log``.
+    * In ``output_directory/indiv_scopes/indiv_scopes.json``: a json file that can be easily loaded as a dictionary (or humanly read as it it) that contains the set of reachable metabolites for each organism. A file expliciting the producibility of seeds ``output_directory/indiv_scopes/seeds_in_indiv_scopes.json`` is also available: it additionally lists the seeds that are absent from the networks. Two more files present the scopes from the focus of metabolites ``output_directory/indiv_scopes/rev_iscopes.json`` and a matrix summarising the producibility of molecules by species ``output_directory/indiv_scopes/rev_iscopes.tsv``. `rev_iscope.tsv` and `rev_iscope.json` that reverse the information from `indiv_scopes.json`. This means that if org1 produces A and B, org2 produces B and C, `indiv_scopes.json` will describe the following: {'org1': ['A', 'B'], 'org2: ['B', 'C']}. `reverse_scope.json` will contain {'A': ['org1'], 'B': ['org1', 'org2'], 'C': ['org2']}, and `reverse_scope.tsv` will contain the same information as a matrix.  Logs are written in ``output_directory/m2m_iscope.log``.
 
 cscope
 *******
@@ -273,28 +290,40 @@ Optional arguments:
 
 .. code:: sh
 
-    m2m cscope -n toy_bact -s metabolic_data/seeds_toy.sbml -o output_directory/
+    m2m cscope -n toy_bact -s seeds_toy.sbml -o output_directory/
 
 * standard output
     .. code::
 
-        ######### Creating metabolic instance for the whole community #########
-        Created instance in /shared/programs/metage2metabo/test/output_directory/community_analysis/miscoto_96owqje2.lp
-        Running whole-community metabolic scopes
-        Community scopes for all metabolic networks available in output_directory//community_analysis/comm_scopes.json
-        --- Community scope runtime 4.33 seconds ---
+    ###############################################
+    #                                             #
+    #    Metabolic potential of the community     #
+    #                                             #
+    ###############################################
+
+    ######### Creating metabolic instance for the whole community #########
+    Created temporary instance file in ../metage2metabo/test/metabolic_data/output_directory/community_analysis/miscoto_9ihtb055.lp
+    Running whole-community metabolic scopes...
+    Community scope for all metabolic networks available in output_directory/community_analysis/comm_scopes.json
+    Contributions of microbes to community scope available in output_directory/community_analysis/contributions_of_microbes.json.
 
 
-        651 metabolites (excluding the seeds) reachable by the whole community/microbiota: 
+    Number of metabolites producible in community: 698.
 
-        ...
-        --- Total runtime 4.34 seconds ---
-        --- Logs written in output_directory//m2m_cscope.log ---
+    Reverse community scopes for all metabolic networks available in output_directory/community_analysis/rev_cscope.json and output_directory/community_analysis/rev_cscope.tsv. They higlight the producibility of metabolites by species in the community.
 
-    651 metabolites are reachable by the microbiota. This does not include the seeds. The list of metabolites is given in output. 
+    --- Community scope runtime 5.41 seconds ---
+    ...
+    --- Total runtime 5.42 seconds ---
+    --- Logs written in output_directory/m2m_cscope.log ---
+
+
+698 metabolites (excluding the seeds) reachable by the whole community/microbiota:
 * files outputs
-    * In addition to the logs at the root of the results directory, a json file with the results is created in ``output_directory/community_analysis/indiv_scopes.json``.
-    * To screen the putative redundancy of metabolite producibility predicted for the genomes, we also provide `rev_iscope.tsv` and `rev_iscope.json` that reverse the information from `indiv_scopes.json`. This means that if org1 produces A and B, org2 produces B and C, `indiv_scopes.json` will describe the following: {'org1': ['A', 'B'], 'org2: ['B', 'C']}. `reverse_scope.json` will contain {'A': ['org1'], 'B': ['org1', 'org2'], 'C': ['org2']}, and `reverse_scope.tsv` will contain the same information as a matrix. 
+    * In addition to the logs at the root of the results directory, a json file with the results is created in ``output_directory/community_analysis/comm_scopes.json``. It lists all molecules reachable by the community, taking into account the interactions occurring among community members.
+    * A file details the roles of community members in the production of metabolites: which microbes possess the reactions that produce the metabolites. This file is ``output_directory/community_analysis/contributions_of_microbes.json``. It also recapitulates the compounds producible by species individually versus in community, and highlights the newly producible compounds in community, per symbiont. 
+    * As for the individual scopes, the redundancy of metabolite producibility is described in ``output_directory/community_analysis/rev_cscope.json`` and ``output_directory/community_analysis/rev_cscope.tsv``.
+    * Logs are written in ``output_directory/m2m_cscope.log``.
 
 addedvalue
 **********
@@ -314,50 +343,75 @@ Optional arguments:
 
 .. code:: sh
 
-    m2m addedvalue -n toy_bact -s metabolic_data/seeds_toy.sbml -o output_directory/
+    m2m addedvalue -n toy_bact -s seeds_toy.sbml -o output_directory/
 
 * standard output
     .. code::
 
-        ######### Running individual metabolic scopes #########
-        Individual scopes for all metabolic networks available in output_directory//indiv_scopes/indiv_scopes.json
+        ###############################################
+        #                                             #
+        #       Individual metabolic potentials       #
+        #                                             #
+        ###############################################
+
+
+        Individual scopes for all metabolic networks available in output_directory/indiv_scopes/indiv_scopes.json. The scopes have been filtered a way that if a seed is in a scope, it means the corresponding species is predicted to be able to produce it.
+
+        Information regarding the producibility of seeds, and the possible absence of seeds in some metabolic networks is stored in output_directory/indiv_scopes/seeds_in_indiv_scopes.json.
+
         17 metabolic models considered.
 
-        135 metabolites in core reachable by all organisms (intersection) 
+        50 metabolites in core reachable by all organisms (intersection)
+        
+        ...
+
+        576 metabolites reachable by individual organisms altogether (union), among which 44 metabolites that are also part of the seeds (growth medium)
 
         ...
 
-        625 metabolites reachable by individual organisms altogether (union), among which 93 seeds (growth medium) 
+        Summary:
+        - intersection of scopes 50
+        - union of scopes 576
+        - max metabolites in scopes 422
+        - min metabolites in scopes 116
+        - average number of metabolites in scopes 239.06 (+/- 89.51)
 
-        ...
+        Analysis of functional redundancy (producers of all metabolites) is computed as a dictionary in output_directory/indiv_scopes/rev_iscope.json and as a matrix in output_directory/indiv_scopes/rev_iscope.tsv.
+        --- Indiv scopes runtime 21.46 seconds ---
 
-        intersection of scope 135
-        union of scope 625
-        max metabolites in scope 477
-        min metabolites in scope 195
-        average number of metabolites in scope 308.71 (+/- 82.59)
-        Analysis of functional redundancy (producers of all metabolites) is computed as a dictionary in output_directory//indiv_scopes/rev_iscope.json and as a matrix in output_directory//indiv_scopes/rev_iscope.tsv.
-        --- Indiv scopes runtime 8.43 seconds ---
+        ###############################################
+        #                                             #
+        #    Metabolic potential of the community     #
+        #                                             #
+        ###############################################
 
         ######### Creating metabolic instance for the whole community #########
-        Created instance in /shared/programs/metage2metabo/test/output_directory/community_analysis/miscoto_rwvbc87b.lp
-        Running whole-community metabolic scopes
-        Community scopes for all metabolic networks available in output_directory//community_analysis/comm_scopes.json
-        --- Community scope runtime 4.33 seconds ---
+        Created temporary instance file in ../metage2metabo/test/metabolic_data/output_directory/community_analysis/miscoto_9ihtb055.lp
+        Running whole-community metabolic scopes...
+        Community scope for all metabolic networks available in output_directory/community_analysis/comm_scopes.json
+        Contributions of microbes to community scope available in output_directory/community_analysis/contributions_of_microbes.json.
 
 
-        651 metabolites (excluding the seeds) reachable by the whole community/microbiota: 
+        Number of metabolites producible in community: 698.
 
+        Reverse community scopes for all metabolic networks available in output_directory/community_analysis/rev_cscope.json and output_directory/community_analysis/rev_cscope.tsv. They higlight the producibility of metabolites by species in the community.
+
+        --- Community scope runtime 5.41 seconds ---
         ...
 
-        Added value of cooperation over individual metabolism: 119 newly reachable metabolites: 
+        ###############################################
+        #                                             #
+        #    Added-value of metabolic interactions    #
+        #                                             #
+        ###############################################
 
+
+        Added value of cooperation over individual metabolism: 122 newly reachable metabolites:
         ...
-
-        Added-value of cooperation written in output_directory//community_analysis/addedvalue.json
-        Target file created with the addedvalue targets in: output_directory//community_analysis/targets.sbml
-        --- Total runtime 12.78 seconds ---
-        --- Logs written in output_directory//m2m_addedvalue.log ---
+        Added-value of cooperation written in output_directory/community_analysis/addedvalue.json
+        Target file created with the addedvalue targets in: output_directory/community_analysis/targets.sbml
+        --- Total runtime 27.74 seconds ---
+        --- Logs written in output_directory/m2m_addedvalue.log ---
 
     As you can see, the individual and community scopes are run again. In addition to the previous outputs, the union of all individual scopes and the community scopes are printed. Finally, the difference between the two sets, that is to say the metabolites that can only be produced collectively (i.e. by at least two bacteria cooperating) is displayed. Here it consists of 119 metabolites. 
 * files outputs
@@ -370,11 +424,15 @@ Optional arguments:
         ├── community_analysis
         │   ├── comm_scopes.json
         │   ├── addedvalue.json
+        │   ├── contributions_of_microbes.json
+        │   ├── rev_cscope.json
+        │   ├── rev_cscope.tsv
         │   └── targets.sbml
         ├── indiv_scopes
         │   └── indiv_scopes.json
         │   └── rev_iscope.json
         │   └── rev_iscope.tsv
+        │   └── seeds_in_indiv_scopes.json
 
 Optional: create the seeds SBML file
 *************************************
@@ -430,14 +488,21 @@ Optional arguments:
 
 .. code:: sh
 
-    m2m mincom -n toy_bact -s metabolic_data/seeds_toy.sbml -t metabolic_data/targets_toy.sbml -o output_directory/
+    m2m mincom -n toy_bact -s seeds_toy.sbml -t targets_toy.sbml -o output_directory/
 
 * standard output
     .. code::
 
-        ######### Creating metabolic instance for the whole community #########
-        Created instance in /shared/programs/metage2metabo/test/output_directory/community_analysis/miscoto_fsboc3q7.lp
+        ###############################################
+        #                                             #
+        #         Minimal community selection         #
+        #                                             #
+        ###############################################
+
+        WARNING: The following seeds are among the targets: {'M_MANNITOL_c'}. They will not be considered as targets during the computation of minimal communities: they will be considered as already reachable according to the network expansion definition.
+
         Running minimal community selection
+        /Users/cfrioux/.pyenv/versions/metage2metabo/lib/python3.10/site-packages/miscoto/encodings/community_soup.lp
 
         In the initial and minimal communities 120 targets are producible and 0 remain unproducible.
 
@@ -447,81 +512,80 @@ Optional arguments:
         0 still unproducible targets:
 
 
-        Minimal communities are available in output_directory//community_analysis/mincom.json 
+        Minimal communities are available in output_directory/community_analysis/mincom.json
 
         ######### One minimal community #########
         # One minimal community enabling the producibility of the target metabolites given as inputs
         Minimal number of bacteria in communities => 13
 
-        GCA_003437885
-        GCA_003437715
-        GCA_003437905
-        GCA_003437665
-        GCA_003437255
-        GCA_003437295
-        GCA_003437815
-        GCA_003437945
-        GCA_003438055
-        GCA_003437195
-        GCA_003437375
         GCA_003437055
         GCA_003437595
+        GCA_003437295
+        GCA_003437345
+        GCA_003437715
+        GCA_003437815
+        GCA_003437905
+        GCA_003437375
+        GCA_003437195
+        GCA_003438055
+        GCA_003437885
+        GCA_003437665
+        GCA_003437255
         ######### Key species: Union of minimal communities #########
         # Bacteria occurring in at least one minimal community enabling the producibility of the target metabolites given as inputs
         Number of key species => 17
 
-        GCA_003437885
+        GCA_003437055
+        GCA_003437325
+        GCA_003437595
+        GCA_003437345
         GCA_003437715
         GCA_003437905
-        GCA_003437665
-        GCA_003437295
-        GCA_003438055
-        GCA_003437195
-        GCA_003437175
-        GCA_003437345
-        GCA_003437055
-        GCA_003437595
-        GCA_003437785
-        GCA_003437255
-        GCA_003437815
         GCA_003437945
+        GCA_003438055
+        GCA_003437255
+        GCA_003437295
+        GCA_003437785
+        GCA_003437815
+        GCA_003437175
         GCA_003437375
-        GCA_003437325
+        GCA_003437195
+        GCA_003437885
+        GCA_003437665
         ######### Essential symbionts: Intersection of minimal communities #########
         # Bacteria occurring in ALL minimal communities enabling the producibility of the target metabolites given as inputs
         Number of essential symbionts => 12
 
-        GCA_003437885
-        GCA_003437715
-        GCA_003437905
-        GCA_003437665
-        GCA_003437255
-        GCA_003437295
-        GCA_003437815
-        GCA_003438055
-        GCA_003437195
-        GCA_003437375
         GCA_003437055
         GCA_003437595
+        GCA_003437295
+        GCA_003437715
+        GCA_003437815
+        GCA_003437905
+        GCA_003437375
+        GCA_003437195
+        GCA_003438055
+        GCA_003437885
+        GCA_003437665
+        GCA_003437255
         ######### Alternative symbionts: Difference between Union and Intersection #########
         # Bacteria occurring in at least one minimal community but not all minimal communities enabling the producibility of the target metabolites given as inputs
         Number of alternative symbionts => 5
 
-        GCA_003437785
-        GCA_003437945
         GCA_003437345
-        GCA_003437175
         GCA_003437325
+        GCA_003437945
+        GCA_003437785
+        GCA_003437175
 
-        --- Mincom runtime 3.70 seconds ---
+        --- Mincom runtime 5.61 seconds ---
 
-        --- Total runtime 6.50 seconds ---
-        --- Logs written in output_directory//m2m_mincom.log ---
-
+        --- Total runtime 7.72 seconds ---
+        --- Logs written in output_directory/m2m_mincom.log ---
 
     This output gives the result of minimal community selection. It means that for producing the 120 metabolic targets, a minimum of 13 bacteria out of the 17 is required. One example of such minimal community is given. In addition, the whole space of solution is studied. All bacteria (17) occur in at least one minimal community (key species). Finally, the intersection gives the following information: a set of 12 bacteria occurs in each minimal communtity. This means that these 12 bacteria are needed in any case (essential symbionts), and that any of the remaining 5 bacteria (alternative symbionts) can complete the missing function(s).
 * files outputs
-    * As for other commands, a json file with the results is produced in ``output_directory/community_analysis/comm_scopes.json``, together with logs at the root of the results directory.
+    * As for other commands, a json file with the results is produced in ``output_directory/community_analysis/mincom.json.json``, together with logs at the root of the results directory.
 
 m2m metacom
 ------------
@@ -674,17 +738,21 @@ Optional arguments:
     .. code ::
 
         output_directory/
-        ├── m2m_metacom.log
-        ├── producibility_targets.json
+        ├── m2m_mincom.log
         ├── community_analysis
-        │   ├── addedvalue.json
+        │   ├── addedvalue.json
         │   ├── comm_scopes.json
+        │   ├── contributions_of_microbes.json
         │   ├── mincom.json
-        │   ├── targets.sbml
+        │   ├── rev_cscope.json
+        │   ├── rev_cscope.tsv
+        │   └── targets.sbml
         ├── indiv_scopes
         │   └── indiv_scopes.json
         │   └── rev_iscope.json
         │   └── rev_iscope.tsv
+        │   └── seeds_in_indiv_scopes.json
+
 
 m2m workflow and m2m test
 -------------------------
@@ -734,87 +802,100 @@ Optional arguments:
 
     .. code ::
 
-        Uncompressing test data to output_directory
-        Launching workflow on test data
-        ######### Running metabolic network reconstruction with Pathway Tools #########
-        ~~~~~~~~~~Creation of input data from Genbank/GFF/PF~~~~~~~~~~
-        Checking inputs for GCA_003433675: no missing files.
-        Checking inputs for GCA_003433665: no missing files.
-        ----------End of creation of input data from Genbank/GFF/PF: 0.02s----------
-        ~~~~~~~~~~Inference on the data~~~~~~~~~~
-        pathway-tools -no-web-cel-overview -no-cel-overview -no-patch-download -disable-metadata-saving -nologfile -patho output_directory/workflow_genomes/GCA_003433665/
-        pathway-tools -no-web-cel-overview -no-cel-overview -no-patch-download -disable-metadata-saving -nologfile -patho output_directory/workflow_genomes/GCA_003433675/
-        ~~~~~~~~~~Check inference~~~~~~~~~~
-        No log directory, it will be created.
+        WARNING: compounds ('M_MANNITOL_c',) are both in seeds and targets. As such, they will be considered already reachable during community selection and will be ignored. However, their producibility can be assessed in individual and community scopes. If a host is provided, the community scope computation differs slightly and the producibility of the compound will have to be checked in the output files: indiv_scopes/seeds_in_indiv_scopes.json and the key 'individually producible' in the file producibility_targets.json. 
 
-        2 builds have passed!
 
-        ----------End of PathoLogic inference: 403.90s----------
-        ~~~~~~~~~~Creation of the .dat files~~~~~~~~~~
-        pathway-tools -no-patch-download -disable-metadata-saving -nologfile -load output_directory/workflow_genomes/GCA_003433675/dat_creation.lisp
-        pathway-tools -no-patch-download -disable-metadata-saving -nologfile -load output_directory/workflow_genomes/GCA_003433665/dat_creation.lisp
-        ~~~~~~~~~~Check .dat~~~~~~~~~~
-        gca_003433675cyc: 23 out of 23 dat files created.
-        gca_003433665cyc: 23 out of 23 dat files created.
-        ----------End of dat files creation: 163.21s----------
-        ~~~~~~~~~~End of Pathway Tools~~~~~~~~~~
-        ~~~~~~~~~~Moving result files~~~~~~~~~~
-        ----------End of moving fimes: 0.12s----------
-        ----------mpwt has finished in 567.29s! Thank you for using it.
-        ######### Creating SBML files #########
-        ######### Stats GSMN reconstruction #########
-        Number of genomes: 2
-        Number of reactions in all GSMN: 2026
-        Number of compounds in all GSMN: 2095
-        Average reactions per GSMN: 1437.00(+/- 678.82)
-        Average compounds per GSMN: 1560.00(+/- 615.18)
-        Average genes per GSMN: 893.00(+/- 475.18)
-        Average pathways per GSMN: 257.00(+/- 134.35)
-        Percentage of reactions associated with genes: 79.90(+/- 3.20)
-        --- Recon runtime 574.26 seconds ---
+        ###############################################
+        #                                             #
+        #       Individual metabolic potentials       #
+        #                                             #
+        ###############################################
 
-        ######### Running individual metabolic scopes #########
-        Individual scopes for all metabolic networks available in output_directory/indiv_scopes/indiv_scopes.json
-        2 metabolic models considered.
 
-        123 metabolites in core reachable by all organisms (intersection) 
+        Individual scopes for all metabolic networks available in output_directory/indiv_scopes/indiv_scopes.json. The scopes have been filtered a way that if a seed is in a scope, it means the corresponding species is predicted to be able to produce it.
+
+        Information regarding the producibility of seeds, and the possible absence of seeds in some metabolic networks is stored in output_directory/indiv_scopes/seeds_in_indiv_scopes.json.
+
+        17 metabolic models considered.
+
+        50 metabolites in core reachable by all organisms (intersection) 
 
         ...
 
-        325 metabolites reachable by individual organisms altogether (union), among which 26 seeds (growth medium) 
+        576 metabolites reachable by individual organisms altogether (union), among which 44 metabolites that are also part of the seeds (growth medium) 
 
         ...
 
-        intersection of scope 123
-        union of scope 325
-        max metabolites in scope 321
-        min metabolites in scope 127
-        average number of metabolites in scope 224.00 (+/- 137.18)
+        Summary:
+        - intersection of scopes 50
+        - union of scopes 576
+        - max metabolites in scopes 422
+        - min metabolites in scopes 116
+        - average number of metabolites in scopes 239.06 (+/- 89.51)
+
         Analysis of functional redundancy (producers of all metabolites) is computed as a dictionary in output_directory/indiv_scopes/rev_iscope.json and as a matrix in output_directory/indiv_scopes/rev_iscope.tsv.
-        --- Indiv scopes runtime 1.21 seconds ---
+        --- Indiv scopes runtime 25.26 seconds ---
+
+
+        ###############################################
+        #                                             #
+        #    Metabolic potential of the community     #
+        #                                             #
+        ###############################################
 
         ######### Creating metabolic instance for the whole community #########
-        Created instance in /shared/programs/metage2metabo/test/output_directory/community_analysis/miscoto_17f5ygw7.lp
-        Running whole-community metabolic scopes
-        Community scopes for all metabolic networks available in output_directory/community_analysis/comm_scopes.json
-        --- Community scope runtime 0.85 seconds ---
+        Created temporary instance file in ..metage2metabo/test/metabolic_data/output_directory/community_analysis/miscoto_h00llsyy.lp
+        Running whole-community metabolic scopes...
+        Community scope for all metabolic networks available in output_directory/community_analysis/comm_scopes.json
+        Contributions of microbes to community scope available in output_directory/community_analysis/contributions_of_microbes.json.
 
 
-        Added value of cooperation over individual metabolism: 33 newly reachable metabolites: 
+        Number of metabolites producible in community: 698. 
+
+        Reverse community scopes for all metabolic networks available in output_directory/community_analysis/rev_cscope.json and output_directory/community_analysis/rev_cscope.tsv. They higlight the producibility of metabolites by species in the community.
+
+        --- Community scope runtime 6.05 seconds ---
+
+
+        ###############################################
+        #                                             #
+        #    Added-value of metabolic interactions    #
+        #                                             #
+        ###############################################
+
+
+        Added value of cooperation over individual metabolism: 122 newly reachable metabolites: 
 
         ...
-
 
         Added-value of cooperation written in output_directory/community_analysis/addedvalue.json
 
-        Target file created with the addedvalue targets in: output_directory/community_analysis/targets.sbml
-        Setting 33 compounds as targets 
+        The following 1 targets are individually reachable by at least one organism: 
+
+        M_MANNITOL_c
+
+        The following 119 targets are additionally reachable through putative cross-feeding events: 
+
+        ...
+
+        Target file created with the targets provided by the user in: output_directory/community_analysis/targets.sbml
+        Setting 120 compounds as targets. 
+
+
+        ###############################################
+        #                                             #
+        #         Minimal community selection         #
+        #                                             #
+        ###############################################
+
+        WARNING: The following seeds are among the targets: {'M_MANNITOL_c'}. They will not be considered as targets during the computation of minimal communities: they will be considered as already reachable according to the network expansion definition.
 
         Running minimal community selection
+        ...metage2metabo/lib/python3.10/site-packages/miscoto/encodings/community_soup.lp
 
-        In the initial and minimal communities 33 targets are producible and 0 remain unproducible.
+        In the initial and minimal communities 120 targets are producible and 0 remain unproducible.
 
-        33 producible targets:
+        120 producible targets:
         ...
 
         0 still unproducible targets:
@@ -824,33 +905,33 @@ Optional arguments:
 
         ######### One minimal community #########
         # One minimal community enabling the producibility of the target metabolites given as inputs
-        Minimal number of bacteria in communities => 2
+        Minimal number of bacteria in communities => 13
 
-        GCA_003433665
-        GCA_003433675
+        ...
+
         ######### Key species: Union of minimal communities #########
         # Bacteria occurring in at least one minimal community enabling the producibility of the target metabolites given as inputs
-        Number of key species => 2
+        Number of key species => 17
 
-        GCA_003433665
-        GCA_003433675
+        ...
+
         ######### Essential symbionts: Intersection of minimal communities #########
         # Bacteria occurring in ALL minimal communities enabling the producibility of the target metabolites given as inputs
-        Number of essential symbionts => 2
+        Number of essential symbionts => 12
 
-        GCA_003433665
-        GCA_003433675
+        ...
+
         ######### Alternative symbionts: Difference between Union and Intersection #########
         # Bacteria occurring in at least one minimal community but not all minimal communities enabling the producibility of the target metabolites given as inputs
-        Number of alternative symbionts => 0
+        Number of alternative symbionts => 5
 
+        ...
 
-
-        --- Mincom runtime 1.36 seconds ---
+        --- Mincom runtime 8.76 seconds ---
 
         Targets producibility are available at output_directory/producibility_targets.json
-        --- Total runtime 577.84 seconds ---
-        --- Logs written in output_directory/m2m_test.log ---
+        --- Total runtime 40.18 seconds ---
+        --- Logs written in output_directory/m2m_metacom.log ---
 
 
 * files outputs
@@ -862,14 +943,18 @@ Optional arguments:
         ├── m2m_workflow.log
         ├── producibility_targets.json
         ├── community_analysis
-        │   ├── addedvalue.json
+        │   ├── addedvalue.json
         │   ├── comm_scopes.json
+        │   ├── contributions_of_microbes.json
         │   ├── mincom.json
-        │   ├── targets.sbml
+        │   ├── rev_cscope.json
+        │   ├── rev_cscope.tsv
+        │   └── targets.sbml
         ├── indiv_scopes
         │   └── indiv_scopes.json
         │   └── rev_iscope.json
         │   └── rev_iscope.tsv
+        │   └── seeds_in_indiv_scopes.json
         ├── padmet
         │   ├── GCA_003433665.padmet
         │   └── GCA_003433675.padmet
@@ -929,6 +1014,8 @@ Optional arguments:
 
     These files are the same as the ones presented in the previous commands: metabolic networks reconstructions (Pathway Tools data, SBML), individual and collective scopes, minimal community selection. 
 
+    ``m2m metacom`` runs the whole workflow except the reconstruction of metabolic networks. We advise to use this command to explore the metabolism of the microbial community when you already have metabolic networks.
+
 
 Including a host in the picture
 -------------------------------
@@ -946,3 +1033,9 @@ Then back to the effect of the host in the other commands.
 
 More generally, for more information and analysis on the usage of hosts in addition to the microbiota, we refer the interested user to the `Miscoto
 <https://github.com/cfrioux/miscoto>`_ `Python package <https://pypi.org/project/Miscoto/>`__, on which m2m relies. Miscoto can be used as a standalone package for such analyses, with additional options, such as the identification of putative exchanges among the minimal communities. 
+
+
+More information
+-----------------
+
+Take a look at the complete tutorial in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/tutorials/method_tutorial>`__
