@@ -3,7 +3,7 @@
 
 """
 Description:
-Test m2m addedvalue on 17 metabolic networks and a file representing growth medium (seeds).
+Test m2m cscope on 17 metabolic networks and a file representing growth medium (seeds).
 """
 
 import os
@@ -12,6 +12,7 @@ import subprocess
 import tarfile
 import json
 from libsbml import SBMLReader
+from metage2metabo.sbml_management import get_compounds
 
 
 EXPECTED_TARGETS = {
@@ -76,10 +77,11 @@ EXPECTED_TARGETS = {
         'M_REDUCED__45__MENAQUINONE_c', 'M_CPD__45__14378_c',
         'M_2__45__METHYL__45__ACETO__45__ACETYL__45__COA_c',
         'M_CPD0__45__2121_c', 'M_CPD__45__12773_c', 'M_CPD__45__13644_c',
-        'M_ALPHA__45__GLC__45__6__45__P_c'
+        'M_ALPHA__45__GLC__45__6__45__P_c',
+        'M_MANNITOL_c'
     }
 
-SIZE_CSCOPE = 651
+SIZE_CSCOPE = 698
 
 
 def test_m2m_cscope_call():
@@ -107,9 +109,12 @@ def test_m2m_cscope_call():
     # CSCOPE ANALYSIS
     with open(cscope_file, 'r') as json_cdata:
         d_cscope = json.load(json_cdata)
+    producible_compounds = set(d_cscope['com_scope'])
+    targets = set(get_compounds(targets_path))
+    producible_targets = producible_compounds.intersection(targets)
+    print(producible_targets)
     assert len(d_cscope['com_scope']) == SIZE_CSCOPE
-    assert sorted(d_cscope['com_prodtargets']) == sorted(EXPECTED_TARGETS)
-    assert d_cscope['com_unprodtargets'] == []
+    assert sorted(producible_targets) == sorted(EXPECTED_TARGETS)
 
     # clean
     shutil.rmtree(respath)

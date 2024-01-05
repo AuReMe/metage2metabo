@@ -31,6 +31,7 @@ from metage2metabo.m2m.community_scope import cscope, instance_community
 from metage2metabo.m2m.community_addedvalue import addedvalue
 from metage2metabo.m2m.minimal_community import mincom
 from metage2metabo.m2m.m2m_workflow import run_workflow, metacom_analysis
+from metage2metabo.sbml_management import get_compounds
 
 from metage2metabo import sbml_management, utils
 
@@ -355,7 +356,7 @@ def main():
             # test if some targets are seeds
             itsct_seeds_targets = sbml_management.compare_seeds_and_targets(args.seeds, args.targets)
             if itsct_seeds_targets != set():
-                logger.warning(f"\nWARNING: compounds {*list(itsct_seeds_targets),} are both in seeds and targets. Since they are in seeds, they will be in each organism's individual producibility scope (iscope), but not appear in the community scope (cscope). To be certain that they are produced (through an activable reaction and not just because they are seeds), check the output file: indiv_scopes/indiv_produced_seeds.json and the key 'individually producible' in the file producibility_targets.json.\n")
+                logger.warning(f"\nWARNING: compounds {*list(itsct_seeds_targets),} are both in seeds and targets. As such, they will be considered already reachable during community selection and will be ignored. However, their producibility can be assessed in individual and community scopes. If a host is provided, the community scope computation differs slightly and the producibility of the compound will have to be checked in the output files: indiv_scopes/seeds_in_indiv_scopes.json and the key 'individually producible' in the file producibility_targets.json. \n")
         if args.cmd == "iscope":
             main_iscope(network_dir, args.seeds, args.out, args.cpu)
         elif args.cmd == "cscope":
@@ -416,7 +417,7 @@ def main_cscope(*allargs):
     """Run cscope command.
     """
     instance_com, comscope = cscope(*allargs)
-    logger.info("\n" + str(len(comscope)) + " metabolites (excluding the seeds) reachable by the whole community/microbiota: \n")
+    logger.info("\n" + str(len(comscope)) + " metabolites reachable by the whole community/microbiota: \n")
     logger.info('\n'.join(comscope))
     #delete intermediate file
     os.unlink(instance_com)
@@ -456,7 +457,7 @@ def main_mincom(sbmldir, seedsfiles, outdir, targets, host):
     #create instance
     instance = instance_community(sbmldir, seedsfiles, outdir, targets, host)
     #run mincom
-    mincom(instance, outdir)
+    mincom(instance, seedsfiles, set(get_compounds(targets)), outdir)
     #delete intermediate file
     os.unlink(instance)
 
