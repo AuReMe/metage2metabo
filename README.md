@@ -69,8 +69,8 @@ pip install -r requirements.txt --no-cache-dir
 In particular, m2m relies on:
 * [mpwt](https://github.com/AuReMe/mpwt) to automatize metabolic network reconstruction with Pathway Tools
 * [padmet](https://github.com/AuReMe/padmet) to manage metabolic networks
-* [menetools](https://github.com/cfrioux/MeneTools) to analyze individual metabolic capabilities using logic programming
-* [miscoto](https://github.com/cfrioux/miscoto) to analyze collective metabolic capabilities and select communities within microbiota using logic programming
+* [menetools](https://github.com/cfrioux/MeneTools) to analyze individual metabolic capabilities using logic programming. **Requires MeneTools > 3.4**
+* [miscoto](https://github.com/cfrioux/miscoto) to analyze collective metabolic capabilities and select communities within microbiota using logic programming. **Requires MiSCoTo > 3.2**
 
 Also, m2m_analysis relies on other packages:
 * [networkx](https://github.com/networkx/networkx) to create graph from miscoto results
