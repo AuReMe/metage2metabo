@@ -45,6 +45,11 @@ def powergraph_analysis(gml_input_file_folder, output_folder, oog_jar=None, taxo
         taxonomy_level (str): taxonomy level, must be: phylum, class, order, family, genus or species.
     """
     starttime = time.time()
+    logger.info('\n###############################################')
+    logger.info('#                                             #')
+    logger.info('#  Compression and visualisation of graph     #')
+    logger.info('#                                             #')
+    logger.info('###############################################\n')
 
     gml_paths = utils.file_or_folder(gml_input_file_folder)
 
@@ -211,6 +216,7 @@ def compression(gml_input, bbl_output):
         bbl_output (str): bbl output file
     """
     starttime = time.time()
+
     with open('powergrasp.cfg', 'w') as config_file:
         config_file.write('[powergrasp options]\n')
         config_file.write('SHOW_STORY = no\n')
@@ -311,7 +317,7 @@ def convert_taxon_id(taxon_id):
     Returns:
         taxon_id (str): converted taxon ID
     """
-    matches = re.findall('_c\d*_', taxon_id)
+    matches = re.findall(r'_c\d*_', taxon_id)
     for match in matches:
         convert_match = chr(int(match.strip('_c').strip('_')))
         taxon_id = taxon_id.replace(match, convert_match)

@@ -38,7 +38,6 @@ def run_analysis_workflow(sbml_folder, target_folder_file, seed_file, output_dir
         host_file (str): metabolic network file for host
         taxonomy_level (str): taxonomy level, must be: phylum, class, order, family, genus or species.
     """
-    logger.info('######### Start m2m_analysis workflow. #########')
     starttime = time.time()
 
     json_file_folder = enumeration_analysis(sbml_folder, target_folder_file, seed_file, output_dir, host_file)

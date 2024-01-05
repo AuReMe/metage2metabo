@@ -44,6 +44,13 @@ def enumeration(sbml_folder, target_file, seed_file, output_json, host_file):
         enumeration=True, union=True,
         optsol=True, output_json=output_json)
 
+    # Check for unproducible targets.
+    if results['still_unprod'] != []:
+        logger.error('ERROR ', results["still_unprod"], ' is unproducible')
+        logger.error('ERROR: Please remove these unproducible targets ({0}) from the targets file "{1}" and re-run m2m_analysis'.format(','.join(results["still_unprod"]), target_file))
+        os.remove(output_json)
+        sys.exit(1)
+
     # Give enumeration of solutions
     enumeration = str(len(results['enum_bacteria']))
     minimal_solution_size = str(len(results["bacteria"]))
@@ -88,6 +95,11 @@ def enumeration_analysis(sbml_folder, target_folder_file, seed_file, output_dir,
         dict: {target_filename_without_extension: json_output_path}
     """
     starttime = time.time()
+    logger.info('\n###############################################')
+    logger.info('#                                             #')
+    logger.info('#      Enumeration of minimal communities     #')
+    logger.info('#                                             #')
+    logger.info('###############################################\n')
 
     target_paths = utils.file_or_folder(target_folder_file)
 

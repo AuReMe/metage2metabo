@@ -50,9 +50,8 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_
         tree_output_file (str): path to tree output file
         taxonomy_level (str): taxonomy level, must be: phylum, class, order, family, genus or species.
     """
-    logger.info('######### Extract taxon information from {0}. #########'.format(mpwt_taxon_file))
-
     starttime = time.time()
+    logger.info('######### Extract taxon information from {0}. #########'.format(mpwt_taxon_file))
 
     ncbi = NCBITaxa()
 
