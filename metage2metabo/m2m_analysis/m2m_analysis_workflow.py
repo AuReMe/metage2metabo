@@ -44,7 +44,7 @@ def run_analysis_workflow(sbml_folder, target_folder_file, seed_file, output_dir
 
     gml_output = graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file, taxonomy_level)
 
-    powergraph_analysis(gml_output, output_dir, oog_jar, taxon_file, taxonomy_level)
+    powergraph_analysis(json_file_folder, gml_output, output_dir, oog_jar, taxon_file, taxonomy_level)
 
     logger.info(
         '--- m2m_analysis runtime %.2f seconds ---\n' % (time.time() - starttime))

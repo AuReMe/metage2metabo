@@ -197,7 +197,7 @@ def main():
         "powergraph",
         help="powergraph creation and visualization",
         parents=[
-            parent_parser_g, parent_parser_jar, parent_parser_q, parent_parser_taxon,
+            parent_parser_j, parent_parser_g, parent_parser_jar, parent_parser_q, parent_parser_taxon,
             parent_parser_level, parent_parser_o
         ],
         description=
@@ -242,8 +242,8 @@ def main():
             logger.critical('Error: ' + args.seeds + " is not a correct filepath")
             sys.exit(1)
     if "targets" in args and args.targets is not None:
-        if not utils.is_valid_file(args.targets):
-            logger.critical('Error: ' + args.targets + " is not a correct filepath")
+        if not utils.is_valid_file(args.targets) and not utils.is_valid_dir(args.targets):
+            logger.critical('Error: ' + args.targets + " is not a correct filepath or folder")
             sys.exit(1)
 
     # add logger in file
@@ -301,7 +301,7 @@ def main():
     elif args.cmd == "graph":
         main_graph(args.json, args.targets, args.out, args.taxon, args.level)
     elif args.cmd == "powergraph":
-        main_powergraph(args.gml, args.out, args.oog, args.taxon, args.level)
+        main_powergraph(args.json, args.gml, args.out, args.oog, args.taxon, args.level)
 
     logger.info("--- Total runtime %.2f seconds ---" % (time.time() - start_time))
 
