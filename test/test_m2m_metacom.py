@@ -181,8 +181,9 @@ def test_m2m_metacom_call():
 
     if not os.path.exists(respath):
         os.makedirs(respath)
-    with tarfile.open(toy_bact_tgz_path) as tar:
-        tar.extractall(path=respath)
+
+    metage2metabo.utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
+
     subprocess.call([
         'm2m', 'metacom', '-n', toy_bact_path, '-o',
         respath, '-s', seeds_path, '-q'
@@ -242,8 +243,9 @@ def test_m2m_metacom_targets_import():
 
     if not os.path.exists(respath):
         os.makedirs(respath)
-    with tarfile.open(toy_bact_tgz_path) as tar:
-        tar.extractall(path=respath)
+
+    metage2metabo.utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
+
     metage2metabo.m2m.m2m_workflow.metacom_analysis(sbml_dir=toy_bact_path, out_dir=respath,
                 seeds=seeds_path, host_mn=None, targets_file=targets_path, cpu_number=1)
 
@@ -320,8 +322,8 @@ def test_metacom_produced_seed():
     expected_producers = ['GCA_003437905', 'GCA_003438055', 'GCA_003437885', 'GCA_003437815', 'GCA_003437595', 'GCA_003437375']
     if not os.path.exists(respath):
         os.makedirs(respath)
-    with tarfile.open(toy_bact_tgz_path) as tar:
-        tar.extractall(path=respath)
+
+    metage2metabo.utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
 
     with open(target_txt_path, 'w') as butyrate_output:
         butyrate_output.write('M_BUTYRIC_ACID_c')

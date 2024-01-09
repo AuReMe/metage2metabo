@@ -9,10 +9,11 @@ Test m2m addedvalue on 17 metabolic networks and a file representing growth medi
 import os
 import shutil
 import subprocess
-import tarfile
 import json
+
 from libsbml import SBMLReader
 
+from metage2metabo import utils
 
 EXPECTED_TARGETS = {
         'M_3__45__OCTAPRENYL__45__4__45__HYDROXYBENZOATE_c',
@@ -100,8 +101,9 @@ def test_m2m_addedvalue_call():
 
     if not os.path.exists(respath):
         os.makedirs(respath)
-    with tarfile.open(toy_tgz_bact) as tar:
-        tar.extractall(path=respath)
+
+    utils.safe_tar_extract_all(toy_tgz_bact, respath)
+
     subprocess.call([
         'm2m', 'addedvalue', '-n', toy_bact, '-o',
         respath, '-s', seeds_path, '-q'

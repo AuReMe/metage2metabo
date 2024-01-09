@@ -9,11 +9,10 @@ Test m2m cscope on 17 metabolic networks and a file representing growth medium (
 import os
 import shutil
 import subprocess
-import tarfile
 import json
-from libsbml import SBMLReader
-from metage2metabo.sbml_management import get_compounds
 
+from metage2metabo.sbml_management import get_compounds
+from metage2metabo import utils
 
 EXPECTED_TARGETS = {
         'M_3__45__OCTAPRENYL__45__4__45__HYDROXYBENZOATE_c',
@@ -98,8 +97,9 @@ def test_m2m_cscope_call():
 
     if not os.path.exists(respath):
         os.makedirs(respath)
-    with tarfile.open(toy_bact_tgz) as tar:
-        tar.extractall(path=respath)
+
+    utils.safe_tar_extract_all(toy_bact_tgz, respath)
+
     subprocess.call([
         'm2m', 'cscope', '-n', toy_bact_path, '-o',
         respath, '-s', seeds_path,

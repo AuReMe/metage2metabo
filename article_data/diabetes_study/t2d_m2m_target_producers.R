@@ -6,6 +6,7 @@ library(ape)
 library(vegan)
 library(viridis)
 library(RColorBrewer)
+library(lsr)
 
 ######### CONFIG ###########
 focus = "mhd" # can be "mhd" or "swe" or "all"
