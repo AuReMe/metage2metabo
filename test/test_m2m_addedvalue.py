@@ -77,12 +77,15 @@ EXPECTED_TARGETS = {
         'M_REDUCED__45__MENAQUINONE_c', 'M_CPD__45__14378_c',
         'M_2__45__METHYL__45__ACETO__45__ACETYL__45__COA_c',
         'M_CPD0__45__2121_c', 'M_CPD__45__12773_c', 'M_CPD__45__13644_c',
-        'M_ALPHA__45__GLC__45__6__45__P_c'
+        'M_ALPHA__45__GLC__45__6__45__P_c',
+        'M_CELLULOSE_c',
+        'M_DODECANOATE_c',
+        'M_STEARIC_ACID_c',
     }
 NUMBER_BACT = 17
-SIZE_UNION = 625
-SIZE_INTERSECTION = 135
-SIZE_CSCOPE = 651
+SIZE_UNION = 576
+SIZE_INTERSECTION = 50
+SIZE_CSCOPE = 698
 
 
 def test_m2m_addedvalue_call():
@@ -129,7 +132,7 @@ def test_m2m_addedvalue_call():
     reader = SBMLReader()
     document = reader.readSBML(target_file)
     new_targets = set([specie.getId() for specie in document.getModel().getListOfSpecies()])
-    assert new_targets == EXPECTED_TARGETS
+    assert sorted(new_targets) == sorted(EXPECTED_TARGETS)
     # clean
     shutil.rmtree(respath)
 

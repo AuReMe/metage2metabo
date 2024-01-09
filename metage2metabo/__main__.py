@@ -30,6 +30,7 @@ from metage2metabo.m2m.community_scope import cscope, instance_community
 from metage2metabo.m2m.community_addedvalue import addedvalue
 from metage2metabo.m2m.minimal_community import mincom
 from metage2metabo.m2m.m2m_workflow import run_workflow, metacom_analysis
+from metage2metabo.sbml_management import get_compounds
 
 from metage2metabo import sbml_management, utils
 
@@ -209,7 +210,8 @@ def main():
             parent_parser_xml
         ],
         description=
-        "Run metabolic network reconstruction for each annotated genome of the input directory, using Pathway Tools"
+        "Run metabolic network reconstruction for each annotated genome of the input directory, using Pathway Tools",
+        allow_abbrev=False
     )
     indivscope_parser = subparsers.add_parser(
         "iscope",
@@ -218,7 +220,8 @@ def main():
             parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_q, parent_parser_c
         ],
         description=
-        "Compute individual scopes (reachable metabolites from seeds) for each metabolic network of the input directory"
+        "Compute individual scopes (reachable metabolites from seeds) for each metabolic network of the input directory",
+        allow_abbrev=False
     )
     comscope_parser = subparsers.add_parser(
         "cscope",
@@ -227,7 +230,7 @@ def main():
             parent_parser_n, parent_parser_s, parent_parser_o, parent_parser_m,
             parent_parser_q, parent_parser_t_optional
         ],
-        description="Compute the community scope of all metabolic networks")
+        description="Compute the community scope of all metabolic networks", allow_abbrev=False)
     added_value_parser = subparsers.add_parser(
         "addedvalue",
         help="added value of microbiota's metabolism over individual's",
@@ -236,7 +239,8 @@ def main():
             parent_parser_q
         ],
         description=
-        "Compute metabolites that are reachable by the community/microbiota and not by individual organisms"
+        "Compute metabolites that are reachable by the community/microbiota and not by individual organisms",
+        allow_abbrev=False
     )
     mincom_parser = subparsers.add_parser(
         "mincom",
@@ -246,13 +250,15 @@ def main():
             parent_parser_q, parent_parser_t_required
         ],
         description=
-        "Select minimal-size community to make reachable a set of metabolites")
+        "Select minimal-size community to make reachable a set of metabolites",
+        allow_abbrev=False)
     seeds_parser = subparsers.add_parser(
         "seeds",
         help="creation of seeds SBML file",
         parents=[parent_parser_o, parent_parser_q],
         description=
-        "Create a SBML file starting for a simple text file with metabolic compounds identifiers"
+        "Create a SBML file starting for a simple text file with metabolic compounds identifiers",
+        allow_abbrev=False
     )
     seeds_parser.add_argument(
         "--metabolites",
@@ -268,7 +274,8 @@ def main():
             parent_parser_t_optional, parent_parser_cl, parent_parser_xml
         ],
         description=
-        "Run the whole workflow: metabolic network reconstruction, individual and community scope analysis and community selection"
+        "Run the whole workflow: metabolic network reconstruction, individual and community scope analysis and community selection",
+        allow_abbrev=False
     )
     metacom_parser = subparsers.add_parser(
         "metacom",
@@ -278,7 +285,8 @@ def main():
             parent_parser_t_optional, parent_parser_q, parent_parser_c
         ],
         description=
-        "Run the whole metabolism community analysis: individual and community scope analysis and community selection"
+        "Run the whole metabolism community analysis: individual and community scope analysis and community selection",
+        allow_abbrev=False
     )
     test_parser = subparsers.add_parser(
         "test",
@@ -286,8 +294,7 @@ def main():
         parents=[
             parent_parser_q, parent_parser_c, parent_parser_o
         ],
-        description=
-        "Test the whole workflow on a data sample")
+        description="Test the whole workflow on a data sample", allow_abbrev=False)
 
     args = parser.parse_args()
 
@@ -354,7 +361,7 @@ def main():
             # test if some targets are seeds
             itsct_seeds_targets = sbml_management.compare_seeds_and_targets(args.seeds, args.targets)
             if itsct_seeds_targets != set():
-                logger.warning(f"\nWARNING: compounds {*list(itsct_seeds_targets),} are both in seeds and targets. Since they are in seeds, they will be in each organism's individual producibility scope (iscope), but not appear in the community scope (cscope). To be certain that they are produced (through an activable reaction and not just because they are seeds), check the output file: indiv_scopes/indiv_produced_seeds.json and the key 'individually producible' in the file producibility_targets.json.\n")
+                logger.warning(f"\nWARNING: compounds {*list(itsct_seeds_targets),} are both in seeds and targets. As such, they will be considered already reachable during community selection and will be ignored. However, their producibility can be assessed in individual and community scopes. If a host is provided, the community scope computation differs slightly and the producibility of the compound will have to be checked in the output files: indiv_scopes/seeds_in_indiv_scopes.json and the key 'individually producible' in the file producibility_targets.json. \n")
         if args.cmd == "iscope":
             main_iscope(network_dir, args.seeds, args.out, args.cpu)
         elif args.cmd == "cscope":
@@ -415,7 +422,7 @@ def main_cscope(*allargs):
     """Run cscope command.
     """
     instance_com, comscope = cscope(*allargs)
-    logger.info("\n" + str(len(comscope)) + " metabolites (excluding the seeds) reachable by the whole community/microbiota: \n")
+    logger.info("\n" + str(len(comscope)) + " metabolites reachable by the whole community/microbiota: \n")
     logger.info('\n'.join(comscope))
     #delete intermediate file
     os.unlink(instance_com)
@@ -455,7 +462,7 @@ def main_mincom(sbmldir, seedsfiles, outdir, targets, host):
     #create instance
     instance = instance_community(sbmldir, seedsfiles, outdir, targets, host)
     #run mincom
-    mincom(instance, outdir)
+    mincom(instance, seedsfiles, set(get_compounds(targets)), outdir)
     #delete intermediate file
     os.unlink(instance)
 

@@ -22,7 +22,7 @@ import os
 from metage2metabo import utils, sbml_management
 from metage2metabo.m2m.reconstruction import recon
 from metage2metabo.m2m.individual_scope import iscope
-from metage2metabo.m2m.community_scope import cscope
+from metage2metabo.m2m.community_scope import cscope, reverse_cscope
 from metage2metabo.m2m.community_addedvalue import addedvalue
 from metage2metabo.m2m.minimal_community import mincom
 
@@ -81,10 +81,10 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, cpu_number
             logger.info("\n".join(individually_producible_targets))
         commonly_producible_targets = user_targets.intersection(addedvalue_targets)
         if len(commonly_producible_targets) > 0:
-            logger.info('\n The following ' + str(len(commonly_producible_targets)) + " targets are additionally reachable through putative cooperation events: \n")
+            logger.info('\n The following ' + str(len(commonly_producible_targets)) + " targets are additionally reachable through putative cross-feeding events: \n")
             logger.info("\n".join(commonly_producible_targets))
         else:
-            logger.info("Cooperation events do not enable the producibility of additional targets")
+            logger.info("Cross feeding interactions do not enable the producibility of additional targets")
     else:
         user_targets = None
         newtargets = addedvalue_targets
@@ -103,7 +103,7 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, cpu_number
         sbml_management.create_species_sbml(newtargets, target_file_path)
 
         # Add these targets to the instance
-        logger.info("Setting " + str(len(newtargets)) + " compounds as targets \n")
+        logger.info("Setting " + str(len(newtargets)) + " compounds as targets. \n")
         # if len(newtargets) != len(addedvalue_targets):
         #     logger.info("\n".join(newtargets))
 
@@ -111,7 +111,7 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, cpu_number
             instance_com, out_dir,
             newtargets)
         # MINCOM
-        mincom(instance_w_targets, out_dir)
+        mincom(instance_w_targets, seeds, newtargets, out_dir)
         # remove intermediate files
         os.unlink(instance_com)
         os.unlink(instance_w_targets)
@@ -171,8 +171,9 @@ def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, add
     prod_targets['indiv_producible'] = list(indiv_producible)
 
     indiv_scopes_path = os.path.join(*[m2m_out_dir, 'indiv_scopes', 'indiv_scopes.json'])
-    produced_seeds_path = os.path.join(*[m2m_out_dir, 'indiv_scopes', 'indiv_produced_seeds.json'])
+    produced_seeds_path = os.path.join(*[m2m_out_dir, 'indiv_scopes', 'seeds_in_indiv_scopes.json'])
     comm_scopes_path = os.path.join(*[m2m_out_dir, 'community_analysis', 'comm_scopes.json'])
+    reverse_cscope_path = os.path.join(*[m2m_out_dir, 'community_analysis', 'rev_cscope.json'])
     mincom_path = os.path.join(*[m2m_out_dir, 'community_analysis', 'mincom.json'])
     producibility_targets_path = os.path.join(m2m_out_dir, 'producibility_targets.json')
 
@@ -200,15 +201,26 @@ def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, add
 
     if os.path.exists(comm_scopes_path):
         prod_targets['com_only_producers'] = {}
-        with open(comm_scopes_path) as json_data:
-            com_producible_compounds = json.load(json_data)
-        for target in selected_targets:
-            if target in com_producible_compounds['targets_producers']:
-                if target in prod_targets['individual_producers']:
-                    only_com_producing_species = list(set(com_producible_compounds['targets_producers'][target]) - set(prod_targets['individual_producers'][target]))
-                else:
-                    only_com_producing_species = com_producible_compounds['targets_producers'][target]
-                prod_targets['com_only_producers'][target] = only_com_producing_species
+        if os.path.exists(reverse_cscope_path):
+            with open(reverse_cscope_path) as json_data:
+                rev_cscope = json.load(json_data)
+            for target in selected_targets:
+                if target in rev_cscope:
+                    if target in prod_targets['individual_producers']:
+                        only_com_producing_species = list(set(rev_cscope[target]) - set(prod_targets['individual_producers'][target]))
+                    else:
+                        only_com_producing_species = rev_cscope[target]
+                    prod_targets['com_only_producers'][target] = only_com_producing_species
+        else:
+            with open(comm_scopes_path) as json_data:
+                com_producible_compounds = json.load(json_data)
+            for target in selected_targets:
+                if target in com_producible_compounds['targets_producers']:
+                    if target in prod_targets['individual_producers']:
+                        only_com_producing_species = list(set(com_producible_compounds['targets_producers'][target]) - set(prod_targets['individual_producers'][target]))
+                    else:
+                        only_com_producing_species = com_producible_compounds['targets_producers'][target]
+                    prod_targets['com_only_producers'][target] = only_com_producing_species
 
     if os.path.exists(mincom_path):
         with open(mincom_path) as json_data:

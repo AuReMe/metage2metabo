@@ -53,6 +53,11 @@ def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clea
         tuple: PGDB directory (str), SBML directory (str)
     """
     starttime = time.time()
+    logger.info('\n###############################################')
+    logger.info('#                                             #')
+    logger.info('#       Metabolic network reconstruction      #')
+    logger.info('#                                             #')
+    logger.info('###############################################\n')
 
     if use_pwt_xml and padmet_bool:
         logger.critical("-p/padmet_bool and --pwt-xml/use_pwt_xml are incompatible arguments")

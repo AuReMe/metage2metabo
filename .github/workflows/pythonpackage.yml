@@ -67,3 +67,4 @@ jobs:
         pytest test_m2m_iscope.py
         pytest test_m2m_metacom.py
         pytest test_m2m_mincom.py
+        pytest test_tiny_toy_metacom.py
