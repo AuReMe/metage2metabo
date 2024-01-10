@@ -13,6 +13,8 @@ import tarfile
 import json
 import networkx as nx
 
+from metage2metabo.m2m_analysis.enumeration import create_boolean_equation_from_enumeration
+
 KEY_SPECIES = ['GCA_003437665', 'GCA_003437785', 'GCA_003437345',
                      'GCA_003437325', 'GCA_003437055', 'GCA_003437195',
                      'GCA_003437375', 'GCA_003437905', 'GCA_003437715',
@@ -61,6 +63,19 @@ GML_NODES = ['GCA_003437595', 'GCA_003437055', 'GCA_003437665',
              'GCA_003437295', 'GCA_003438055', 'GCA_003437175',
              'GCA_003437195', 'GCA_003437345', 'GCA_003437785',
              'GCA_003437325', 'GCA_003437945']
+
+
+def test_m2m_create_boolean_equation_from_enumeration():
+    expected_bacterial_groups = [frozenset({'A'}), frozenset({'B', 'G'}), frozenset({'F', 'D', 'C', 'E'})]
+
+    expected_file = os.path.join('metabolic_data', 'example_enumeration.json')
+    with open(expected_file, 'r') as json_data:
+        enumeration_json = json.load(json_data)
+
+    bacterial_groups = create_boolean_equation_from_enumeration(enumeration_json)
+
+    assert sorted(expected_bacterial_groups) == sorted(bacterial_groups)
+
 
 def test_m2m_analysis_call():
     """
@@ -120,7 +135,6 @@ def test_m2m_analysis_workflow():
     draft_tgz_path = os.path.join(inppath, 'toy_bact.tar.gz')
     seeds_path = os.path.join(inppath, 'seeds_toy.sbml')
     targets_path = os.path.join(inppath, 'targets_toy.sbml')
-    taxon_id_file_path = os.path.join(inppath, 'taxon_id.tsv')
 
     html_file_path = os.path.join(*[respath, 'html', 'targets_toy_powergraph.html'])
 

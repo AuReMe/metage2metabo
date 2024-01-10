@@ -78,6 +78,10 @@ def enumeration(sbml_folder, target_file, seed_file, output_json, host_file):
                 str(len(alternative_symbionts)))
     logger.info("\n".join(alternative_symbionts))
 
+    # Compute the boolean equation associated with minimal communities
+    logger.info('######### Boolean equation of minimal communities #########')
+    create_boolean_equation_from_enumeration(results)
+
     return output_json
 
 
@@ -123,3 +127,59 @@ def enumeration_analysis(sbml_folder, target_folder_file, seed_file, output_dir,
         "--- Enumeration runtime %.2f seconds ---\n" % (time.time() - starttime))
 
     return output_jsons
+
+
+def create_boolean_equation_from_enumeration(results):
+    """ From the results of the enumeration computes the boolean eaqution of the minimal communities.
+
+    Args:
+        results (dict): results dictionary of miscoto for the enumeration.
+
+    Returns:
+        bacterial_groups (list): list of frozenset containing each different group of the community
+    """
+
+    enum_bacteria = [value for key, value in results['enum_bacteria'].items()]
+    all_bacteria = results['bacteria']
+
+    # For each bacteria of the minimal community computes its competitors.
+    # Here competitors are bacteria that are present in minimal community in which the focused bacteria is not
+    # and also bacteria that never are in teh same minimal community than the focused bacteria.
+    bacteria_competitors = {}
+    for bact in all_bacteria:
+        partners = set([other_bact for min_com in enum_bacteria if bact in min_com for other_bact in min_com])
+        competitors = set([other_bact for min_com in enum_bacteria if bact not in min_com for other_bact in min_com]) - partners
+        bacteria_competitors[bact] = competitors
+
+    # Create bacteria groups according to competitors.
+    # Regroup each group of competitors together as they are group of alternative symbionts.
+    # Essential symbionts will be single in a group.
+    bacterial_groups = []
+    for bact in bacteria_competitors:
+        if bacteria_competitors[bact] == set():
+            bacterial_groups.append(frozenset([bact]))
+        else:
+            alternative_group = [bact]
+            alternative_group.extend(bacteria_competitors[bact])
+            alternative_group = frozenset(alternative_group)
+            if alternative_group not in bacterial_groups:
+                bacterial_groups.append(alternative_group)
+
+    # Convert the bacterial groups into a boolean equation.
+    boolean_equation = '('
+    for index, group in enumerate(bacterial_groups):
+        boolean_equation += '('
+        for index_bacteria, bacteria in enumerate(group):
+            if index_bacteria + 1 == len(group):
+                boolean_equation += ' ' + bacteria + ' '
+            else:
+                boolean_equation += ' ' + bacteria + ' |'
+        if index + 1 == len(bacterial_groups):
+            boolean_equation += ')'
+        else:
+            boolean_equation += ') & \n'
+    boolean_equation += ' )'
+
+    logger.info(f'Boolean equation: \n{boolean_equation}')
+
+    return bacterial_groups
