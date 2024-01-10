@@ -19,6 +19,7 @@ import os
 import sys
 import time
 
+from functools import reduce
 from metage2metabo import utils
 
 logger = logging.getLogger(__name__)
@@ -80,7 +81,19 @@ def enumeration(sbml_folder, target_file, seed_file, output_json, host_file):
 
     # Compute the boolean equation associated with minimal communities
     logger.info('######### Boolean equation of minimal communities #########')
-    create_boolean_equation_from_enumeration(results)
+    logger.info('The boolean equation can only be created for simple case (without too many combinatorics).')
+    bacterial_groups = extract_groups_from_enumeration(results)
+    boolean_equation = convert_groups_to_equation(bacterial_groups)
+    boolean_equation_combinatorics = str(reduce(lambda x, y: x*y, [len(i) for i in bacterial_groups]))
+    if enumeration == boolean_equation_combinatorics:
+        logger.info('Boolean equation seems good, as it has the same combinatorics ({0}) than the one from enumeration ({1}).'.format(boolean_equation_combinatorics, enumeration))
+        logger.info(f'Boolean equation: \n{boolean_equation}')
+        results['boolean_equation'] = boolean_equation.replace('\n', '')
+        results['bacterial_groups'] = [list(group) for group in bacterial_groups]
+        miscoto.utils.to_json(results, output_json)
+
+    else:
+        logger.info('Boolean equation has not the same complexity ({0}) than the enumeration ({1}), it is not a good estimator. It will not be created and shown.'.format(boolean_equation_combinatorics, enumeration))
 
     return output_json
 
@@ -129,8 +142,9 @@ def enumeration_analysis(sbml_folder, target_folder_file, seed_file, output_dir,
     return output_jsons
 
 
-def create_boolean_equation_from_enumeration(results):
+def extract_groups_from_enumeration(results):
     """ From the results of the enumeration computes the boolean eaqution of the minimal communities.
+    It is a very simple method that will fail for enumeration with high combinatorics.
 
     Args:
         results (dict): results dictionary of miscoto for the enumeration.
@@ -165,6 +179,18 @@ def create_boolean_equation_from_enumeration(results):
             if alternative_group not in bacterial_groups:
                 bacterial_groups.append(alternative_group)
 
+    return bacterial_groups
+
+
+def convert_groups_to_equation(bacterial_groups):
+    """ Convert bacterial groups (from extract_groups_from_enumeration) to boolean equation.
+
+    Args:
+        bacterial_groups (list): list of frozenset containing each different group of the community
+
+    Returns:
+        boolean_equation (str): string representing the boolean equation of minimal communities
+    """
     # Convert the bacterial groups into a boolean equation.
     boolean_equation = '('
     for index, group in enumerate(bacterial_groups):
@@ -180,6 +206,4 @@ def create_boolean_equation_from_enumeration(results):
             boolean_equation += ') & \n'
     boolean_equation += ' )'
 
-    logger.info(f'Boolean equation: \n{boolean_equation}')
-
-    return bacterial_groups
+    return boolean_equation

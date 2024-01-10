@@ -686,7 +686,7 @@ def test_powergraph_heuristics(enumeration_json_file, powergraph_bubble_file, ou
     # Compare both combinatorics.
     if powergraph_combinatorics != observed_combinatorics_number:
         logger.critical('Divergence between theorical combinatorics ({0}) from powergraph and the combinatorics ({1}) found in solution.'.format(powergraph_combinatorics, observed_combinatorics_number))
-        logger.critical('This means that the compression heuristics create non observed realtion, so it is a simplification of the solutions.\n')
+        logger.critical('This means that the compression heuristics create non observed relation, so it is a simplification of the solutions.\n')
     else:
         logger.info('Same combinatorics between theorical ({0}) and solution ({1})'.format(powergraph_combinatorics, observed_combinatorics_number))
         logger.info('The powergraph seems to be an optimal representation of the solutions.\n')
