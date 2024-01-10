@@ -562,3 +562,8 @@ If you have used the ``--taxon``, two new files have been created:
 ``taxonomy_species.tsv``: it is a tsv file with 9 columns. The row corresponds to the species in your community. For each species, you will have its name in your dataset, its taxID (from taxon_id.tsv), an attributed taxonomic name (used in the power graph), then the taxonomic classification: phylum, class, order, family, genus and species.
 
 ``taxon_tree.txt``: the topology of the taxonomic classification of your species according to the NCBI taxonomy.
+
+More information
+-----------------
+
+Take a look at the complete tutorial in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/tutorials/method_tutorial>`__

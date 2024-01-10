@@ -9,9 +9,9 @@ Test m2m mincom on 17 metabolic networks and files representing growth medium (s
 import os
 import shutil
 import subprocess
-import tarfile
 import json
 
+from metage2metabo import utils
 
 UNION = {
     'GCA_003437815', 'GCA_003437055', 'GCA_003437715', 'GCA_003437255',
@@ -102,8 +102,9 @@ def test_m2m_mincom_call():
 
     if not os.path.exists(respath):
         os.makedirs(respath)
-    with tarfile.open(toy_bact_tgz_path) as tar:
-        tar.extractall(path=respath)
+
+    utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
+
     subprocess.call([
         'm2m', 'mincom', '-n', toy_bact_path, '-o', respath,
         '-s', seeds_path, '-t', targets_path,

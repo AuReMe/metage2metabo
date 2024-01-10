@@ -14,6 +14,7 @@ import json
 import networkx as nx
 
 from metage2metabo.m2m_analysis.enumeration import extract_groups_from_enumeration
+from metage2metabo import utils
 
 KEY_SPECIES = ['GCA_003437665', 'GCA_003437785', 'GCA_003437345',
                      'GCA_003437325', 'GCA_003437055', 'GCA_003437195',
@@ -94,8 +95,9 @@ def test_m2m_analysis_call():
 
     if not os.path.exists(respath):
         os.makedirs(respath)
-    with tarfile.open(draft_tgz_path) as tar:
-        tar.extractall(path=respath)
+
+    utils.safe_tar_extract_all(draft_tgz_path, respath)
+
     subprocess.call([
         'm2m_analysis', 'enum', '-n', draft_path, '-o',
         respath, '-t', targets_path, '-s', seeds_path,
@@ -140,8 +142,9 @@ def test_m2m_analysis_workflow():
 
     if not os.path.exists(respath):
         os.makedirs(respath)
-    with tarfile.open(draft_tgz_path) as tar:
-        tar.extractall(path=respath)
+
+    utils.safe_tar_extract_all(draft_tgz_path, respath)
+
     subprocess.call([
         'm2m_analysis', 'workflow', '-n', draft_path, '-o',
         respath, '-t', targets_path, '-s', seeds_path,

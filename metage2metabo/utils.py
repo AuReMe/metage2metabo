@@ -13,6 +13,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>
 
 import sys
+import tarfile
 import os
 import logging
 
@@ -156,3 +157,38 @@ def file_or_folder(variable_folder_file):
         sys.exit(1)
 
     return file_folder_paths
+
+def check_absolute_path(directory, target):
+    """ Check if the extracted element is inside the output directory.
+    If not, it is a potential path traversal attempt.
+
+    Args:
+        directory (str): path to output directory for extraction.
+        target (str): path of file contained in tar file.
+    """
+    abs_directory = os.path.abspath(directory)
+    abs_target = os.path.abspath(target)
+
+    prefix = os.path.commonprefix([abs_directory, abs_target])
+
+    return prefix == abs_directory
+
+
+def safe_tar_extract_all(tar_file, outdir):
+    """ Perform a sanitized check to ensure no file outside the output folder will be modified.
+
+    Args:
+        tar_file (str): path to tar file.
+        outdir (str): path to output directory for extraction.
+    """
+    tar = tarfile.open(tar_file, "r:gz")
+    tar.extractall(outdir)
+
+    for member in tar.getmembers():
+        member_path = os.path.join(outdir, member.name)
+        if not check_absolute_path(outdir, member_path):
+            raise Exception("Attempted Path Traversal in Tar File")
+
+    tar.extractall(outdir)
+
+    tar.close()

@@ -183,7 +183,8 @@ def main():
             parent_parser_s, parent_parser_n, parent_parser_t, parent_parser_m, parent_parser_o, parent_parser_q
         ],
         description=
-        "Run miscoto enumeration on sbml species with seeds and targets"
+        "Run miscoto enumeration on sbml species with seeds and targets",
+        allow_abbrev=False
     )
     graph_parser = subparsers.add_parser(
         "graph",
@@ -192,7 +193,8 @@ def main():
             parent_parser_j, parent_parser_o, parent_parser_t, parent_parser_taxon, parent_parser_q,
             parent_parser_level
         ],
-        description="Create the solution graph using the JSON from miscoto enumeration")
+        description="Create the solution graph using the JSON from miscoto enumeration",
+        allow_abbrev=False)
     powergraph_parser = subparsers.add_parser(
         "powergraph",
         help="powergraph creation and visualization",
@@ -201,7 +203,8 @@ def main():
             parent_parser_level, parent_parser_o
         ],
         description=
-        "Compress the GMl graph of solution and create a powergraph (bbl), a website format of the powergraph and a svg of the graph (if you use the --oog option)"
+        "Compress the GMl graph of solution and create a powergraph (bbl), a website format of the powergraph and a svg of the graph (if you use the --oog option)",
+        allow_abbrev=False
     )
     wkf_parser = subparsers.add_parser(
         "workflow",
@@ -211,7 +214,8 @@ def main():
             parent_parser_taxon, parent_parser_q, parent_parser_level
         ],
         description=
-        "Run the whole workflow: miscoto enumeration, graph on solution and powergraph creation"
+        "Run the whole workflow: miscoto enumeration, graph on solution and powergraph creation",
+        allow_abbrev=False
     )
 
     args = parser.parse_args()

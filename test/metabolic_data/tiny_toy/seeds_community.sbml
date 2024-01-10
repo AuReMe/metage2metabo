@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbml xmlns="http://www.sbml.org/sbml/level3/version1/core"
+    xmlns:fbc="http://www.sbml.org/sbml/level3/version1/fbc/version2" sboTerm="SBO:0000624" level="3" version="1" fbc:required="false">
+    <model metaid="meta_seeds" id="seeds" fbc:strict="true">
+        <listOfCompartments>
+            <compartment id="c" constant="true"/>
+        </listOfCompartments>
+        <listOfSpecies>
+            <species id="M_S1_c" name="S1" compartment="c" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+            <species id="M_S2_c" name="S2" compartment="c" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+        </listOfSpecies>
+    </model>
+</sbml>

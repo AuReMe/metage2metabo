@@ -19,6 +19,7 @@ import sys
 import time
 
 from metage2metabo import utils
+from metage2metabo.sbml_management import get_compounds
 
 from miscoto import run_mincom
 
@@ -28,16 +29,33 @@ logging.getLogger("miscoto").setLevel(logging.CRITICAL)
 logging.getLogger("mpwt").setLevel(logging.INFO)
 
 
-def mincom(instance_w_targets, out_dir):
+def mincom(instance_w_targets, seeds, targets, out_dir):
     """Compute minimal community selection and show analyses.
     
     Args:
         instance_w_targets (str): ASP instance filepath
+        seeds (str): seeds filepath
+        targets (str): targets set
         out_dir (str): results directory
     """
     starttime = time.time()
+
+    logger.info('\n###############################################')
+    logger.info('#                                             #')
+    logger.info('#         Minimal community selection         #')
+    logger.info('#                                             #')
+    logger.info('###############################################\n')
+
     miscoto_dir = os.path.join(out_dir, 'community_analysis')
     miscoto_mincom_path = os.path.join(miscoto_dir, 'mincom.json')
+
+    # check if seeds are among the targets
+    seeds = set(get_compounds(seeds))
+    targets = set(targets)
+    intersection = seeds.intersection(targets)
+    if len(intersection) > 0:
+        logger.warning(f'WARNING: The following seeds are among the targets: {intersection}. They will not be considered as targets during the computation of minimal communities: they will be considered as already reachable according to the network expansion definition.\n')    
+
     if not utils.is_valid_dir(miscoto_dir):
         logger.critical('Impossible to access/create output directory')
         sys.exit(1)
