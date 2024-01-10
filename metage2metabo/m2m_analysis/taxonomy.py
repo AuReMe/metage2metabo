@@ -26,19 +26,23 @@ def get_taxon(taxonomy_file_path):
 
     Args:
         taxonomy_file_path (str): path to the taxonomy_file
+
+    Returns:
+        taxon_named_species (dict): associate organism ID as key with taxon name as value
+        all_taxa (list): list all taxa in file
     """
     taxon_named_species = {}
-    all_taxons = []
+    all_taxa = []
     with open(taxonomy_file_path, "r") as taxonomy_file:
         taxonomy_reader = csv.reader(taxonomy_file, delimiter="\t", quotechar="|")
         next(taxonomy_reader)
         for row in taxonomy_reader:
             taxonomy = row[2].split('__')[0]
             taxon_named_species[row[0]] = row[2]
-            if taxonomy not in all_taxons:
-                all_taxons.append(taxonomy)
+            if taxonomy not in all_taxa:
+                all_taxa.append(taxonomy)
 
-    return taxon_named_species, all_taxons
+    return taxon_named_species, all_taxa
 
 
 def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_level="phylum"):
