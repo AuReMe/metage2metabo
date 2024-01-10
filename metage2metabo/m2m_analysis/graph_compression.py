@@ -25,9 +25,12 @@ import time
 import zipfile
 
 from itertools import product
+from functools import reduce
+
 from bubbletools import convert, BubbleTree
 from metage2metabo import utils
 from metage2metabo.m2m_analysis.taxonomy import extract_taxa, get_taxon
+from metage2metabo.m2m_analysis.enumeration import extract_groups_from_enumeration, convert_groups_to_equation
 
 # Deactivate clingo module to avoid issue like this one:
 # https://github.com/Aluriak/PowerGrASP/issues/1
@@ -297,7 +300,7 @@ def bbl_to_html(bbl_input, html_output):
         bbl_input (str): bbl input file
         html_output (str): html output file
     """
-    logger.info('######### Creation of the powergraph website accessible at ' + html_output + ' #########')
+    logger.info('Creation of the powergraph website accessible at ' + html_output)
     convert.bubble_to_js(bbl_input, html_output, width_as_cover=False)
 
 
@@ -316,7 +319,7 @@ def bbl_to_svg(oog_jar, bbl_input, svg_output):
     check_oog = check_oog_jar_file(oog_jar)
 
     if check_oog:
-        logger.info('######### Creation of the powergraph svg accessible at ' + svg_output + ' #########')
+        logger.info('Creation of the powergraph svg accessible at ' + svg_output)
         oog_cmds = ["java", "-jar", oog_jar, "-inputfiles=" + bbl_input, "-img", "-outputdir=" + svg_output]
         subproc = subprocess.Popen(oog_cmds)
         subproc.wait()
@@ -577,6 +580,7 @@ def test_powergraph_heuristics(enumeration_json_file, powergraph_bubble_file, ou
     """PowerGrASP can use heuristics to compress the graph and creates powergraph representation.
     So some powergraphs visualisation are not correct according to the combinatorics of the enumeration of minimal solution.
     This function tests the powergraph to see if the combinatorics corresponds to the one of the enumeration.
+    If no heuristics have been used, then the function tries to create a boolean equation summarizing the powergraph.
 
     Args:
         enumeration_json_file (str): path to enumeration json file
@@ -684,24 +688,60 @@ def test_powergraph_heuristics(enumeration_json_file, powergraph_bubble_file, ou
     powergraph_combinatorics = sum([comparison_combinatorics[min_equation]['powergraph_estimated_combinatorics'] for min_equation in comparison_combinatorics])
 
     # Compare both combinatorics.
+    powergraph_corresponds_to_enumeration = []
+
     if powergraph_combinatorics != observed_combinatorics_number:
         logger.critical('Divergence between theorical combinatorics ({0}) from powergraph and the combinatorics ({1}) found in solution.'.format(powergraph_combinatorics, observed_combinatorics_number))
         logger.critical('This means that the compression heuristics create non observed relation, so it is a simplification of the solutions.\n')
+        powergraph_corresponds_to_enumeration.append(False)
     else:
         logger.info('Same combinatorics between theorical ({0}) and solution ({1})'.format(powergraph_combinatorics, observed_combinatorics_number))
         logger.info('The powergraph seems to be an optimal representation of the solutions.\n')
+        powergraph_corresponds_to_enumeration.append(True)
 
     number_of_enumerations_by_m2m_analysis = len(json_data['enum_bacteria'])
 
     if powergraph_combinatorics != number_of_enumerations_by_m2m_analysis:
         logger.critical('Powergraph theorical combinatorics ({0}) is different from the enumeration of solutions by m2m_analysis ({1}), so the results is not optimal.\n'.format(powergraph_combinatorics, number_of_enumerations_by_m2m_analysis))
+        powergraph_corresponds_to_enumeration.append(False)
     else:
         logger.info('Same combinatorics between theorical ({0}) and the enumeration of solutions by m2m_analysis  ({1})'.format(powergraph_combinatorics, number_of_enumerations_by_m2m_analysis))
         logger.info('The powergraph seems to be an optimal representation of the solutions.\n')
+        powergraph_corresponds_to_enumeration.append(True)
 
     if observed_combinatorics_number != number_of_enumerations_by_m2m_analysis:
         logger.critical('Difference between the computed combinatorics from powernodes ({0}) and the enumeration of solutions by m2m_analysis ({1}), so the method of this script has an issue.'.format(observed_combinatorics_number, number_of_enumerations_by_m2m_analysis))
         logger.critical('Maybe some of the presented minimal equations are redundants.\n')
+        powergraph_corresponds_to_enumeration.append(False)
     else:
         logger.info('Same number of solution between the computed combinatorics from powernodes ({0}) and the enumeration of solutions by m2m_analysis ({1})'.format(observed_combinatorics_number, number_of_enumerations_by_m2m_analysis))
         logger.info('But this does not indicate that the powernodes are an optimal representation but that they contain the solution.\n')
+        powergraph_corresponds_to_enumeration.append(True)
+
+    # If no heuristics have been used, try to create a boolean equation.
+    if all(powergraph_corresponds_to_enumeration) is True:
+        logger.info('It seems that there are no heuristics in powergraph so it could be possible to create a boolean equation.')
+        enumeration = str(len(json_data['enum_bacteria']))
+        # Compute the boolean equation associated with minimal communities
+        logger.info('######### Boolean equation of minimal communities #########')
+        logger.info('The boolean equation can only be created for simple case (without too many combinatorics).')
+        bacterial_groups = extract_groups_from_enumeration(json_data)
+        boolean_equation = convert_groups_to_equation(bacterial_groups)
+        boolean_equation_combinatorics = str(reduce(lambda x, y: x*y, [len(i) for i in bacterial_groups]))
+        if enumeration == boolean_equation_combinatorics:
+            logger.info('Boolean equation seems good, as it has the same combinatorics ({0}) than the one from enumeration ({1}).'.format(boolean_equation_combinatorics, enumeration))
+            logger.info(f'Boolean equation: \n{boolean_equation}')
+            results = {}
+            results['boolean_equation'] = boolean_equation.replace('\n', '')
+            results['bacterial_groups'] = [list(group) for group in bacterial_groups]
+            if taxon_species is not None:
+                for organism in taxon_species:
+                    boolean_equation = boolean_equation.replace(organism, taxon_species[organism])
+                results['boolean_equation_taxon'] = boolean_equation
+                results['bacterial_group_taxon'] = [[taxon_species[organism] for organism in group] for group in bacterial_groups]
+                logger.info(f'\n\nBoolean equation with taxonomic name: \n{boolean_equation}')
+            output_boolean_equation = os.path.join(output_minimal_equations_folder, 'boolean_equation.json')
+            with open(output_boolean_equation, 'w') as open_json_file:
+                json.dump(results, open_json_file, indent=4)
+        else:
+            logger.info('Boolean equation has not the same complexity ({0}) than the enumeration ({1}), it is not a good estimator. It will not be created and shown.'.format(boolean_equation_combinatorics, enumeration))

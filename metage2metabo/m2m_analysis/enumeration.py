@@ -12,14 +12,12 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>
 
-import json
 import logging
 import miscoto
 import os
 import sys
 import time
 
-from functools import reduce
 from metage2metabo import utils
 
 logger = logging.getLogger(__name__)
@@ -78,22 +76,6 @@ def enumeration(sbml_folder, target_file, seed_file, output_json, host_file):
     logger.info("Alternative symbionts = " +
                 str(len(alternative_symbionts)))
     logger.info("\n".join(alternative_symbionts))
-
-    # Compute the boolean equation associated with minimal communities
-    logger.info('######### Boolean equation of minimal communities #########')
-    logger.info('The boolean equation can only be created for simple case (without too many combinatorics).')
-    bacterial_groups = extract_groups_from_enumeration(results)
-    boolean_equation = convert_groups_to_equation(bacterial_groups)
-    boolean_equation_combinatorics = str(reduce(lambda x, y: x*y, [len(i) for i in bacterial_groups]))
-    if enumeration == boolean_equation_combinatorics:
-        logger.info('Boolean equation seems good, as it has the same combinatorics ({0}) than the one from enumeration ({1}).'.format(boolean_equation_combinatorics, enumeration))
-        logger.info(f'Boolean equation: \n{boolean_equation}')
-        results['boolean_equation'] = boolean_equation.replace('\n', '')
-        results['bacterial_groups'] = [list(group) for group in bacterial_groups]
-        miscoto.utils.to_json(results, output_json)
-
-    else:
-        logger.info('Boolean equation has not the same complexity ({0}) than the enumeration ({1}), it is not a good estimator. It will not be created and shown.'.format(boolean_equation_combinatorics, enumeration))
 
     return output_json
 
@@ -154,11 +136,11 @@ def extract_groups_from_enumeration(results):
     """
 
     enum_bacteria = [value for key, value in results['enum_bacteria'].items()]
-    all_bacteria = results['bacteria']
+    all_bacteria = results['key_species']
 
     # For each bacteria of the minimal community computes its competitors.
     # Here competitors are bacteria that are present in minimal community in which the focused bacteria is not
-    # and also bacteria that never are in teh same minimal community than the focused bacteria.
+    # and also bacteria that never are in the same minimal community than the focused bacteria.
     bacteria_competitors = {}
     for bact in all_bacteria:
         partners = set([other_bact for min_com in enum_bacteria if bact in min_com for other_bact in min_com])
