@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2023 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade
+# Copyright (C) 2019-2024 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -126,7 +126,7 @@ def enumeration_analysis(sbml_folder, target_folder_file, seed_file, output_dir,
 
 def extract_groups_from_enumeration(results):
     """ From the results of the enumeration computes the boolean eaqution of the minimal communities.
-    It is a very simple method that will fail for enumeration with high combinatorics.
+    It is a very simple method that will fail for enumeration with numerous and complex combinations.
 
     Args:
         results (dict): results dictionary of miscoto for the enumeration.
