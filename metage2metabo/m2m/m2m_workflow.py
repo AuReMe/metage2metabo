@@ -227,6 +227,8 @@ def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, add
             mincom_producible_compounds = json.load(json_data)
         prod_targets['mincom_producible'] = mincom_producible_compounds['producible']
         prod_targets['key_species'] = mincom_producible_compounds['union_bacteria']
+        prod_targets['alternative_symbionts'] = mincom_producible_compounds['alternative_symbionts']
+        prod_targets['essential_symbionts'] = mincom_producible_compounds['essential_symbionts']
         prod_targets['mincom_optsol_producers'] = {}
         prod_targets['mincom_union_producers'] = {}
         prod_targets['mincom_inter_producers'] = {}
