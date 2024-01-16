@@ -195,6 +195,13 @@ def main():
         help="Optional targets for metabolic analysis, if not used metage2metabo will use the addedvalue of the community",
         required=False
         )
+    parent_parser_t_com_scope = argparse.ArgumentParser(add_help=False)
+    parent_parser_t_com_scope.add_argument(
+        "--target-com-scope",
+        help="Instead of the addedvalue, use the community scope as targets for mincom.",
+        required=False,
+        action="store_true",
+        default=None)
 
     # subparsers
     subparsers = parser.add_subparsers(
@@ -271,7 +278,8 @@ def main():
         parents=[
             parent_parser_g, parent_parser_s, parent_parser_m, parent_parser_o,
             parent_parser_c, parent_parser_q, parent_parser_no, parent_parser_p,
-            parent_parser_t_optional, parent_parser_cl, parent_parser_xml
+            parent_parser_t_optional, parent_parser_cl, parent_parser_xml,
+            parent_parser_t_com_scope
         ],
         description=
         "Run the whole workflow: metabolic network reconstruction, individual and community scope analysis and community selection",
@@ -282,7 +290,8 @@ def main():
         help="whole metabolism community analysis",
         parents=[
             parent_parser_n, parent_parser_s, parent_parser_m, parent_parser_o,
-            parent_parser_t_optional, parent_parser_q, parent_parser_c
+            parent_parser_t_optional, parent_parser_q, parent_parser_c,
+            parent_parser_t_com_scope
         ],
         description=
         "Run the whole metabolism community analysis: individual and community scope analysis and community selection",
@@ -348,7 +357,8 @@ def main():
     # deal with given subcommand
     if args.cmd == "workflow":
         main_workflow(args.genomes, args.out, args.cpu, args.clean, args.seeds,
-                      args.noorphan, args.padmet, new_arg_modelhost, args.targets, args.pwt_xml)
+                      args.noorphan, args.padmet, new_arg_modelhost, args.targets, args.pwt_xml,
+                      args.target_com_scope)
     elif args.cmd in ["iscope", "cscope", "addedvalue", "mincom", "metacom"]:
         if not os.path.isdir(args.networksdir):
             logger.critical(args.networksdir + " is not a correct directory path")
@@ -372,7 +382,7 @@ def main():
         elif args.cmd == "mincom":
             main_mincom(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
         elif args.cmd == "metacom":
-            main_metacom(network_dir, args.out, args.seeds, new_arg_modelhost, args.targets, args.cpu)
+            main_metacom(network_dir, args.out, args.seeds, new_arg_modelhost, args.targets, args.cpu, args.target_com_scope)
     elif args.cmd == "recon":
         main_recon(args.genomes, args.out, args.noorphan, args.padmet, args.level, args.cpu,
                    args.clean, args.pwt_xml)

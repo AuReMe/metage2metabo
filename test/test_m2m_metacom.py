@@ -347,6 +347,52 @@ def test_metacom_produced_seed():
     shutil.rmtree(respath)
 
 
+def test_metacom_target_com_scope():
+    inppath = 'metabolic_data/'
+    respath = 'metacom_output/'
+    toy_bact_tgz_path = os.path.join(inppath, 'toy_bact.tar.gz')
+    toy_bact_path = os.path.join(respath, 'toy_bact')
+    seeds_path = os.path.join(inppath, 'seeds_toy.sbml')
+    targets_producibility = os.path.join(respath, 'producibility_targets.json')
+
+    expected_key_species = ['GCA_003437815', 'GCA_003437295', 'GCA_003437665',
+                            'GCA_003437595', 'GCA_003437175', 'GCA_003437785',
+                            'GCA_003437195', 'GCA_003437255', 'GCA_003437345',
+                            'GCA_003437375', 'GCA_003438055', 'GCA_003437055',
+                            'GCA_003437715', 'GCA_003437945', 'GCA_003437905',
+                            'GCA_003437885', 'GCA_003437325']
+
+    essential_symbionts = ['GCA_003437195', 'GCA_003437255', 'GCA_003437815',
+                           'GCA_003438055', 'GCA_003437375', 'GCA_003437055',
+                           'GCA_003437295', 'GCA_003437715', 'GCA_003437665',
+                           'GCA_003437905', 'GCA_003437595', 'GCA_003437885']
+
+    alternative_symbionts = ['GCA_003437785', 'GCA_003437945', 'GCA_003437325',
+                             'GCA_003437175', 'GCA_003437345']
+
+    if not os.path.exists(respath):
+        os.makedirs(respath)
+
+    metage2metabo.utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
+
+    subprocess.call([
+        'm2m', 'metacom', '-n', toy_bact_path, '-o',
+        respath, '-s', seeds_path, '--target-com-scope',
+        '-q'
+    ])
+
+    with open(targets_producibility, 'r') as json_output:
+        d_producibility = json.load(json_output)
+
+    assert set(d_producibility['key_species']) == set(expected_key_species)
+    assert set(d_producibility['essential_symbionts']) == set(essential_symbionts)
+    assert set(d_producibility['alternative_symbionts']) == set(alternative_symbionts)
+    assert len(d_producibility['producible']) == SIZE_CSCOPE
+
+    # clean
+    shutil.rmtree(respath)
+
+
 if __name__ == "__main__":
     test_m2m_metacom_call()
     test_m2m_metacom_targets_import()

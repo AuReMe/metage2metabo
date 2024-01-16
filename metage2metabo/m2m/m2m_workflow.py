@@ -31,7 +31,7 @@ from shutil import copyfile
 logger = logging.getLogger(__name__)
 
 
-def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_bool, host_mn, targets_file, use_pwt_xml):
+def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_bool, host_mn, targets_file, use_pwt_xml, target_com_scope=None):
     """Run the whole m2m workflow.
     
     Args:
@@ -45,15 +45,16 @@ def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_b
         host_mn (str): metabolic network file for host
         targets_file (str): targets file
         use_pwt_xml (bool): use Pathway Tools XML instead of creating them with padmet
+        target_com_scope (bool): if True, will use all metabolties in com_scope as targets for minimal community predictions.
     """
     # METABOLIC NETWORK RECONSTRUCTION
     sbml_dir = recon(inp_dir, out_dir, noorphan_bool, padmet_bool, 2, nb_cpu, clean, use_pwt_xml)[1]
 
     # METABOLISM COMMUNITY ANALYSIS
-    metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, nb_cpu)
+    metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, nb_cpu, target_com_scope)
 
 
-def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, cpu_number=1):
+def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, cpu_number=1, target_com_scope=None):
     """Run the metabolism community analysis part of m2m.
 
     Args:
@@ -63,6 +64,7 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, cpu_number
         host_mn (str): metabolic network file for host
         targets_file (str): targets file
         cpu_number (int): number of CPU to use for multiprocessing
+        target_com_scope (bool): if True, will use all metabolties in com_scope as targets for minimal community predictions.
     """
     # INDIVIDUAL SCOPES
     union_targets_iscope = iscope(sbml_dir, seeds, out_dir, cpu_number)
@@ -86,8 +88,15 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, cpu_number
         else:
             logger.info("Cross feeding interactions do not enable the producibility of additional targets")
     else:
-        user_targets = None
-        newtargets = addedvalue_targets
+        # If user has not specified to use the com_scope as targets, use the addedvalue.
+        if target_com_scope is None:
+            logger.info("\nUse the addedvalue as targets.")
+            user_targets = None
+            newtargets = addedvalue_targets
+        else:
+            logger.info("\nUse the community scope (all metabolites producible by the community) as targets.")
+            user_targets = None
+            newtargets = targets_cscope
 
     if len(newtargets) > 0:
         target_file_path = os.path.join(*[out_dir, 'community_analysis', 'targets.sbml'])
@@ -97,8 +106,11 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, cpu_number
 
         else:
             sbml_management.create_species_sbml(newtargets, target_file_path)
-            logger.info("\nTarget file created with the addedvalue targets in: " +
-                        target_file_path)
+            if target_com_scope is None:
+                logger_word = 'addedvalue'
+            else:
+                logger_word = 'community scope'
+            logger.info("\nTarget file created with the {0} targets in: {1}".format(logger_word, target_file_path))
 
         sbml_management.create_species_sbml(newtargets, target_file_path)
 
@@ -119,8 +131,8 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, cpu_number
         logger.info("No newly producible compounds, hence no community selection will be computed")
         os.unlink(instance_com)
 
-    # Create targets result file
-    targets_producibility(out_dir, union_targets_iscope, targets_cscope, addedvalue_targets, user_targets)
+    # Create targets producibility result file
+    targets_producibility(out_dir, union_targets_iscope, targets_cscope, addedvalue_targets, user_targets, target_com_scope)
 
 
 def add_targets_to_instance(instancefile, output_dir, target_set):
@@ -143,7 +155,8 @@ def add_targets_to_instance(instancefile, output_dir, target_set):
             f.write('target("' + elem + '").\n')
     return new_instance_file
 
-def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, addedvalue_targets, user_targets=None):
+
+def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, addedvalue_targets, user_targets=None, target_com_scope=None):
     """Create a json summarizing the producibility of the targets (either the addedvalue or the user provided targets)
 
     Args:
@@ -152,19 +165,26 @@ def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, add
         targets_cscope (list): targets producible by community
         addedvalue_targets (list): targets produbed by the community and not by individual
         user_targets (list): targets provided by the user
+        target_com_scope (bool): if True, will use all metabolties in com_scope as targets for minimal community predictions.
     """
     prod_targets = {}
 
-    if user_targets:
+    if user_targets is not None:
         selected_targets = user_targets
         unproducible_targets = user_targets - union_targets_iscope - targets_cscope
         producible_targets = user_targets.intersection(union_targets_iscope.union(targets_cscope))
         indiv_producible = user_targets.intersection(union_targets_iscope)
     else:
-        selected_targets = addedvalue_targets
-        unproducible_targets = []
-        producible_targets = addedvalue_targets
-        indiv_producible = []
+        if target_com_scope is None:
+            selected_targets = addedvalue_targets
+            unproducible_targets = []
+            producible_targets = addedvalue_targets
+            indiv_producible = []
+        else:
+            selected_targets = targets_cscope
+            unproducible_targets = []
+            producible_targets = targets_cscope
+            indiv_producible = []
 
     prod_targets['unproducible'] = list(unproducible_targets)
     prod_targets['producible'] = list(producible_targets)
