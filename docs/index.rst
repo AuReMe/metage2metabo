@@ -37,6 +37,7 @@ Documentation of M2M
     suppinformation
     api
     m2m_analysis
+    troubleshooting
 
 
 Additional features
