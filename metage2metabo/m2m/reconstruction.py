@@ -263,10 +263,10 @@ def create_sbml_stat(species_name, sbml_file):
             for el in els:
                 reaction_id = sbmlPlugin.convert_from_coded_id(el.get('id'))[0]
                 reactions.append(reaction_id)
-                for subel in el.getchildren():
+                for subel in el.iter():
                     if 'notes' in subel.tag:
-                        for subsubel in subel.getchildren():
-                            for subsubsubel in subsubel.getchildren():
+                        for subsubel in subel.iter():
+                            for subsubsubel in subsubel.iter():
                                 if 'GENE_ASSOCIATION' in subsubsubel.text:
                                     for gene in sbmlPlugin.parseGeneAssoc(subsubsubel.text):
                                         if gene not in genes:
@@ -275,7 +275,7 @@ def create_sbml_stat(species_name, sbml_file):
                                         gene_associated_rxns.append(reaction_id)
                     # Use geneProductAssociation for xml from MetaFlux.
                     elif 'geneProductAssociation' in subel.tag:
-                        for subsubel in subel.getchildren():
+                        for subsubel in subel.iter():
                             if 'geneProductRef' in subsubel.tag:
                                 gene = subsubel.get('{http://www.sbml.org/sbml/level3/version1/fbc/version2}geneProduct')
                                 if gene:
@@ -285,7 +285,7 @@ def create_sbml_stat(species_name, sbml_file):
                                     if reaction_id not in fbc_gene_associated_rxns:
                                         fbc_gene_associated_rxns.append(reaction_id)
                             else:
-                                for subsubsubel in subsubel.getchildren():
+                                for subsubsubel in subsubel.iter():
                                     gene = subsubsubel.get('{http://www.sbml.org/sbml/level3/version1/fbc/version2}geneProduct')
                                     if gene:
                                         gene = gene.replace('G_', '')
