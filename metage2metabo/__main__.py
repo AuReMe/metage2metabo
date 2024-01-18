@@ -14,6 +14,7 @@
 
 import argparse
 import logging
+import json
 import os
 import pkg_resources
 import re
@@ -395,7 +396,11 @@ def main():
     elif args.cmd == 'test':
         main_test(args.out, args.cpu)
 
-    logger.info("--- Total runtime %.2f seconds ---" % (time.time() - start_time))
+    duration = time.time() - start_time
+    dict_args = vars(args)
+    metadata_json_file = os.path.join(args.out, 'm2m_metadata.json')
+    create_metadata(dict_args, duration, metadata_json_file)
+    logger.info("--- Total runtime %.2f seconds ---" % (duration))
     logger.warning(f'--- Logs written in {log_file_path} ---')
 
 
@@ -532,6 +537,55 @@ def main_test(outdir, cpu):
                 clean, seeds, noorphan_bool,
                 padmet_bool, host_mn, targets_file,
                 use_pwt_xml)
+
+
+def create_metadata(dict_args, duration, metadata_json_file):
+    """ Create metadata from args and package versions.
+
+    Args:
+        dict_args (dict): dict of args given to argparse
+        duration (int): time of the run
+        metadata_json_file (str): pat hto metadata output file
+    """
+    from miscoto import __version__ as miscoto_version
+    from menetools import __version__ as menetools_version
+    from metage2metabo import __version__ as m2m_version
+
+    # Retrieve args given to m2m.
+    metadata = {}
+    metadata['m2m_args'] = dict_args
+
+    # Get package version.
+    metadata['tool_dependencies'] = {}
+    metadata['tool_dependencies']['python_package'] = {}
+    metadata['tool_dependencies']['python_package']['Python_version'] = sys.version
+    metadata['tool_dependencies']['python_package']['Metage2Metabo'] = m2m_version
+    metadata['tool_dependencies']['python_package']['MiSCoTo'] = miscoto_version
+    metadata['tool_dependencies']['python_package']['MeneTools'] = menetools_version
+
+    # Get clingo path and version.
+    metadata['tool_dependencies']['clingo'] = which('clingo')
+    response = subprocess.Popen(['clingo', '--version'], stdout=subprocess.PIPE, start_new_session=True, universal_newlines='')
+    for line in response.stdout:
+        str_line = str(line)
+        if 'clingo version' in str_line:
+            clingo_version = str_line.split('clingo version ')[1]
+    metadata['tool_dependencies']['clingo_version'] = clingo_version
+
+    # If recon, get mpwt, padmet and Pathway Tools versions.
+    if dict_args['cmd'] == 'recon' or dict_args['cmd'] == 'workflow':
+        from mpwt import __version__ as mpwt_version
+        metadata['tool_dependencies']['python_package']['mpwt'] = mpwt_version
+        import pkg_resources
+        padmet_version = pkg_resources.get_distribution('padmet').version
+        metadata['tool_dependencies']['python_package']['padmet'] = padmet_version
+        from mpwt.utils import get_ptools_version
+        metadata['tool_dependencies']['Pathway-Tools'] = get_ptools_version()
+
+    metadata['duration'] = duration
+
+    with open(metadata_json_file, 'w') as dumpfile:
+        json.dump(metadata, dumpfile, indent=4)
 
 
 if __name__ == "__main__":
