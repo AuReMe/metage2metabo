@@ -9,7 +9,6 @@ Test m2m metacom on 17 metabolic networks and a file representing growth medium 
 import os
 import shutil
 import subprocess
-import tarfile
 import json
 from libsbml import SBMLReader
 import metage2metabo
