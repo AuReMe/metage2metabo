@@ -62,7 +62,8 @@ def compare_seeds_and_targets(seedfile, targetfile):
 
 
 def create_species_sbml(metabolites, outputfile):
-    """Create a SBML files with a list of species containing metabolites of the input set
+    """Create a SBML files with a list of species containing metabolites of the input set.
+    Check if there are forbidden SBML characters in the metabolite IDs/ If yes, exit.
     
     Args:
         metabolites (set): set of metabolites
@@ -70,12 +71,23 @@ def create_species_sbml(metabolites, outputfile):
     """
     document = libsbml.SBMLDocument(2, 1)
     model = document.createModel("metabolites")
+    forbidden_charlist = ['-', '|', '/', '(', ')',
+        "'", '=', '#', '*', '.', ':', '!', '+', '[',
+        ']', ',', ' ']
+    forbidden_character_in_metabolites = None
     for compound in metabolites:
         compound = compound.strip('"')
         name, stype, comp = convert_from_coded_id(compound)
         s = model.createSpecies()
         sbmlGenerator.check(s, 'create species')
-        sbmlGenerator.check(s.setId(compound), 'set species id')
+        forbidden_characters_detacted = [char for char in forbidden_charlist if char in compound]
+        if len(forbidden_characters_detacted) > 0:
+            logger.warning("Forbidden character ({0}) in {1}. SBML creation will failed.".format(' '.join(forbidden_characters_detacted), compound))
+            forbidden_character_in_metabolites = True
+        try:
+            sbmlGenerator.check(s.setId(compound), 'set species id')
+        except:
+            logger.warning("Issue when trying to add compound {0}.".format(compound))
 
         # Add name and compartment if found by padmet
         if name is not None:
@@ -87,6 +99,11 @@ def create_species_sbml(metabolites, outputfile):
             sbmlGenerator.check(s.setCompartment(comp), 'set species compartment')
         elif comp is None:
             logger.warning("No compartment for " + compound)
+
+    if forbidden_character_in_metabolites is True:
+        logger.warning("Forbidden character in compound ID, SBML creation will failed.")
+        logger.warning("Modify the metabolic networks SBMl file by renaming these metabolites and removing the forbidden character.")
+        sys.exit(1)
 
     libsbml.writeSBMLToFile(document, outputfile)
 
