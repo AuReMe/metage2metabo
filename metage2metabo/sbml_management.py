@@ -75,6 +75,7 @@ def create_species_sbml(metabolites, outputfile):
         "'", '=', '#', '*', '.', ':', '!', '+', '[',
         ']', ',', ' ']
     forbidden_character_in_metabolites = None
+    issue_trying_to_add_species = None
     for compound in metabolites:
         compound = compound.strip('"')
         name, stype, comp = convert_from_coded_id(compound)
@@ -87,21 +88,20 @@ def create_species_sbml(metabolites, outputfile):
         try:
             sbmlGenerator.check(s.setId(compound), 'set species id')
         except:
+            issue_trying_to_add_species = True
             logger.warning("Issue when trying to add compound {0}.".format(compound))
-
-        # Add name and compartment if found by padmet
-        if name is not None:
-            sbmlGenerator.check(s.setName(name), 'set species name')
-        elif name is None:
-            logger.warning("No name for " + compound)
 
         if comp is not None:
             sbmlGenerator.check(s.setCompartment(comp), 'set species compartment')
         elif comp is None:
             logger.warning("No compartment for " + compound)
 
-    if forbidden_character_in_metabolites is True:
+    if issue_trying_to_add_species is True and forbidden_character_in_metabolites is True:
         logger.warning("Forbidden character in compound ID, SBML creation will failed.")
+        logger.warning("Modify the metabolic networks SBMl file by renaming these metabolites and removing the forbidden character.")
+        sys.exit(1)
+    if issue_trying_to_add_species is True and forbidden_character_in_metabolites is None:
+        logger.warning("Issue when trying to add metabolite into SBML file, potential issue with SBML format.")
         logger.warning("Modify the metabolic networks SBMl file by renaming these metabolites and removing the forbidden character.")
         sys.exit(1)
 

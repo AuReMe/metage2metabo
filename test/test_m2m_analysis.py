@@ -9,7 +9,6 @@ Test m2m addedvalue on 17 metabolic networks and a file representing growth medi
 import os
 import shutil
 import subprocess
-import tarfile
 import json
 import networkx as nx
 
@@ -189,8 +188,8 @@ def test_m2m_analysis_workflow_taxon():
 
     if not os.path.exists(respath):
         os.makedirs(respath)
-    with tarfile.open(draft_tgz_path) as tar:
-        tar.extractall(path=respath)
+    utils.safe_tar_extract_all(draft_tgz_path, respath)
+
     subprocess.call([
         'm2m_analysis', 'workflow', '-n', draft_path, '-o',
         respath, '-t', targets_path, '-s', seeds_path,

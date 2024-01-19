@@ -19,6 +19,8 @@ import json
 import logging
 import os
 
+from shutil import copyfile
+
 from metage2metabo import utils, sbml_management
 from metage2metabo.m2m.reconstruction import recon
 from metage2metabo.m2m.individual_scope import iscope
@@ -26,7 +28,6 @@ from metage2metabo.m2m.community_scope import cscope, reverse_cscope
 from metage2metabo.m2m.community_addedvalue import addedvalue
 from metage2metabo.m2m.minimal_community import mincom
 
-from shutil import copyfile
 
 logger = logging.getLogger(__name__)
 
@@ -234,13 +235,14 @@ def targets_producibility(m2m_out_dir, union_targets_iscope, targets_cscope, add
         else:
             with open(comm_scopes_path) as json_data:
                 com_producible_compounds = json.load(json_data)
-            for target in selected_targets:
-                if target in com_producible_compounds['targets_producers']:
-                    if target in prod_targets['individual_producers']:
-                        only_com_producing_species = list(set(com_producible_compounds['targets_producers'][target]) - set(prod_targets['individual_producers'][target]))
-                    else:
-                        only_com_producing_species = com_producible_compounds['targets_producers'][target]
-                    prod_targets['com_only_producers'][target] = only_com_producing_species
+            if 'targets_producers' in com_producible_compounds and 'individual_producers' in com_producible_compounds:
+                for target in selected_targets:
+                    if target in com_producible_compounds['targets_producers']:
+                        if target in prod_targets['individual_producers']:
+                            only_com_producing_species = list(set(com_producible_compounds['targets_producers'][target]) - set(prod_targets['individual_producers'][target]))
+                        else:
+                            only_com_producing_species = com_producible_compounds['targets_producers'][target]
+                        prod_targets['com_only_producers'][target] = only_com_producing_species
 
     if os.path.exists(mincom_path):
         with open(mincom_path) as json_data:
