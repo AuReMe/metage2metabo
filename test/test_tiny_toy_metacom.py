@@ -8,8 +8,6 @@ Test m2m metacom on a tiny dataset that is easily visualized and understood.
 
 import os
 import shutil
-import subprocess
-import tarfile
 import json
 from libsbml import SBMLReader
 from metage2metabo.m2m.m2m_workflow import metacom_analysis
@@ -393,7 +391,7 @@ def test_m2m_metacom_tiny_toy():
     seeds_path = os.path.join(inppath, 'seeds_community.sbml')
     targets_path = os.path.join(inppath, 'targets_community.sbml')
 
-    metacom_analysis(sbml_dir = networks_path, out_dir = respath, seeds = seeds_path, host_mn = None, targets_file = targets_path, cpu_number=1) 
+    metacom_analysis(sbml_dir = networks_path, out_dir = respath, seeds = seeds_path, host_mn = None, targets_file = targets_path, cpu_number=1)
 
     # result files
     iscope_file = os.path.join(*[respath, 'indiv_scopes', 'indiv_scopes.json'])
@@ -490,6 +488,39 @@ def test_m2m_metacom_tiny_toy():
 
     # clean
     shutil.rmtree(respath)
+
+
+def test_m2m_metacom_tiny_toy_host():
+    """
+    Test m2m metacom when called from the API using the tiny toy dataset.
+    """
+    # RUN THE COMMAND
+    inppath = 'metabolic_data/tiny_toy'
+    respath = 'tiny_metacom_output'
+    networks_path = os.path.join(inppath, 'networks')
+    seeds_path = os.path.join(inppath, 'seeds_community.sbml')
+    targets_path = os.path.join(inppath, 'targets_community.sbml')
+    host_path = os.path.join(inppath, 'host.sbml')
+
+    metacom_analysis(sbml_dir=networks_path, out_dir=respath, seeds=seeds_path, host_mn=host_path, targets_file=targets_path, cpu_number=1)
+
+    mincom_file = os.path.join(*[respath, 'community_analysis', 'mincom.json'])
+    with open(mincom_file, 'r') as json_cdata:
+        mincom = json.load(json_cdata)
+
+    # MINCOM ANALYSIS
+    # ensure the minimal number of bacteria in a minimal community is ok
+    assert len(mincom['bacteria']) == MIN_SIZE_COM
+    # ensure the bacteria in union are ok
+    assert set(mincom['union_bacteria']) == UNION_MINCOM
+    # ensure the bacteria in intersection are ok
+    assert set(mincom['inter_bacteria']) == INTERSECTION_MINCOM
+    # ensure the newly producible targets are ok
+    assert set(mincom['producible']) == PROD_TARGETS
+
+    # clean
+    shutil.rmtree(respath)
+
 
 if __name__ == "__main__":
     test_m2m_metacom_tiny_toy()
