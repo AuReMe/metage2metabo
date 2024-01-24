@@ -35,7 +35,12 @@ from metage2metabo.sbml_management import get_compounds
 
 from metage2metabo import sbml_management, utils
 
-VERSION = pkg_resources.get_distribution("metage2metabo").version
+if sys.version_info >= (3, 9):
+    import importlib.metadata
+    VERSION = importlib.metadata.version("metage2metabo")
+else:
+    import pkg_resources
+    VERSION = pkg_resources.get_distribution("metage2metabo").version
 LICENSE = """Copyright (C) Dyliss & Pleiade\n
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -576,8 +581,13 @@ def create_metadata(dict_args, duration, metadata_json_file):
     if dict_args['cmd'] == 'recon' or dict_args['cmd'] == 'workflow':
         from mpwt import __version__ as mpwt_version
         metadata['tool_dependencies']['python_package']['mpwt'] = mpwt_version
-        import pkg_resources
-        padmet_version = pkg_resources.get_distribution('padmet').version
+        if sys.version_info >= (3, 9):
+            import importlib.metadata
+            padmet_version = importlib.metadata.version("padmet")
+        else:
+            import pkg_resources
+            padmet_version = pkg_resources.get_distribution('padmet').version
+
         metadata['tool_dependencies']['python_package']['padmet'] = padmet_version
         from mpwt.utils import get_ptools_version
         metadata['tool_dependencies']['Pathway-Tools'] = get_ptools_version()

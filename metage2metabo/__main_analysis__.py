@@ -16,7 +16,6 @@ import argparse
 import logging
 import os
 import json
-import pkg_resources
 import sys
 import subprocess
 import time
@@ -46,7 +45,13 @@ from metage2metabo.m2m_analysis.graph_compression import powergraph_analysis, ch
 from metage2metabo.m2m_analysis.solution_graph import graph_analysis
 from metage2metabo.m2m_analysis.m2m_analysis_workflow import run_analysis_workflow
 
-VERSION = pkg_resources.get_distribution("metage2metabo").version
+if sys.version_info >= (3, 9):
+    import importlib.metadata
+    VERSION = importlib.metadata.version("metage2metabo")
+else:
+    import pkg_resources
+    VERSION = pkg_resources.get_distribution("metage2metabo").version
+
 LICENSE = """Copyright (C) Dyliss & Pleiade
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 metage2metabo is free software: you are free to change and redistribute it.
@@ -373,11 +378,18 @@ def create_metadata(dict_args, duration, metadata_json_file):
 
     # If powergaph, get bubbletools and powergrasp versions.
     if dict_args['cmd'] == 'powergraph' or dict_args['cmd'] == 'workflow':
-        import pkg_resources
-        bubbletools_version = pkg_resources.get_distribution('bubbletools').version
-        metadata['tool_dependencies']['python_package']['bubbletools'] = bubbletools_version
-        powergrasp_version = pkg_resources.get_distribution('powergrasp').version
-        metadata['tool_dependencies']['python_package']['powergrasp'] = powergrasp_version
+        if sys.version_info >= (3, 9):
+            import importlib.metadata
+            bubbletools_version = importlib.metadata.version("bubbletools")
+            metadata['tool_dependencies']['python_package']['bubbletools'] = bubbletools_version
+            powergrasp_version = importlib.metadata.version("powergrasp")
+            metadata['tool_dependencies']['python_package']['powergrasp'] = powergrasp_version
+        else:
+            import pkg_resources
+            bubbletools_version = pkg_resources.get_distribution('bubbletools').version
+            metadata['tool_dependencies']['python_package']['bubbletools'] = bubbletools_version
+            powergrasp_version = pkg_resources.get_distribution('powergrasp').version
+            metadata['tool_dependencies']['python_package']['powergrasp'] = powergrasp_version
 
     # If graph, get networkx version.
     if dict_args['cmd'] == 'graph' or dict_args['cmd'] == 'workflow':
