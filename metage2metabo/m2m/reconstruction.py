@@ -30,6 +30,8 @@ from multiprocessing import Pool
 from padmet.classes.padmetSpec import PadmetSpec
 from padmet.utils import sbmlPlugin
 
+from menetools.sbml import get_model, get_listOfSpecies
+
 from shutil import copyfile
 
 logger = logging.getLogger(__name__)
@@ -180,6 +182,10 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean, use_pwt_xml):
     nb_genomes_dir = len([folder for folder in os.listdir(genomes_dir) if os.path.isdir(os.path.join(genomes_dir, folder))])
     if use_pwt_xml:
         nb_pgdb_dir = len([folder for folder in os.listdir(pgdb_dir) if os.path.isfile(os.path.join(pgdb_dir, folder))])
+        logger.warning("Adding prefix M_ to XML form Pathway Tools.")
+        for xml_file in os.listdir(pgdb_dir):
+            xml_path = os.path.join(pgdb_dir, xml_file)
+            update_pathway_tools_xml(xml_path, xml_path)
     else:
         nb_pgdb_dir = len([folder for folder in os.listdir(pgdb_dir) if os.path.isdir(os.path.join(pgdb_dir, folder))])
 
@@ -325,6 +331,27 @@ def mean_sd_data(datas):
         sd_data = None
 
     return mean_data, sd_data
+
+
+def update_pathway_tools_xml(input_sbml, output_sbml):
+    """ Update XML from Pathway Tools by adding a 'M_' prefix to avoid issue, when using metaboltie IDs.
+
+    Args:
+        input_sbml (str): path to xml input file
+        output_sbml (str): path to xml output file
+    """
+    tree = etree.parse(input_sbml)
+    sbml = tree.getroot()
+    model = get_model(sbml)
+    speciesids = get_listOfSpecies(model)
+    speciesids.sort(key=len, reverse=True)
+    with open(input_sbml, 'r') as open_sbml:
+        open_sbml_str = open_sbml.read()
+        for species in speciesids:
+            open_sbml_str = open_sbml_str.replace(species, 'M_'+species)
+
+    with open(output_sbml, 'w') as open_sbml_out:
+        open_sbml_out.write(open_sbml_str)
 
 
 def analyze_recon(sbml_folder, output_stat_file, padmet_folder=None, padmet_bool=None, nb_cpu=1):
