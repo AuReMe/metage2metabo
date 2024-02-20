@@ -343,7 +343,7 @@ def update_pathway_tools_xml(input_sbml, output_sbml):
     tree = etree.parse(input_sbml)
     sbml = tree.getroot()
     model = get_model(sbml)
-    speciesids = get_listOfSpecies(model)
+    speciesids = [species.attrib.get("id") for species in get_listOfSpecies(model)]
     speciesids.sort(key=len, reverse=True)
     with open(input_sbml, 'r') as open_sbml:
         open_sbml_str = open_sbml.read()
