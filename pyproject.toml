@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Metage2Metabo"
+dynamic = ["version"]
+authors = [{name = "AuReMe", email = "gem-aureme@inria.fr"}]
+readme = "README.md"
+description = "Automatic reconstruction of draft metabolic networks with Pathway Tools and graph-based metabolic analysis"
+license = {text = "LGPL-3.0-or-later"}
+requires-python = ">= 3.8"
+dependencies = [
+  'miscoto',
+  'menetools',
+  'mpwt',
+  'padmet'
+]
+
+[project.scripts]
+m2m = "metage2metabo.__main__:main"
+m2m_analysis = "metage2metabo.__main_analysis__:main"
+
+[project.urls]
+Homepage = "https://github.com/aureme/metage2metabo"
+Changelog = "https://github.com/aureme/metage2metabo/blob/main/CHANGELOG.md"
+
+[tool.setuptools]
+packages = ['metage2metabo', 'metage2metabo.m2m', 'metage2metabo.m2m_analysis']
+package-dir = {'metage2metabo' = 'metage2metabo', 'metage2metabo.m2m' = 'metage2metabo/m2m' , 'metage2metabo.m2m_analysis' = 'metage2metabo/m2m_analysis'}
+package-data = {'metage2metabo' = ['workflow_data/workflow_genomes.tar.gz', 'workflow_data/seeds_workflow.sbml']}
+
+[tool.setuptools.dynamic]
+version = { attr = "metage2metabo.__version__" }
+dependencies = {file = ["requirements.txt"]}
