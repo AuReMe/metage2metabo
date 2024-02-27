@@ -25,6 +25,7 @@ import traceback
 
 from shutil import which
 
+from metage2metabo import __version__ as VERSION
 from metage2metabo.m2m.reconstruction import recon
 from metage2metabo.m2m.individual_scope import iscope
 from metage2metabo.m2m.community_scope import cscope, instance_community
@@ -35,12 +36,6 @@ from metage2metabo.sbml_management import get_compounds
 
 from metage2metabo import sbml_management, utils
 
-if sys.version_info >= (3, 9):
-    import importlib.metadata
-    VERSION = importlib.metadata.version("metage2metabo")
-else:
-    import pkg_resources
-    VERSION = pkg_resources.get_distribution("metage2metabo").version
 LICENSE = """Copyright (C) Dyliss & Pleiade\n
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by

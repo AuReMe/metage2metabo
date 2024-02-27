@@ -39,18 +39,12 @@ except ImportError:
     raise ImportError('Requires ete3 (https://github.com/etetoolkit/ete).')
 
 from metage2metabo import utils
+from metage2metabo import __version__ as VERSION
 
 from metage2metabo.m2m_analysis.enumeration import enumeration_analysis
 from metage2metabo.m2m_analysis.graph_compression import powergraph_analysis, check_oog_jar_file
 from metage2metabo.m2m_analysis.solution_graph import graph_analysis
 from metage2metabo.m2m_analysis.m2m_analysis_workflow import run_analysis_workflow
-
-if sys.version_info >= (3, 9):
-    import importlib.metadata
-    VERSION = importlib.metadata.version("metage2metabo")
-else:
-    import pkg_resources
-    VERSION = pkg_resources.get_distribution("metage2metabo").version
 
 LICENSE = """Copyright (C) Dyliss & Pleiade
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>

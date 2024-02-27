@@ -12,8 +12,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>
 
-from metage2metabo import m2m, m2m_analysis
-
 __version__ = '1.5.4'
 """ version of the package
 """ 

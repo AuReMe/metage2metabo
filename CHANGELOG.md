@@ -1,5 +1,40 @@
 # Changelog
 
+# Metage2Metabo v1.6.0 (2024-02-21)
+
+WARNING: change for individual and community scopes:
+* for inidivudal scope: only seeds associated with reactions are now shown in the results.
+* for community scope: use `miscoto focus` to compute it.
+
+## Add
+
+* Test in m2m_analysis to check if combination of powergraph predicted by bubbletools is the same as the ones found in minimal communities.
+* Creation of boolean equation summarizing the powergraph if it is simple enough.
+* New option `--target-com-scope` to use all the community scope as targets for minimal community prediction (issue #21).
+* Add a function to modify xml created by Pathway Tools (issue #60).
+* Troubleshooting page in readthedocs (issue #24 and #25).
+* Metadata json file created when using command line (both for `m2m` and `m2m_analysis`).
+* Test for host for m2m metacom.
+
+## Fix
+
+* Fix potential error when reading taxon_id file (issue #22).
+* Fix issue with etree in reconstruction.
+* Issues with readthedocs.
+* GitHub Actions not working.
+
+## Modify
+
+* Exit m2m_analysis when there are unproducible targets (issue #23).
+* Check forbidden character during targets file creation.
+* Do not allow abbreviation for argparse.
+* Remove unused dependency.
+* First step in replacing `pkg_resources` (which will become deprecated in the future) with `importlib.metadata` or import of \_\_version\_\_.
+* Move from `setup.py`/`setup.cfg` to `pyproject.toml`.
+* Update tutorial.
+* Update docs and readme.
+* Update license year and affiliation.
+
 # Metage2Metabo v1.5.4 (2023-05-25)
 
 ## Fix
