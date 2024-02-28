@@ -3,8 +3,8 @@
 # Metage2Metabo v1.6.0 (2024-02-21)
 
 WARNING: change for individual and community scopes:
-* for inidivudal scope: only seeds associated with reactions are now shown in the results.
-* for community scope: use `miscoto focus` to compute it.
+* for individual scope: only seeds that are producible, ie associated with activated reactions are now shown in the results. Additional information on producible, non-producible and absent seeds are available in the json output. This requires MeneTools version >= `3.4.0`.
+* for community scope: use of `miscoto focus` for computation in order to retrieve the metabolite producers in community. This requires MeneTools version >= `3.2.0`.
 
 ## Add
 
@@ -26,7 +26,7 @@ WARNING: change for individual and community scopes:
 ## Modify
 
 * Exit m2m_analysis when there are unproducible targets (issue #23).
-* Check forbidden character during targets file creation.
+* Check forbidden characters during targets file creation.
 * Do not allow abbreviation for argparse.
 * Remove unused dependency.
 * First step in replacing `pkg_resources` (which will become deprecated in the future) with `importlib.metadata` or import of \_\_version\_\_.
