@@ -19,7 +19,7 @@ import json
 import logging
 import os
 
-from shutil import copy2
+from shutil import copyfile
 
 from metage2metabo import utils, sbml_management
 from metage2metabo.m2m.reconstruction import recon
@@ -148,7 +148,7 @@ def add_targets_to_instance(instancefile, output_dir, target_set):
         str: new instance filepath
     """
     new_instance_file = os.path.join(*[output_dir, 'community_analysis', utils.get_basename(instancefile) + '__tgts.lp'])
-    copy2(instancefile, new_instance_file)
+    copyfile(instancefile, new_instance_file)
 
     with open(new_instance_file, 'a') as f:
         f.write('\n')
