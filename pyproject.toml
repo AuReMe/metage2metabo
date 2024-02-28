@@ -9,7 +9,7 @@ authors = [{name = "AuReMe", email = "gem-aureme@inria.fr"}]
 readme = "README.md"
 description = "Automatic reconstruction of draft metabolic networks with Pathway Tools and graph-based metabolic analysis"
 license = {text = "LGPL-3.0-or-later"}
-requires-python = ">= 3.8"
+requires-python = ">= 3.7"
 dependencies = [
   'miscoto',
   'menetools',
