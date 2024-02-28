@@ -19,12 +19,12 @@ import json
 import logging
 import os
 
-from shutil import copyfile
+from shutil import copy2
 
-from metage2metabo import utils, sbml_management
+from metage2metabo import sbml_management
 from metage2metabo.m2m.reconstruction import recon
 from metage2metabo.m2m.individual_scope import iscope
-from metage2metabo.m2m.community_scope import cscope, reverse_cscope
+from metage2metabo.m2m.community_scope import cscope
 from metage2metabo.m2m.community_addedvalue import addedvalue
 from metage2metabo.m2m.minimal_community import mincom
 
@@ -126,11 +126,11 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, cpu_number
         # MINCOM
         mincom(instance_w_targets, seeds, newtargets, out_dir)
         # remove intermediate files
-        os.remove(instance_com)
-        os.remove(instance_w_targets)
+        os.unlink(instance_com)
+        os.unlink(instance_w_targets)
     else:
         logger.info("No newly producible compounds, hence no community selection will be computed")
-        os.remove(instance_com)
+        os.unlink(instance_com)
 
     # Create targets producibility result file
     targets_producibility(out_dir, union_targets_iscope, targets_cscope, addedvalue_targets, user_targets, target_com_scope)
@@ -147,8 +147,8 @@ def add_targets_to_instance(instancefile, output_dir, target_set):
     Returns:
         str: new instance filepath
     """
-    new_instance_file = os.path.join(*[output_dir, 'community_analysis', utils.get_basename(instancefile) + '__tgts.lp'])
-    copyfile(instancefile, new_instance_file)
+    new_instance_file = os.path.join(*[output_dir, 'community_analysis'])
+    copy2(instancefile, new_instance_file)
 
     with open(new_instance_file, 'a') as f:
         f.write('\n')

@@ -440,7 +440,7 @@ def main_cscope(*allargs):
     logger.info("\n" + str(len(comscope)) + " metabolites reachable by the whole community/microbiota: \n")
     logger.info('\n'.join(comscope))
     #delete intermediate file
-    os.remove(instance_com)
+    os.unlink(instance_com)
     return comscope
 
 
