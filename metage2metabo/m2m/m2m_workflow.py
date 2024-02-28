@@ -21,7 +21,7 @@ import os
 
 from shutil import copy2
 
-from metage2metabo import sbml_management
+from metage2metabo import utils, sbml_management
 from metage2metabo.m2m.reconstruction import recon
 from metage2metabo.m2m.individual_scope import iscope
 from metage2metabo.m2m.community_scope import cscope
@@ -147,7 +147,7 @@ def add_targets_to_instance(instancefile, output_dir, target_set):
     Returns:
         str: new instance filepath
     """
-    new_instance_file = os.path.join(*[output_dir, 'community_analysis'])
+    new_instance_file = os.path.join(*[output_dir, 'community_analysis', utils.get_basename(instancefile) + '__tgts.lp'])
     copy2(instancefile, new_instance_file)
 
     with open(new_instance_file, 'a') as f:
