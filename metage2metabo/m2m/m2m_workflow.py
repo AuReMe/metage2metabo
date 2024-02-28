@@ -18,6 +18,7 @@
 import json
 import logging
 import os
+import tempfile
 
 from shutil import copyfile
 
@@ -147,8 +148,12 @@ def add_targets_to_instance(instancefile, output_dir, target_set):
     Returns:
         str: new instance filepath
     """
-    new_instance_file = os.path.join(*[output_dir, 'community_analysis', utils.get_basename(instancefile) + '__tgts.lp'])
-    copyfile(instancefile, new_instance_file)
+    # create tempfile
+    fd, new_instance_file = tempfile.mkstemp(suffix='__tgts.lp', prefix='metage2metabo_', dir=os.path.join(*[output_dir, 'community_analysis']))
+
+    with open(new_instance_file, 'a') as outfile:
+        with open(instancefile, 'r') as f:
+            outfile.write(f.read())
 
     with open(new_instance_file, 'a') as f:
         f.write('\n')
