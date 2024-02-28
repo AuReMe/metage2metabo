@@ -126,11 +126,11 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, cpu_number
         # MINCOM
         mincom(instance_w_targets, seeds, newtargets, out_dir)
         # remove intermediate files
-        os.unlink(instance_com)
-        os.unlink(instance_w_targets)
+        os.remove(instance_com)
+        os.remove(instance_w_targets)
     else:
         logger.info("No newly producible compounds, hence no community selection will be computed")
-        os.unlink(instance_com)
+        os.remove(instance_com)
 
     # Create targets producibility result file
     targets_producibility(out_dir, union_targets_iscope, targets_cscope, addedvalue_targets, user_targets, target_com_scope)
@@ -154,6 +154,7 @@ def add_targets_to_instance(instancefile, output_dir, target_set):
         f.write('\n')
         for elem in target_set:
             f.write('target("' + elem + '").\n')
+
     return new_instance_file
 
 
