@@ -11,7 +11,7 @@ import shutil
 import subprocess
 import json
 from libsbml import SBMLReader
-import metage2metabo
+from metage2metabo import utils, m2m
 
 
 EXPECTED_TARGETS_ADVAL = {
@@ -181,7 +181,7 @@ def test_m2m_metacom_call():
     if not os.path.exists(respath):
         os.makedirs(respath)
 
-    metage2metabo.utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
+    utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
 
     subprocess.call([
         'm2m', 'metacom', '-n', toy_bact_path, '-o',
@@ -243,9 +243,9 @@ def test_m2m_metacom_targets_import():
     if not os.path.exists(respath):
         os.makedirs(respath)
 
-    metage2metabo.utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
+    utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
 
-    metage2metabo.m2m.m2m_workflow.metacom_analysis(sbml_dir=toy_bact_path, out_dir=respath,
+    m2m.m2m_workflow.metacom_analysis(sbml_dir=toy_bact_path, out_dir=respath,
                 seeds=seeds_path, host_mn=None, targets_file=targets_path, cpu_number=1)
 
     iscope_file = os.path.join(*[respath, 'indiv_scopes', 'indiv_scopes.json'])
@@ -322,7 +322,7 @@ def test_metacom_produced_seed():
     if not os.path.exists(respath):
         os.makedirs(respath)
 
-    metage2metabo.utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
+    utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
 
     with open(target_txt_path, 'w') as butyrate_output:
         butyrate_output.write('M_BUTYRIC_ACID_c')
@@ -372,7 +372,7 @@ def test_metacom_target_com_scope():
     if not os.path.exists(respath):
         os.makedirs(respath)
 
-    metage2metabo.utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
+    utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
 
     subprocess.call([
         'm2m', 'metacom', '-n', toy_bact_path, '-o',
