@@ -182,7 +182,10 @@ def safe_tar_extract_all(tar_file, outdir):
         outdir (str): path to output directory for extraction.
     """
     tar = tarfile.open(tar_file, "r:gz")
-    tar.extractall(outdir, filter='data')
+    if sys.version_info >= (3, 12):
+        tar.extractall(outdir, filter='data')
+    else:
+        tar.extractall(outdir)
 
     for member in tar.getmembers():
         member_path = os.path.join(outdir, member.name)
