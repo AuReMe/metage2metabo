@@ -18,7 +18,7 @@
 import json
 import logging
 import os
-import tempfile
+import sys
 
 from shutil import copyfile
 
@@ -127,7 +127,8 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, cpu_number
         # MINCOM
         mincom(instance_w_targets, seeds, newtargets, out_dir)
         # remove intermediate files
-        os.unlink(instance_com)
+        if sys.platform != 'win32':
+            os.unlink(instance_com)
         os.unlink(instance_w_targets)
     else:
         logger.info("No newly producible compounds, hence no community selection will be computed")
@@ -148,12 +149,8 @@ def add_targets_to_instance(instancefile, output_dir, target_set):
     Returns:
         str: new instance filepath
     """
-    # create tempfile
-    fd, new_instance_file = tempfile.mkstemp(suffix='__tgts.lp', prefix='metage2metabo_', dir=os.path.join(*[output_dir, 'community_analysis']))
-
-    with open(new_instance_file, 'a') as outfile:
-        with open(instancefile, 'r') as f:
-            outfile.write(f.read())
+    new_instance_file = os.path.join(*[output_dir, 'community_analysis', utils.get_basename(instancefile) + '__tgts.lp'])
+    copyfile(instancefile, new_instance_file)
 
     with open(new_instance_file, 'a') as f:
         f.write('\n')
