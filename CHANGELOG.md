@@ -1,6 +1,6 @@
 # Changelog
 
-# Metage2Metabo v1.6.0 (2024-02-28)
+# Metage2Metabo v1.6.0 (2024-02-29)
 
 WARNING: change for individual and community scopes:
 * for individual scope: only seeds that are producible, ie associated with activated reactions are now shown in the results. Additional information on producible, non-producible and absent seeds are available in the json output. This requires MeneTools version >= `3.4.0`.
