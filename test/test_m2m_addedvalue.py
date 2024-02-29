@@ -10,6 +10,7 @@ import os
 import shutil
 import subprocess
 import json
+import sys
 
 from libsbml import SBMLReader
 
@@ -134,7 +135,10 @@ def test_m2m_addedvalue_call():
     new_targets = set([specie.getId() for specie in document.getModel().getListOfSpecies()])
     assert sorted(new_targets) == sorted(EXPECTED_TARGETS)
     # clean
-    shutil.rmtree(respath)
+    # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
+    # Refer to: https://github.com/python/cpython/issues/109608
+    if sys.platform != 'win32':
+        shutil.rmtree(respath)
 
 if __name__ == "__main__":
     test_m2m_addedvalue_call()

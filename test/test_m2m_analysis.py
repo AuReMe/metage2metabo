@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import json
 import networkx as nx
+import sys
 
 from metage2metabo.m2m_analysis.enumeration import extract_groups_from_enumeration
 from metage2metabo import utils
@@ -122,7 +123,10 @@ def test_m2m_analysis_call():
     assert sorted(G.nodes) == sorted(GML_NODES)
     assert len(G.edges()) == 126
     # clean
-    shutil.rmtree(respath)
+    # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
+    # Refer to: https://github.com/python/cpython/issues/109608
+    if sys.platform != 'win32':
+        shutil.rmtree(respath)
 
 
 def test_m2m_analysis_workflow():

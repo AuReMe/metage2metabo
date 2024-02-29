@@ -10,6 +10,7 @@ import os
 import shutil
 import subprocess
 import json
+import sys
 from libsbml import SBMLReader
 from metage2metabo import utils, m2m
 
@@ -225,7 +226,10 @@ def test_m2m_metacom_call():
     # ensure the newly producible targets are ok
     assert set(d_mincom['producible']) == EXPECTED_TARGETS_ADVAL
     # clean
-    shutil.rmtree(respath)
+    # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
+    # Refer to: https://github.com/python/cpython/issues/109608
+    if sys.platform != 'win32':
+        shutil.rmtree(respath)
 
 
 def test_m2m_metacom_targets_import():
@@ -305,7 +309,10 @@ def test_m2m_metacom_targets_import():
         for species in d_target['com_only_producers'][target]:
             assert target in sbml_products[species]
     # clean
-    shutil.rmtree(respath)
+    # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
+    # Refer to: https://github.com/python/cpython/issues/109608
+    if sys.platform != 'win32':
+        shutil.rmtree(respath)
 
 
 def test_metacom_produced_seed():
@@ -343,7 +350,10 @@ def test_metacom_produced_seed():
 
     # clean
     os.remove(target_txt_path)
-    shutil.rmtree(respath)
+    # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
+    # Refer to: https://github.com/python/cpython/issues/109608
+    if sys.platform != 'win32':
+        shutil.rmtree(respath)
 
 
 def test_metacom_target_com_scope():
@@ -389,7 +399,10 @@ def test_metacom_target_com_scope():
     assert len(d_producibility['producible']) == SIZE_CSCOPE
 
     # clean
-    shutil.rmtree(respath)
+    # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
+    # Refer to: https://github.com/python/cpython/issues/109608
+    if sys.platform != 'win32':
+        shutil.rmtree(respath)
 
 
 if __name__ == "__main__":

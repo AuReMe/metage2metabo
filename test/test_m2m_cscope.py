@@ -10,6 +10,7 @@ import os
 import shutil
 import subprocess
 import json
+import sys
 
 from metage2metabo.sbml_management import get_compounds
 from metage2metabo import utils
@@ -117,7 +118,10 @@ def test_m2m_cscope_call():
     assert sorted(producible_targets) == sorted(EXPECTED_TARGETS)
 
     # clean
-    shutil.rmtree(respath)
+    # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
+    # Refer to: https://github.com/python/cpython/issues/109608
+    if sys.platform != 'win32':
+        shutil.rmtree(respath)
 
 if __name__ == "__main__":
     test_m2m_cscope_call()

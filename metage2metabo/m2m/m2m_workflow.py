@@ -127,6 +127,8 @@ def metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, cpu_number
         # MINCOM
         mincom(instance_w_targets, seeds, newtargets, out_dir)
         # remove intermediate files
+        # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
+        # Refer to: https://github.com/python/cpython/issues/109608
         if sys.platform != 'win32':
             os.unlink(instance_com)
         os.unlink(instance_w_targets)

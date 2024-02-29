@@ -440,7 +440,10 @@ def main_cscope(*allargs):
     logger.info("\n" + str(len(comscope)) + " metabolites reachable by the whole community/microbiota: \n")
     logger.info('\n'.join(comscope))
     #delete intermediate file
-    os.unlink(instance_com)
+    # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
+    # Refer to: https://github.com/python/cpython/issues/109608
+    if sys.platform != 'win32':
+        os.unlink(instance_com)
     return comscope
 
 
@@ -479,7 +482,10 @@ def main_mincom(sbmldir, seedsfiles, outdir, targets, host):
     #run mincom
     mincom(instance, seedsfiles, set(get_compounds(targets)), outdir)
     #delete intermediate file
-    os.unlink(instance)
+    # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
+    # Refer to: https://github.com/python/cpython/issues/109608
+    if sys.platform != 'win32':
+        os.unlink(instance)
 
 
 def main_seeds(metabolites_file, outdir):

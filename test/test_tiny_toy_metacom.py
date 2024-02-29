@@ -9,6 +9,7 @@ Test m2m metacom on a tiny dataset that is easily visualized and understood.
 import os
 import shutil
 import json
+import sys
 from libsbml import SBMLReader
 from metage2metabo.m2m.m2m_workflow import metacom_analysis
 
@@ -487,7 +488,10 @@ def test_m2m_metacom_tiny_toy():
                 assert set(producibility_targets[key][compound]) == set(PRODUCIBILITY_TARGETS[key][compound])
 
     # clean
-    shutil.rmtree(respath)
+    # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
+    # Refer to: https://github.com/python/cpython/issues/109608
+    if sys.platform != 'win32':
+        shutil.rmtree(respath)
 
 
 def test_m2m_metacom_tiny_toy_host():
@@ -519,7 +523,10 @@ def test_m2m_metacom_tiny_toy_host():
     assert set(mincom['producible']) == PROD_TARGETS
 
     # clean
-    shutil.rmtree(respath)
+    # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
+    # Refer to: https://github.com/python/cpython/issues/109608
+    if sys.platform != 'win32':
+        shutil.rmtree(respath)
 
 
 if __name__ == "__main__":

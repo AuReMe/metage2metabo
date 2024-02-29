@@ -10,6 +10,7 @@ import os
 import shutil
 import subprocess
 import json
+import sys
 
 from metage2metabo import utils
 
@@ -125,7 +126,10 @@ def test_m2m_mincom_call():
     # one target is also a seed. It will be in "producible", not "newly_prod"
     assert set(d_mincom['newly_prod']) == NEWLYPROD_TARGETS - {"M_MANNITOL_c"}
     # clean
-    shutil.rmtree(respath)
+    # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
+    # Refer to: https://github.com/python/cpython/issues/109608
+    if sys.platform != 'win32':
+        shutil.rmtree(respath)
 
 if __name__ == "__main__":
     test_m2m_mincom_call()
