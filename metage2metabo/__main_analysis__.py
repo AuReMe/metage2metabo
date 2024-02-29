@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2023 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade
+# Copyright (C) 2019-2024 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -15,13 +15,12 @@
 import argparse
 import logging
 import os
-import pkg_resources
-import re
+import json
 import sys
-import tarfile
+import subprocess
 import time
 
-from shutil import copyfile, which
+from shutil import which
 
 try:
     with open('powergrasp.cfg', 'w') as config_file:
@@ -39,14 +38,14 @@ try:
 except ImportError:
     raise ImportError('Requires ete3 (https://github.com/etetoolkit/ete).')
 
-from metage2metabo import sbml_management, utils
+from metage2metabo import utils
+from metage2metabo import __version__ as VERSION
 
 from metage2metabo.m2m_analysis.enumeration import enumeration_analysis
 from metage2metabo.m2m_analysis.graph_compression import powergraph_analysis, check_oog_jar_file
 from metage2metabo.m2m_analysis.solution_graph import graph_analysis
 from metage2metabo.m2m_analysis.m2m_analysis_workflow import run_analysis_workflow
 
-VERSION = pkg_resources.get_distribution("metage2metabo").version
 LICENSE = """Copyright (C) Dyliss & Pleiade
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 metage2metabo is free software: you are free to change and redistribute it.
@@ -199,7 +198,7 @@ def main():
         "powergraph",
         help="powergraph creation and visualization",
         parents=[
-            parent_parser_g, parent_parser_jar, parent_parser_q, parent_parser_taxon,
+            parent_parser_j, parent_parser_g, parent_parser_jar, parent_parser_q, parent_parser_taxon,
             parent_parser_level, parent_parser_o
         ],
         description=
@@ -246,8 +245,8 @@ def main():
             logger.critical('Error: ' + args.seeds + " is not a correct filepath")
             sys.exit(1)
     if "targets" in args and args.targets is not None:
-        if not utils.is_valid_file(args.targets):
-            logger.critical('Error: ' + args.targets + " is not a correct filepath")
+        if not utils.is_valid_file(args.targets) and not utils.is_valid_dir(args.targets):
+            logger.critical('Error: ' + args.targets + " is not a correct filepath or folder")
             sys.exit(1)
 
     # add logger in file
@@ -305,9 +304,13 @@ def main():
     elif args.cmd == "graph":
         main_graph(args.json, args.targets, args.out, args.taxon, args.level)
     elif args.cmd == "powergraph":
-        main_powergraph(args.gml, args.out, args.oog, args.taxon, args.level)
+        main_powergraph(args.json, args.gml, args.out, args.oog, args.taxon, args.level)
 
-    logger.info("--- Total runtime %.2f seconds ---" % (time.time() - start_time))
+    duration = time.time() - start_time
+    dict_args= vars(args)
+    metadata_json_file = os.path.join(args.out, 'm2m_analysis_metadata.json')
+    create_metadata(dict_args, duration, metadata_json_file)
+    logger.info("--- Total runtime %.2f seconds ---" % (duration))
 
 
 def main_analysis_workflow(*allargs):
@@ -332,6 +335,70 @@ def main_powergraph(*allargs):
     """Run powergraph command
     """
     powergraph_analysis(*allargs)
+
+
+def create_metadata(dict_args, duration, metadata_json_file):
+    """ Create metadata from args and package versions.
+
+    Args:
+        dict_args (dict): dict of args given to argparse
+        duration (int): time of the run
+        metadata_json_file (str): pat hto metadata output file
+    """
+    from miscoto import __version__ as miscoto_version
+    from menetools import __version__ as menetools_version
+    from metage2metabo import __version__ as m2m_version
+
+    # Retrieve args given to m2m.
+    metadata = {}
+    metadata['m2m_args'] = dict_args
+
+    # Get package version.
+    metadata['tool_dependencies'] = {}
+    metadata['tool_dependencies']['python_package'] = {}
+    metadata['tool_dependencies']['python_package']['Python_version'] = sys.version
+    metadata['tool_dependencies']['python_package']['Metage2Metabo'] = m2m_version
+    metadata['tool_dependencies']['python_package']['MiSCoTo'] = miscoto_version
+    metadata['tool_dependencies']['python_package']['MeneTools'] = menetools_version
+
+    # Get clingo path and version.
+    metadata['tool_dependencies']['clingo'] = which('clingo')
+    response = subprocess.Popen(['clingo', '--version'], stdout=subprocess.PIPE, start_new_session=True, universal_newlines='')
+    for line in response.stdout:
+        str_line = str(line)
+        if 'clingo version' in str_line:
+            clingo_version = str_line.split('clingo version ')[1]
+    metadata['tool_dependencies']['clingo_version'] = clingo_version
+
+    # If powergaph, get bubbletools and powergrasp versions.
+    if dict_args['cmd'] == 'powergraph' or dict_args['cmd'] == 'workflow':
+        if sys.version_info >= (3, 9):
+            import importlib.metadata
+            bubbletools_version = importlib.metadata.version("bubbletools")
+            metadata['tool_dependencies']['python_package']['bubbletools'] = bubbletools_version
+            powergrasp_version = importlib.metadata.version("powergrasp")
+            metadata['tool_dependencies']['python_package']['powergrasp'] = powergrasp_version
+        else:
+            import pkg_resources
+            bubbletools_version = pkg_resources.get_distribution('bubbletools').version
+            metadata['tool_dependencies']['python_package']['bubbletools'] = bubbletools_version
+            powergrasp_version = pkg_resources.get_distribution('powergrasp').version
+            metadata['tool_dependencies']['python_package']['powergrasp'] = powergrasp_version
+
+    # If graph, get networkx version.
+    if dict_args['cmd'] == 'graph' or dict_args['cmd'] == 'workflow':
+        from networkx import __version__ as networkx_version
+        metadata['tool_dependencies']['python_package']['networkx'] = networkx_version
+
+    # If taxonomy, get ete3 version.
+    if dict_args['cmd'] == 'taxonomy' or dict_args['cmd'] == 'workflow':
+        from ete3 import __version__ as ete3_version
+        metadata['tool_dependencies']['python_package']['ete3'] = ete3_version
+
+    metadata['duration'] = duration
+
+    with open(metadata_json_file, 'w') as dumpfile:
+        json.dump(metadata, dumpfile, indent=4)
 
 
 if __name__ == "__main__":

@@ -9,10 +9,10 @@ Test m2m metacom on 17 metabolic networks and a file representing growth medium 
 import os
 import shutil
 import subprocess
-import tarfile
 import json
+import sys
 from libsbml import SBMLReader
-import metage2metabo
+from metage2metabo import utils, m2m
 
 
 EXPECTED_TARGETS_ADVAL = {
@@ -182,7 +182,7 @@ def test_m2m_metacom_call():
     if not os.path.exists(respath):
         os.makedirs(respath)
 
-    metage2metabo.utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
+    utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
 
     subprocess.call([
         'm2m', 'metacom', '-n', toy_bact_path, '-o',
@@ -226,7 +226,10 @@ def test_m2m_metacom_call():
     # ensure the newly producible targets are ok
     assert set(d_mincom['producible']) == EXPECTED_TARGETS_ADVAL
     # clean
-    shutil.rmtree(respath)
+    # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
+    # Refer to: https://github.com/python/cpython/issues/109608
+    if sys.platform != 'win32':
+        shutil.rmtree(respath)
 
 
 def test_m2m_metacom_targets_import():
@@ -244,9 +247,9 @@ def test_m2m_metacom_targets_import():
     if not os.path.exists(respath):
         os.makedirs(respath)
 
-    metage2metabo.utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
+    utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
 
-    metage2metabo.m2m.m2m_workflow.metacom_analysis(sbml_dir=toy_bact_path, out_dir=respath,
+    m2m.m2m_workflow.metacom_analysis(sbml_dir=toy_bact_path, out_dir=respath,
                 seeds=seeds_path, host_mn=None, targets_file=targets_path, cpu_number=1)
 
     iscope_file = os.path.join(*[respath, 'indiv_scopes', 'indiv_scopes.json'])
@@ -306,7 +309,10 @@ def test_m2m_metacom_targets_import():
         for species in d_target['com_only_producers'][target]:
             assert target in sbml_products[species]
     # clean
-    shutil.rmtree(respath)
+    # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
+    # Refer to: https://github.com/python/cpython/issues/109608
+    if sys.platform != 'win32':
+        shutil.rmtree(respath)
 
 
 def test_metacom_produced_seed():
@@ -323,7 +329,7 @@ def test_metacom_produced_seed():
     if not os.path.exists(respath):
         os.makedirs(respath)
 
-    metage2metabo.utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
+    utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
 
     with open(target_txt_path, 'w') as butyrate_output:
         butyrate_output.write('M_BUTYRIC_ACID_c')
@@ -344,7 +350,59 @@ def test_metacom_produced_seed():
 
     # clean
     os.remove(target_txt_path)
-    shutil.rmtree(respath)
+    # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
+    # Refer to: https://github.com/python/cpython/issues/109608
+    if sys.platform != 'win32':
+        shutil.rmtree(respath)
+
+
+def test_metacom_target_com_scope():
+    inppath = 'metabolic_data/'
+    respath = 'metacom_output/'
+    toy_bact_tgz_path = os.path.join(inppath, 'toy_bact.tar.gz')
+    toy_bact_path = os.path.join(respath, 'toy_bact')
+    seeds_path = os.path.join(inppath, 'seeds_toy.sbml')
+    targets_producibility = os.path.join(respath, 'producibility_targets.json')
+
+    expected_key_species = ['GCA_003437815', 'GCA_003437295', 'GCA_003437665',
+                            'GCA_003437595', 'GCA_003437175', 'GCA_003437785',
+                            'GCA_003437195', 'GCA_003437255', 'GCA_003437345',
+                            'GCA_003437375', 'GCA_003438055', 'GCA_003437055',
+                            'GCA_003437715', 'GCA_003437945', 'GCA_003437905',
+                            'GCA_003437885', 'GCA_003437325']
+
+    essential_symbionts = ['GCA_003437195', 'GCA_003437255', 'GCA_003437815',
+                           'GCA_003438055', 'GCA_003437375', 'GCA_003437055',
+                           'GCA_003437295', 'GCA_003437715', 'GCA_003437665',
+                           'GCA_003437905', 'GCA_003437595', 'GCA_003437885']
+
+    alternative_symbionts = ['GCA_003437785', 'GCA_003437945', 'GCA_003437325',
+                             'GCA_003437175', 'GCA_003437345']
+
+    if not os.path.exists(respath):
+        os.makedirs(respath)
+
+    utils.safe_tar_extract_all(toy_bact_tgz_path, respath)
+
+    subprocess.call([
+        'm2m', 'metacom', '-n', toy_bact_path, '-o',
+        respath, '-s', seeds_path, '--target-com-scope',
+        '-q'
+    ])
+
+    with open(targets_producibility, 'r') as json_output:
+        d_producibility = json.load(json_output)
+
+    assert set(d_producibility['key_species']) == set(expected_key_species)
+    assert set(d_producibility['essential_symbionts']) == set(essential_symbionts)
+    assert set(d_producibility['alternative_symbionts']) == set(alternative_symbionts)
+    assert len(d_producibility['producible']) == SIZE_CSCOPE
+
+    # clean
+    # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
+    # Refer to: https://github.com/python/cpython/issues/109608
+    if sys.platform != 'win32':
+        shutil.rmtree(respath)
 
 
 if __name__ == "__main__":

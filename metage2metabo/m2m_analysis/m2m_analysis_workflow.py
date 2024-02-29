@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2019-2023 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade
+# Copyright (C) 2019-2024 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -16,7 +16,6 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>
 
 import logging
-import os
 import time
 
 from metage2metabo.m2m_analysis.enumeration import enumeration_analysis
@@ -45,7 +44,7 @@ def run_analysis_workflow(sbml_folder, target_folder_file, seed_file, output_dir
 
     gml_output = graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file, taxonomy_level)
 
-    powergraph_analysis(gml_output, output_dir, oog_jar, taxon_file, taxonomy_level)
+    powergraph_analysis(json_file_folder, gml_output, output_dir, oog_jar, taxon_file, taxonomy_level)
 
     logger.info(
-        "--- m2m_analysis runtime %.2f seconds ---\n" % (time.time() - starttime))
+        '--- m2m_analysis runtime %.2f seconds ---\n' % (time.time() - starttime))

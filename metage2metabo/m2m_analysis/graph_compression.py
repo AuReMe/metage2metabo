@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2023 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade
+# Copyright (C) 2019-2024 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -12,19 +12,25 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>
 
+import csv
 import logging
 import networkx as nx
 import os
 import re
+import json
 import shutil
 import subprocess
 import sys
 import time
 import zipfile
 
-from bubbletools import convert
+from itertools import product
+from functools import reduce
+
+from bubbletools import convert, BubbleTree
 from metage2metabo import utils
 from metage2metabo.m2m_analysis.taxonomy import extract_taxa, get_taxon
+from metage2metabo.m2m_analysis.enumeration import extract_groups_from_enumeration, convert_groups_to_equation
 
 # Deactivate clingo module to avoid issue like this one:
 # https://github.com/Aluriak/PowerGrASP/issues/1
@@ -34,23 +40,33 @@ clyngor.deactivate_clingo_module()
 logger = logging.getLogger(__name__)
 
 
-def powergraph_analysis(gml_input_file_folder, output_folder, oog_jar=None, taxon_file=None, taxonomy_level="phylum"):
+def powergraph_analysis(enumeration_json_folder, gml_input_file_folder, output_folder, oog_jar=None,
+                        taxon_file=None, taxonomy_level="phylum", test_powergraph=True):
     """Run the graph compression and picture creation
 
     Args:
+        enumeration_json_folder (str): path to the enumeration json folder or file
         gml_input_file_folder (str): path to the gml folder or the gml file
         output_folder (str): path to the output folder
         oog_jar (str): path to OOG jar file
         taxon_file (str): mpwt taxon file for species
-        taxonomy_level (str): taxonomy level, must be: phylum, class, order, family, genus or species.
+        taxonomy_level (str): taxonomy level, must be: phylum, class, order, family, genus or species
+        test_powergraph (bool): boolean to decide if the powergraph combinations must be tested to check for use of heuristics
     """
     starttime = time.time()
+    logger.info('\n###############################################')
+    logger.info('#                                             #')
+    logger.info('#  Compression and visualisation of graph     #')
+    logger.info('#                                             #')
+    logger.info('###############################################\n')
 
     gml_paths = utils.file_or_folder(gml_input_file_folder)
+    enumeration_json_paths = utils.file_or_folder(enumeration_json_folder)
 
     bbl_path = os.path.join(output_folder, 'bbl')
     svg_path = os.path.join(output_folder, 'svg')
     html_output = os.path.join(output_folder, 'html')
+    minimal_equation_output = os.path.join(output_folder, 'minimal_equation')
 
     if not utils.is_valid_dir(bbl_path):
         logger.critical("Impossible to access/create output directory " + bbl_path)
@@ -125,7 +141,7 @@ def powergraph_analysis(gml_input_file_folder, output_folder, oog_jar=None, taxo
     "#866097","#365D25","#252F99","#00CCFF","#674E60","#FC009C",
     "#92896B"]
 
-    if taxon_file:
+    if taxon_file is not None:
         taxonomy_output_file = os.path.join(output_folder, 'taxonomy_species.tsv')
         tree_output_file = os.path.join(output_folder, 'taxon_tree.txt')
         if not os.path.exists(taxonomy_output_file):
@@ -146,8 +162,16 @@ def powergraph_analysis(gml_input_file_folder, output_folder, oog_jar=None, taxo
         gml_input_path = gml_paths[target_name]
         logger.info('######### Graph compression: ' + target_name + ' #########')
         compression(gml_input_path, bbl_output)
-        logger.info('######### PowerGraph visualization: ' + target_name + ' #########')
 
+        logger.info('######### Test powergraph heuristics: ' + target_name + ' #########')
+        enumeration_json_file = enumeration_json_paths[target_name]
+        if test_powergraph is True:
+            output_minimal_equations_folder = os.path.join(minimal_equation_output, target_name)
+            if taxon_file is None:
+                taxon_species = None
+            test_powergraph_heuristics(enumeration_json_file, bbl_output, output_minimal_equations_folder, taxon_species)
+
+        logger.info('######### PowerGraph visualization: ' + target_name + ' #########')
         # Read gml file with networkx and extract the essential and alternative symbionts using the note of each node (organism).
         graph = nx.read_gml(gml_input_path)
         essentials = [organism for organism in graph.nodes if graph.nodes[organism]['note'] == 'ES']
@@ -211,6 +235,7 @@ def compression(gml_input, bbl_output):
         bbl_output (str): bbl output file
     """
     starttime = time.time()
+
     with open('powergrasp.cfg', 'w') as config_file:
         config_file.write('[powergrasp options]\n')
         config_file.write('SHOW_STORY = no\n')
@@ -275,7 +300,7 @@ def bbl_to_html(bbl_input, html_output):
         bbl_input (str): bbl input file
         html_output (str): html output file
     """
-    logger.info('######### Creation of the powergraph website accessible at ' + html_output + ' #########')
+    logger.info('Creation of the powergraph website accessible at ' + html_output)
     convert.bubble_to_js(bbl_input, html_output, width_as_cover=False)
 
 
@@ -294,7 +319,7 @@ def bbl_to_svg(oog_jar, bbl_input, svg_output):
     check_oog = check_oog_jar_file(oog_jar)
 
     if check_oog:
-        logger.info('######### Creation of the powergraph svg accessible at ' + svg_output + ' #########')
+        logger.info('Creation of the powergraph svg accessible at ' + svg_output)
         oog_cmds = ["java", "-jar", oog_jar, "-inputfiles=" + bbl_input, "-img", "-outputdir=" + svg_output]
         subproc = subprocess.Popen(oog_cmds)
         subproc.wait()
@@ -311,7 +336,7 @@ def convert_taxon_id(taxon_id):
     Returns:
         taxon_id (str): converted taxon ID
     """
-    matches = re.findall('_c\d*_', taxon_id)
+    matches = re.findall(r'_c\d*_', taxon_id)
     for match in matches:
         convert_match = chr(int(match.strip('_c').strip('_')))
         taxon_id = taxon_id.replace(match, convert_match)
@@ -549,3 +574,174 @@ def merge_html_css_js(html_output, merged_html_path):
 
     with open(output_html, 'w') as output_hml_file:
         output_hml_file.write(new_html_str)
+
+
+def test_powergraph_heuristics(enumeration_json_file, powergraph_bubble_file, output_minimal_equations_folder, taxon_species):
+    """PowerGrASP can use heuristics to compress the graph and creates powergraph representation.
+    So some powergraphs visualisation are not correct according to the combination of the enumeration of minimal solution.
+    This function tests the powergraph to see if the viusalized combinations corresponds to the one of the enumeration.
+    If no heuristics have been used, then the function tries to create a boolean equation summarizing the powergraph.
+
+    Args:
+        enumeration_json_file (str): path to enumeration json file
+        powergraph_bubble_file (str): path to the bbl file containing powergraph
+        output_minimal_equations_folder (str): output fodler for minimal boolean equation of powernodes
+        taxon_species (dict): associate organism ID as key with taxon name as value
+    """
+    if not utils.is_valid_dir(output_minimal_equations_folder):
+        logger.critical("Impossible to access/create output directory " + output_minimal_equations_folder)
+        sys.exit(1)
+
+    with open(enumeration_json_file) as input_file:
+        json_data = json.load(input_file)
+    essential_symbionts = json_data['inter_bacteria']
+    if taxon_species is not None:
+        essential_symbionts = [taxon_species[bacteria] for bacteria in essential_symbionts]
+
+    tree = BubbleTree.from_bubble_file(powergraph_bubble_file)
+
+    reversed_inclusions = {}
+    essential_powernodes = []
+    included_nodes = {}
+    for node in tree.inclusions:
+        if 'PWRN-' in node:
+            included_nodes[node] = [subnode for subnode in tree.inclusions[node] if 'PWRN-' not in subnode]
+        for included in tree.inclusions[node]:
+            if included not in reversed_inclusions:
+                reversed_inclusions[included] = [node]
+            else:
+                reversed_inclusions[included].append(node)
+            if len(set(essential_symbionts).intersection(set([subnode for subnode in tree.inclusions[node] if 'PWRN-' not in subnode]))) > 0:
+                essential_powernodes.append(node)
+
+    solutions = []
+    for solution_index in json_data['enum_bacteria']:
+        bacts = json_data['enum_bacteria'][solution_index]
+        if taxon_species is None:
+            solutions.append(frozenset([reversed_inclusions[bact][0] for bact in bacts]))
+        else:
+            solutions.append(frozenset([reversed_inclusions[taxon_species[bact]][0] for bact in bacts]))
+
+    minimal_equations = set(solutions)
+
+    output_minimal_equations_file = os.path.join(output_minimal_equations_folder, 'minimal_equations.tsv')
+    with open(output_minimal_equations_file, 'w') as output_file:
+        csvwriter = csv.writer(output_file, delimiter='\t')
+        for minimal_equation in minimal_equations:
+            csvwriter.writerow(minimal_equation)
+
+    output_powernodes_composition_file = os.path.join(output_minimal_equations_folder, 'powernodes_composition.json')
+    with open(output_powernodes_composition_file, 'w') as open_json_file:
+        json.dump(included_nodes, open_json_file, indent=4)
+
+    # List all the possible combination of node according to powergraph.
+    minimal_equation_combinations = {}
+    for min_equation in minimal_equations:
+        # Find all node in powernode associated with minimal equation.
+        min_sol_org = [[node for node in tree.inclusions[powernode] if not node.startswith('PWRN-') ] if tree.inclusions[powernode] != () else [powernode] for powernode in min_equation if powernode not in essential_powernodes]
+        # Compute all the possible combo.
+        min_equation_combi = [frozenset(combo) for combo in product(*min_sol_org)]
+        minimal_equation_combinations[min_equation] = min_equation_combi
+
+    # Compute the theorical combinations of minimal equation and the observed one.
+    comparison_combinations = {}
+    for min_sol_combination in minimal_equation_combinations:
+        min_sol_combination_str = ', '.join(min_sol_combination)
+        comparison_combinations[min_sol_combination_str] = {'powergraph_estimated_combinations': len(minimal_equation_combinations[min_sol_combination])}
+
+    minimal_equation_solution_combinations = []
+    for min_equation in minimal_equations:
+        node_solutions = []
+        already_added_essential = []
+        alternative_symbionts = []
+        # Split powernode associated with essential and alternative symbionts.
+        for node in min_equation:
+            if node in essential_powernodes:
+                if node not in already_added_essential:
+                    node_solutions.extend(included_nodes[node])
+                    already_added_essential.append(node)
+            else:
+                alternative_symbionts.append(node)
+
+        # Create list with sublist for each alternative symbionts.
+        potential_alternatives = []
+        for node in alternative_symbionts:
+            potential_alternatives.append(tree.inclusions[node])
+        potential_solution = [list(combo) for combo in product(*potential_alternatives)]
+
+        # Create all possible minimal equations combining boolean equation and powernodes.
+        test_solutions = []
+        for solution in potential_solution:
+            solution.extend(node_solutions)
+            test_solutions.append(solution)
+            minimal_equation_solution_combinations.append(frozenset(solution))
+
+    # Compute number of observed minimal communities.
+    observed_combinations_number = 0
+    for minimal_community_nb in json_data['enum_bacteria']:
+        minimal_community = json_data['enum_bacteria'][minimal_community_nb]
+        if taxon_species is not None:
+            minimal_community = [taxon_species[bacteria] for bacteria in minimal_community]
+        if frozenset(minimal_community) in minimal_equation_solution_combinations:
+            observed_combinations_number += 1
+
+    powergraph_combinations = sum([comparison_combinations[min_equation]['powergraph_estimated_combinations'] for min_equation in comparison_combinations])
+
+    # Compare both combinations of solution.
+    powergraph_corresponds_to_enumeration = []
+
+    if powergraph_combinations != observed_combinations_number:
+        logger.critical('Divergence between theorical combinations ({0}) from powergraph and the combinations ({1}) found in solution.'.format(powergraph_combinations, observed_combinations_number))
+        logger.critical('This means that the compression heuristics create non observed relation, so it is a simplification of the solutions.\n')
+        powergraph_corresponds_to_enumeration.append(False)
+    else:
+        logger.info('Same combinations between theorical ({0}) and solution ({1})'.format(powergraph_combinations, observed_combinations_number))
+        logger.info('The powergraph seems to be an optimal representation of the solutions.\n')
+        powergraph_corresponds_to_enumeration.append(True)
+
+    number_of_enumerations_by_m2m_analysis = len(json_data['enum_bacteria'])
+
+    if powergraph_combinations != number_of_enumerations_by_m2m_analysis:
+        logger.critical('Powergraph theorical combinations ({0}) is different from the enumeration of solutions by m2m_analysis ({1}), so the results is not optimal.\n'.format(powergraph_combinations, number_of_enumerations_by_m2m_analysis))
+        powergraph_corresponds_to_enumeration.append(False)
+    else:
+        logger.info('Same combinations between theorical ({0}) and the enumeration of solutions by m2m_analysis  ({1})'.format(powergraph_combinations, number_of_enumerations_by_m2m_analysis))
+        logger.info('The powergraph seems to be an optimal representation of the solutions.\n')
+        powergraph_corresponds_to_enumeration.append(True)
+
+    if observed_combinations_number != number_of_enumerations_by_m2m_analysis:
+        logger.critical('Difference between the computed combinations from powernodes ({0}) and the enumeration of solutions by m2m_analysis ({1}), so the method of this script has an issue.'.format(observed_combinations_number, number_of_enumerations_by_m2m_analysis))
+        logger.critical('Maybe some of the presented minimal equations are redundants.\n')
+        powergraph_corresponds_to_enumeration.append(False)
+    else:
+        logger.info('Same number of solution between the computed combinations from powernodes ({0}) and the enumeration of solutions by m2m_analysis ({1})'.format(observed_combinations_number, number_of_enumerations_by_m2m_analysis))
+        logger.info('But this does not indicate that the powernodes are an optimal representation but that they contain the solution.\n')
+        powergraph_corresponds_to_enumeration.append(True)
+
+    # If no heuristics have been used, try to create a boolean equation.
+    if all(powergraph_corresponds_to_enumeration) is True:
+        logger.info('It seems that there are no heuristics in powergraph so it could be possible to create a boolean equation.')
+        enumeration = str(len(json_data['enum_bacteria']))
+        # Compute the boolean equation associated with minimal communities
+        logger.info('######### Boolean equation of minimal communities #########')
+        logger.info('The boolean equation can only be created for simple case (without too many combinations).')
+        bacterial_groups = extract_groups_from_enumeration(json_data)
+        boolean_equation = convert_groups_to_equation(bacterial_groups)
+        boolean_equation_combinations = str(reduce(lambda x, y: x*y, [len(i) for i in bacterial_groups]))
+        if enumeration == boolean_equation_combinations:
+            logger.info('Boolean equation seems good, as it has the same combinations ({0}) than the one from enumeration ({1}).'.format(boolean_equation_combinations, enumeration))
+            logger.info(f'Boolean equation: \n{boolean_equation}')
+            results = {}
+            results['boolean_equation'] = boolean_equation.replace('\n', '')
+            results['bacterial_groups'] = [list(group) for group in bacterial_groups]
+            if taxon_species is not None:
+                for organism in taxon_species:
+                    boolean_equation = boolean_equation.replace(organism, taxon_species[organism])
+                results['boolean_equation_taxon'] = boolean_equation
+                results['bacterial_group_taxon'] = [[taxon_species[organism] for organism in group] for group in bacterial_groups]
+                logger.info(f'\n\nBoolean equation with taxonomic name: \n{boolean_equation}')
+            output_boolean_equation = os.path.join(output_minimal_equations_folder, 'boolean_equation.json')
+            with open(output_boolean_equation, 'w') as open_json_file:
+                json.dump(results, open_json_file, indent=4)
+        else:
+            logger.info('Boolean equation has not the same complexity ({0}) than the enumeration ({1}), it is not a good estimator. It will not be created and shown.'.format(boolean_equation_combinations, enumeration))

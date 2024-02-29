@@ -515,7 +515,7 @@ Solution graph
 The solution graph is stored in a gml file (``gml/*.gml``). The nodes of the graph are species occuring in minimal solutions. An edge is created between two nodes when the two nodes are in the same minimal solutions.
 
 Compressed solution graph (power graph)
-++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++
 
 The previous solution graph is then compressed into a power graph using PowerGrASP. The result file is bbl file (``bbl/*.bbl``).
 

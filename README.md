@@ -1,6 +1,7 @@
-[![PyPI version](https://img.shields.io/pypi/v/metage2metabo.svg)](https://pypi.org/project/Metage2Metabo/) [![GitHub license](https://img.shields.io/github/license/AuReMe/metage2metabo.svg)](https://github.com/AuReMe/metage2metabo/blob/master/LICENSE) [![Actions Status](https://github.com/AuReMe/metage2metabo/workflows/Python%20package/badge.svg)](https://github.com/AuReMe/metage2metabo/actions) [![Documentation Status](https://readthedocs.org/projects/metage2metabo/badge/?version=latest)](https://metage2metabo.readthedocs.io/en/latest/?badge=latest) [![](https://img.shields.io/badge/doi-10.7554/eLife.61968-blueviolet.svg)](https://doi.org/10.7554/eLife.61968)
+[![PyPI version](https://img.shields.io/pypi/v/metage2metabo.svg)](https://pypi.org/project/Metage2Metabo/) [![GitHub license](https://img.shields.io/github/license/AuReMe/metage2metabo.svg)](https://github.com/AuReMe/metage2metabo/blob/master/LICENSE) [![Actions Status](https://github.com/AuReMe/metage2metabo/actions/workflows/pythonpackage.yml/badge.svg)](https://github.com/AuReMe/metage2metabo/actions/workflows/pythonpackage.yml) [![Documentation Status](https://readthedocs.org/projects/metage2metabo/badge/?version=latest)](https://metage2metabo.readthedocs.io/en/latest/?badge=latest) [![](https://img.shields.io/badge/doi-10.7554/eLife.61968-blueviolet.svg)](https://doi.org/10.7554/eLife.61968)
+
 # M2M - metage2metabo
-Metage2metabo is a Python3 (Python >= 3.7, tested with 3.7 and 3.8) tool to perform graph-based metabolic analysis starting from annotated genomes (**reference genomes or metagenome-assembled genomes**). It uses *Pathway Tools* in a automatic and parallel way to **reconstruct metabolic networks** for a large number of genomes. The obtained metabolic networks are then **analyzed individually and collectively** in order to get the **added value of metabolic cooperation in microbiota over individual metabolism** and to **identify and screen interesting organisms** among all.
+Metage2metabo is a Python3 (Python >= 3.8, tested with 3.8 and 3.9) tool to perform graph-based metabolic analysis starting from annotated genomes (**reference genomes or metagenome-assembled genomes**). It uses *Pathway Tools* in a automatic and parallel way to **reconstruct metabolic networks** for a large number of genomes. The obtained metabolic networks are then **analyzed individually and collectively** in order to get the **added value of metabolic cooperation in microbiota over individual metabolism** and to **identify and screen interesting organisms** among all.
 
 
 m2m can be used as a whole workflow (``` m2m workflow ```, ``` m2m metacom ```) or steps can be performed individually (``` m2m recon ``` , ``` m2m iscope ``` , ``` m2m cscope ```, ``` m2m addedvalue ```, ``` m2m mincom ```, ``` m2m seeds ```).
@@ -61,7 +62,7 @@ A more detailled documentation is available at: [https://metage2metabo.readthedo
 
 ## Technologies
 
-Python 3 (Python 3.7 and 3.8 is tested). M2M uses a certain number of Python dependencies. An example of all these dependencies working for Ubuntu 18.04 is available in [requirements.txt](https://github.com/AuReMe/metage2metabo/blob/master/requirements.txt).
+Python 3 (Python 3.8 and 3.9 is tested). M2M uses a certain number of Python dependencies. An example of all these dependencies working for Ubuntu 18.04 is available in [requirements.txt](https://github.com/AuReMe/metage2metabo/blob/master/requirements.txt).
 They can be installed with:
 ````sh
 pip install -r requirements.txt --no-cache-dir
@@ -108,19 +109,22 @@ Also, m2m_analysis relies on other packages:
         * **Warning** 
     
         /!\ For all OS, Pathway Tools must be in ```$PATH```. 
-        On Linux and MacOS: ```export PATH=$PATH:your/install/directory/pathway-tools```. 
+        On Linux and MacOS: ```export PATH=$PATH:/your/install/directory/pathway-tools```. 
         Consider adding Pathway Tools in ```$PATH``` permanently by running
         ````sh
         echo 'export PATH="$PATH:your/install/directory/pathway-tools:"' >> ~/.bashrc
         ````
+        Then source the bashrc file:
+        ````sh
+        source ~/.bashrc
 
 * [Oog Power Graph Command line tool](https://github.com/AuReMe/metage2metabo/tree/master/external_dependencies/Oog_CommandLineTool2012) to create a svg file from the compressed graph at the end of m2m_analysis. This tool is a jar file (``Oog.jar``) so Java is needed to use it.
 
 ## Installation
 
-Developed and tested on Linux (Ubuntu, Fedora, Debian) and MacOs (version 10.14) with Python3.7.
+Developed and tested on Linux (Ubuntu, Fedora, Debian) and MacOs (version 10.14) with Python3.8.
 
-Continuous Integration using GitHub Actions with Python3.7 and Python3.8 on ubuntu-latest, macos-latest and windows-latest ([corresponding virtual environment](https://docs.github.com/en/free-pro-team@latest/actions/reference/specifications-for-github-hosted-runners#supported-runners-and-hardware-resources)).
+Continuous Integration using GitHub Actions with Python3.8 and Python3.9 on ubuntu-latest, macos-latest and windows-latest ([corresponding virtual environment](https://docs.github.com/en/free-pro-team@latest/actions/reference/specifications-for-github-hosted-runners#supported-runners-and-hardware-resources)).
 
 ### Installation with pip
 
@@ -274,7 +278,7 @@ Data used to create figures and tables are listed in the [article_data](https://
 - [diabetes_study](https://github.com/AuReMe/metage2metabo/tree/master/article_data/diabetes_study): scripts and tables to create the figures of the diabetes analyses in the article.
 
 ## Authors
-[Clémence Frioux](https://cfrioux.github.io/) and [Arnaud Belcour](https://arnaudbelcour.github.io/blog/), Univ Rennes, Inria, CNRS, IRISA, Rennes, France.
+[Clémence Frioux](https://cfrioux.github.io/) and [Arnaud Belcour](https://arnaudbelcour.github.io/blog/), `Univ Bordeaux, Inria, INRAE, Bordeaux, France`, `Univ Grenoble Alpes, Inria, Grenoble, France` and `Univ Rennes, Inria, CNRS, IRISA, Rennes, France`.
 
 ## Acknowledgement
 People of Pathway Tools (SRI International) for their help integrating Pathway Tools with command line and multiprocessing in the [mpwt](https://github.com/AuReMe/mpwt) package, used in M2M.

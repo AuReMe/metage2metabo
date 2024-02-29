@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2023 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade
+# Copyright (C) 2019-2024 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -59,15 +59,16 @@ def cscope(sbmldir, seeds, out_dir, targets_file=None, host=None):
     contrib_microbes_path = os.path.join(*[out_dir, 'community_analysis', 'contributions_of_microbes.json'])
     # reverse the dict to have compounds as keys, and species as values
     reverse_contrib = {}
-    for species in contributions_of_microbes:
-        for compound in contributions_of_microbes[species]['produced_in_community']:
-            if compound in reverse_contrib:
-                reverse_contrib[compound].append(species)
-            else:
-                reverse_contrib[compound] = [species]
-    # export the reverse cscope to json and tsv
-    rev_cscopes_json_path, rev_cscopes_tsv_path = reverse_cscope(contributions_of_microbes, reverse_contrib, out_dir)
-    logger.info('Reverse community scopes for all metabolic networks available in ' + rev_cscopes_json_path + ' and ' + rev_cscopes_tsv_path + '. They higlight the producibility of metabolites by species in the community.\n')
+    if contributions_of_microbes is not None:
+        for species in contributions_of_microbes:
+            for compound in contributions_of_microbes[species]['produced_in_community']:
+                if compound in reverse_contrib:
+                    reverse_contrib[compound].append(species)
+                else:
+                    reverse_contrib[compound] = [species]
+        # export the reverse cscope to json and tsv
+        rev_cscopes_json_path, rev_cscopes_tsv_path = reverse_cscope(contributions_of_microbes, reverse_contrib, out_dir)
+        logger.info('Reverse community scopes for all metabolic networks available in ' + rev_cscopes_json_path + ' and ' + rev_cscopes_tsv_path + '. They higlight the producibility of metabolites by species in the community.\n')
     logger.info("--- Community scope runtime %.2f seconds ---\n" %
                 (time.time() - starttime))
     return instance_com, community_reachable_metabolites
@@ -131,12 +132,14 @@ def comm_scope_run(instance, output_dir, host_mn=None):
     # Remove keys "host_prodtargets", "host_scope", "comhost_scope" and "host_unprodtargets" if there is no host:
     if host_mn is not None:
         scopes_results = run_scopes(lp_instance_file=instance)
-        microbiota_scope = scopes_results['com_scope']
+        com_scope_dict = {}
+        com_scope_dict['com_scope'] = scopes_results['com_scope']
         contributions_of_microbes = None
         logger.info('The computation of the community scope with a host is of limited functionality. It will not highlight the contribution of each microbe to the community scope. Additionally, the producibility of seeds by the microbes will not be computed. Consider running the community scope without a host (i.e. all metabolic networks, including the host, in the same directory) to get the full functionality of the community scope. \n')
         with open(com_scopes_path, 'w') as dumpfile:
-            json.dump(microbiota_scope, dumpfile, indent=4, sort_keys=True)
+            json.dump(com_scope_dict, dumpfile, indent=4, sort_keys=True)
         logger.info(f'Community scope for all metabolic networks available in {com_scopes_path}.\n')
+        microbiota_scope = set(com_scope_dict['com_scope'])
     else:
         contributions_of_microbes = run_focus(seeds_file = None, bacteria_dir = None, focus_bact=[], all_networks=True, lp_instance_file=instance)
         microbiota_scope = set()

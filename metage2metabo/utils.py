@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2023 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade
+# Copyright (C) 2019-2024 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -15,6 +15,9 @@
 import sys
 import tarfile
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 def get_basename(filepath):
     """Return the basename of given filepath.
@@ -135,15 +138,23 @@ def file_or_folder(variable_folder_file):
     """
     file_folder_paths = {}
 
+    check_file = False
     if os.path.isfile(variable_folder_file):
         filename = os.path.splitext(os.path.basename(variable_folder_file))[0]
         file_folder_paths[filename] = variable_folder_file
+        check_file = True
 
+    check_folder = False
     # For folder, iterate through all files inside the folder.
-    elif os.path.isdir(variable_folder_file):
+    if os.path.isdir(variable_folder_file):
         for file_from_folder in os.listdir(variable_folder_file):
             filename = os.path.splitext(os.path.basename(file_from_folder))[0]
             file_folder_paths[filename] = os.path.join(variable_folder_file, file_from_folder)
+            check_folder = True
+
+    if check_file is False and check_folder is False:
+        logger.critical('ERROR: Wrong input, {0} does not exit'.format(variable_folder_file))
+        sys.exit(1)
 
     return file_folder_paths
 
@@ -171,7 +182,10 @@ def safe_tar_extract_all(tar_file, outdir):
         outdir (str): path to output directory for extraction.
     """
     tar = tarfile.open(tar_file, "r:gz")
-    tar.extractall(outdir)
+    if sys.version_info >= (3, 12):
+        tar.extractall(outdir, filter='data')
+    else:
+        tar.extractall(outdir)
 
     for member in tar.getmembers():
         member_path = os.path.join(outdir, member.name)

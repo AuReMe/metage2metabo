@@ -1,5 +1,43 @@
 # Changelog
 
+# Metage2Metabo v1.6.0 (2024-02-28)
+
+WARNING: change for individual and community scopes:
+* for individual scope: only seeds that are producible, ie associated with activated reactions are now shown in the results. Additional information on producible, non-producible and absent seeds are available in the json output. This requires MeneTools version >= `3.4.0`.
+* for community scope: use of `miscoto focus` for computation in order to retrieve the metabolite producers in community. This requires MeneTools version >= `3.2.0`.
+
+## Add
+
+* Test in m2m_analysis to check if combination of powergraph predicted by bubbletools is the same as the ones found in minimal communities.
+* Creation of boolean equation summarizing the powergraph if it is simple enough.
+* New option `--target-com-scope` to use all the community scope as targets for minimal community prediction (issue #21).
+* Add a function to modify xml created by Pathway Tools (issue #60).
+* Troubleshooting page in readthedocs (issue #24 and #25).
+* Metadata json file created when using command line (both for `m2m` and `m2m_analysis`).
+* Test for host for m2m metacom.
+
+## Fix
+
+* Fix potential error when reading taxon_id file (issue #22).
+* Fix issue with etree in reconstruction.
+* Issues with readthedocs.
+* GitHub Actions not working.
+
+## Modify
+
+* Exit m2m_analysis when there are unproducible targets (issue #23).
+* Check forbidden characters during targets file creation.
+* Do not allow abbreviation for argparse.
+* Remove unused dependency.
+* First step in replacing `pkg_resources` (which will become deprecated in the future) with `importlib.metadata` or import of \_\_version\_\_.
+* Move from `setup.py`/`setup.cfg` to `pyproject.toml`.
+* Update tutorial.
+* Update docs and readme.
+* Update license year and affiliation.
+* Move support for CI to Python 3.8 and 3.9.
+* Remvoe import in `__init__.py` to avoid loading m2m_analysis dependencies when using only m2m.
+* Avoid using os.unlink() function on Windows as it can lead to Permission Error.
+
 # Metage2Metabo v1.5.4 (2023-05-25)
 
 ## Fix

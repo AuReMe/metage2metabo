@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2023 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade
+# Copyright (C) 2019-2024 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -42,6 +42,11 @@ def graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file=
         str: path to folder containing gml results
     """
     starttime = time.time()
+    logger.info('\n###############################################')
+    logger.info('#                                             #')
+    logger.info('#         Solution graph creation             #')
+    logger.info('#                                             #')
+    logger.info('###############################################\n')
 
     target_paths = utils.file_or_folder(target_folder_file)
     json_paths = utils.file_or_folder(json_file_folder)
@@ -113,7 +118,10 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
         added_node = []
         species_weight = {}
         if dicti['still_unprod'] != []:
-            logger.warning('ERROR ', dicti["still_unprod"], ' is unproducible')
+            logger.error('ERROR ', dicti["still_unprod"], ' is unproducible')
+            logger.error('ERROR: Please remove these unproducible targets ({0}) from the targets file, delete output folder ({1}) re-run m2m_analysis'.format(','.join(dicti["still_unprod"]), output_dir))
+            sys.exit(1)
+
         len_target[target_category] = len(dicti['newly_prod']) + len(dicti['still_unprod'])
         len_min_sol[target_category] = len(dicti['bacteria'])
         len_union[target_category] = len(dicti['union_bacteria'])
@@ -163,7 +171,7 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
 
         # Check if all the nodes of G are not isolates.
         if len(G.nodes) == nx.number_of_isolates(G):
-            logger.critical(r'/!\ Warning: All the nodes of the solution graph are isolated (they are not connected to other nodes). This lead to powergrasp creating san empty powergraph.')
+            logger.critical(r'/!\ Warning: All the nodes of the solution graph are isolated (they are not connected to other nodes). This lead to powergrasp creating an empty powergraph.')
             logger.critical('So m2m_analysis stops at the solution graph step.')
             sys.exit(1)
 

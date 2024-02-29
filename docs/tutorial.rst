@@ -65,7 +65,9 @@ Please go check the `documentation of mpwt <https://github.com/AuReMe/mpwt#genba
     m2m recon -g workflow_genomes -o output_directory -c cpu_number [--clean] [--orphan] [-p] [-l sbml_level] [--pwt-xml]
 
 * standard output
-    .. code:: 
+
+    .. code::
+
         ###############################################
         #                                             #
         #      Metabolic network reconstruction       #
@@ -209,7 +211,7 @@ m2m iscope, cscope and addedvalue
 The three subcommands require metabolic networks in the SBML format. Some metabolic networks are available as a compressed archive in `metabolic_data`. Uncompress the file and the directory can be fed to the subcommands. These commands also require a seeds file comprising the metabolic compounds available to assess reachability/producibility in the models. This seeds file needs to be in SBML format. You can use the one in the ``metabolic_data`` directory.
 
 iscope
-*******
+******
 
 It uses the following mandatory inputs (run ``m2m iscope --help`` for optional arguments):
 
@@ -228,6 +230,7 @@ Optional argument
     m2m iscope -n toy_bact -s seeds_toy.sbml -o output_directory/
 
 * standard output
+
     .. code:: 
 
         ###############################################
@@ -266,11 +269,16 @@ Optional argument
     
 
     These results mean that 50 metabolites can be reached by all organisms. When gathering reachable metabolites for all organisms, the union consists of 576 metabolites. Some of the reachable metabolites can also be part of the seeds, meaning that there would be a possibility to renew the reservoir of seed molecules by some species. Finally metrics show the min, max and arithmetic mean number of compounds in all scopes.
+
 * files outputs
-    * In ``output_directory/indiv_scopes/indiv_scopes.json``: a json file that can be easily loaded as a dictionary (or humanly read as it it) that contains the set of reachable metabolites for each organism. A file expliciting the producibility of seeds ``output_directory/indiv_scopes/seeds_in_indiv_scopes.json`` is also available: it additionally lists the seeds that are absent from the networks. Two more files present the scopes from the focus of metabolites ``output_directory/indiv_scopes/rev_iscopes.json`` and a matrix summarising the producibility of molecules by species ``output_directory/indiv_scopes/rev_iscopes.tsv``. `rev_iscope.tsv` and `rev_iscope.json` that reverse the information from `indiv_scopes.json`. This means that if org1 produces A and B, org2 produces B and C, `indiv_scopes.json` will describe the following: {'org1': ['A', 'B'], 'org2: ['B', 'C']}. `reverse_scope.json` will contain {'A': ['org1'], 'B': ['org1', 'org2'], 'C': ['org2']}, and `reverse_scope.tsv` will contain the same information as a matrix.  Logs are written in ``output_directory/m2m_iscope.log``.
+
+    * In ``output_directory/indiv_scopes/indiv_scopes.json``: a json file that can be easily loaded as a dictionary (or humanly read as it it) that contains the set of reachable metabolites for each organism.
+    * A file expliciting the producibility of seeds ``output_directory/indiv_scopes/seeds_in_indiv_scopes.json`` is also available: it additionally lists the seeds that are absent from the networks.
+    * Two more files present the scopes from the focus of metabolites ``output_directory/indiv_scopes/rev_iscopes.json`` and a matrix summarising the producibility of molecules by species ``output_directory/indiv_scopes/rev_iscopes.tsv``. `rev_iscope.tsv` and `rev_iscope.json` that reverse the information from `indiv_scopes.json`. This means that if org1 produces A and B, org2 produces B and C, `indiv_scopes.json` will describe the following: {'org1': ['A', 'B'], 'org2: ['B', 'C']}. `reverse_scope.json` will contain {'A': ['org1'], 'B': ['org1', 'org2'], 'C': ['org2']}, and `reverse_scope.tsv` will contain the same information as a matrix.
+    * Logs are written in ``output_directory/m2m_iscope.log``.
 
 cscope
-*******
+******
 
 It uses the following mandatory inputs (run ``m2m cscope --help`` for optional arguments):
 
@@ -293,32 +301,34 @@ Optional arguments:
     m2m cscope -n toy_bact -s seeds_toy.sbml -o output_directory/
 
 * standard output
+
     .. code::
 
-    ###############################################
-    #                                             #
-    #    Metabolic potential of the community     #
-    #                                             #
-    ###############################################
+        ###############################################
+        #                                             #
+        #    Metabolic potential of the community     #
+        #                                             #
+        ###############################################
 
-    ######### Creating metabolic instance for the whole community #########
-    Created temporary instance file in ../metage2metabo/test/metabolic_data/output_directory/community_analysis/miscoto_9ihtb055.lp
-    Running whole-community metabolic scopes...
-    Community scope for all metabolic networks available in output_directory/community_analysis/comm_scopes.json
-    Contributions of microbes to community scope available in output_directory/community_analysis/contributions_of_microbes.json.
+        ######### Creating metabolic instance for the whole community #########
+        Created temporary instance file in ../metage2metabo/test/metabolic_data/output_directory/community_analysis/miscoto_9ihtb055.lp
+        Running whole-community metabolic scopes...
+        Community scope for all metabolic networks available in output_directory/community_analysis/comm_scopes.json
+        Contributions of microbes to community scope available in output_directory/community_analysis/contributions_of_microbes.json.
 
 
-    Number of metabolites producible in community: 698.
+        Number of metabolites producible in community: 698.
 
-    Reverse community scopes for all metabolic networks available in output_directory/community_analysis/rev_cscope.json and output_directory/community_analysis/rev_cscope.tsv. They higlight the producibility of metabolites by species in the community.
+        Reverse community scopes for all metabolic networks available in output_directory/community_analysis/rev_cscope.json and output_directory/community_analysis/rev_cscope.tsv. They higlight the producibility of metabolites by species in the community.
 
-    --- Community scope runtime 5.41 seconds ---
-    ...
-    --- Total runtime 5.42 seconds ---
-    --- Logs written in output_directory/m2m_cscope.log ---
+        --- Community scope runtime 5.41 seconds ---
+        ...
+        --- Total runtime 5.42 seconds ---
+        --- Logs written in output_directory/m2m_cscope.log ---
 
 
 698 metabolites (excluding the seeds) reachable by the whole community/microbiota:
+
 * files outputs
     * In addition to the logs at the root of the results directory, a json file with the results is created in ``output_directory/community_analysis/comm_scopes.json``. It lists all molecules reachable by the community, taking into account the interactions occurring among community members.
     * A file details the roles of community members in the production of metabolites: which microbes possess the reactions that produce the metabolites. This file is ``output_directory/community_analysis/contributions_of_microbes.json``. It also recapitulates the compounds producible by species individually versus in community, and highlights the newly producible compounds in community, per symbiont. 

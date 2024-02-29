@@ -37,6 +37,7 @@ Documentation of M2M
     suppinformation
     api
     m2m_analysis
+    troubleshooting
 
 
 Additional features
@@ -53,7 +54,7 @@ M2M relies on packages that can also be used independantly with more features an
 Authors
 =======
 
-`Clémence Frioux <https://cfrioux.github.io/>`__ and `Arnaud Belcour <https://arnaudbelcour.github.io/blog/>`__, Univ Bordeaux, Inria, INRAE, Bordeaux, France and Univ Rennes, Inria, CNRS, IRISA, Rennes, France.
+`Clémence Frioux <https://cfrioux.github.io/>`__ and `Arnaud Belcour <https://arnaudbelcour.github.io/blog/>`__, `Univ Bordeaux, Inria, INRAE, Bordeaux, France`, `Univ Grenoble Alpes, Inria, Grenoble, France` and `Univ Rennes, Inria, CNRS, IRISA, Rennes, France`.
 
 Acknowledgement
 ===============

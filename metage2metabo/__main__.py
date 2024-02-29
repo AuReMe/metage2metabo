@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2023 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade
+# Copyright (C) 2019-2024 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -14,6 +14,7 @@
 
 import argparse
 import logging
+import json
 import os
 import pkg_resources
 import re
@@ -24,6 +25,7 @@ import traceback
 
 from shutil import which
 
+from metage2metabo import __version__ as VERSION
 from metage2metabo.m2m.reconstruction import recon
 from metage2metabo.m2m.individual_scope import iscope
 from metage2metabo.m2m.community_scope import cscope, instance_community
@@ -34,7 +36,6 @@ from metage2metabo.sbml_management import get_compounds
 
 from metage2metabo import sbml_management, utils
 
-VERSION = pkg_resources.get_distribution("metage2metabo").version
 LICENSE = """Copyright (C) Dyliss & Pleiade\n
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -195,6 +196,13 @@ def main():
         help="Optional targets for metabolic analysis, if not used metage2metabo will use the addedvalue of the community",
         required=False
         )
+    parent_parser_t_com_scope = argparse.ArgumentParser(add_help=False)
+    parent_parser_t_com_scope.add_argument(
+        "--target-com-scope",
+        help="Instead of the addedvalue, use the community scope as targets for mincom.",
+        required=False,
+        action="store_true",
+        default=None)
 
     # subparsers
     subparsers = parser.add_subparsers(
@@ -271,7 +279,8 @@ def main():
         parents=[
             parent_parser_g, parent_parser_s, parent_parser_m, parent_parser_o,
             parent_parser_c, parent_parser_q, parent_parser_no, parent_parser_p,
-            parent_parser_t_optional, parent_parser_cl, parent_parser_xml
+            parent_parser_t_optional, parent_parser_cl, parent_parser_xml,
+            parent_parser_t_com_scope
         ],
         description=
         "Run the whole workflow: metabolic network reconstruction, individual and community scope analysis and community selection",
@@ -282,7 +291,8 @@ def main():
         help="whole metabolism community analysis",
         parents=[
             parent_parser_n, parent_parser_s, parent_parser_m, parent_parser_o,
-            parent_parser_t_optional, parent_parser_q, parent_parser_c
+            parent_parser_t_optional, parent_parser_q, parent_parser_c,
+            parent_parser_t_com_scope
         ],
         description=
         "Run the whole metabolism community analysis: individual and community scope analysis and community selection",
@@ -348,7 +358,8 @@ def main():
     # deal with given subcommand
     if args.cmd == "workflow":
         main_workflow(args.genomes, args.out, args.cpu, args.clean, args.seeds,
-                      args.noorphan, args.padmet, new_arg_modelhost, args.targets, args.pwt_xml)
+                      args.noorphan, args.padmet, new_arg_modelhost, args.targets, args.pwt_xml,
+                      args.target_com_scope)
     elif args.cmd in ["iscope", "cscope", "addedvalue", "mincom", "metacom"]:
         if not os.path.isdir(args.networksdir):
             logger.critical(args.networksdir + " is not a correct directory path")
@@ -372,7 +383,7 @@ def main():
         elif args.cmd == "mincom":
             main_mincom(network_dir, args.seeds, args.out, args.targets, new_arg_modelhost)
         elif args.cmd == "metacom":
-            main_metacom(network_dir, args.out, args.seeds, new_arg_modelhost, args.targets, args.cpu)
+            main_metacom(network_dir, args.out, args.seeds, new_arg_modelhost, args.targets, args.cpu, args.target_com_scope)
     elif args.cmd == "recon":
         main_recon(args.genomes, args.out, args.noorphan, args.padmet, args.level, args.cpu,
                    args.clean, args.pwt_xml)
@@ -385,7 +396,11 @@ def main():
     elif args.cmd == 'test':
         main_test(args.out, args.cpu)
 
-    logger.info("--- Total runtime %.2f seconds ---" % (time.time() - start_time))
+    duration = time.time() - start_time
+    dict_args = vars(args)
+    metadata_json_file = os.path.join(args.out, 'm2m_metadata.json')
+    create_metadata(dict_args, duration, metadata_json_file)
+    logger.info("--- Total runtime %.2f seconds ---" % (duration))
     logger.warning(f'--- Logs written in {log_file_path} ---')
 
 
@@ -425,7 +440,10 @@ def main_cscope(*allargs):
     logger.info("\n" + str(len(comscope)) + " metabolites reachable by the whole community/microbiota: \n")
     logger.info('\n'.join(comscope))
     #delete intermediate file
-    os.unlink(instance_com)
+    # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
+    # Refer to: https://github.com/python/cpython/issues/109608
+    if sys.platform != 'win32':
+        os.unlink(instance_com)
     return comscope
 
 
@@ -464,7 +482,10 @@ def main_mincom(sbmldir, seedsfiles, outdir, targets, host):
     #run mincom
     mincom(instance, seedsfiles, set(get_compounds(targets)), outdir)
     #delete intermediate file
-    os.unlink(instance)
+    # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
+    # Refer to: https://github.com/python/cpython/issues/109608
+    if sys.platform != 'win32':
+        os.unlink(instance)
 
 
 def main_seeds(metabolites_file, outdir):
@@ -522,6 +543,60 @@ def main_test(outdir, cpu):
                 clean, seeds, noorphan_bool,
                 padmet_bool, host_mn, targets_file,
                 use_pwt_xml)
+
+
+def create_metadata(dict_args, duration, metadata_json_file):
+    """ Create metadata from args and package versions.
+
+    Args:
+        dict_args (dict): dict of args given to argparse
+        duration (int): time of the run
+        metadata_json_file (str): pat hto metadata output file
+    """
+    from miscoto import __version__ as miscoto_version
+    from menetools import __version__ as menetools_version
+    from metage2metabo import __version__ as m2m_version
+
+    # Retrieve args given to m2m.
+    metadata = {}
+    metadata['m2m_args'] = dict_args
+
+    # Get package version.
+    metadata['tool_dependencies'] = {}
+    metadata['tool_dependencies']['python_package'] = {}
+    metadata['tool_dependencies']['python_package']['Python_version'] = sys.version
+    metadata['tool_dependencies']['python_package']['Metage2Metabo'] = m2m_version
+    metadata['tool_dependencies']['python_package']['MiSCoTo'] = miscoto_version
+    metadata['tool_dependencies']['python_package']['MeneTools'] = menetools_version
+
+    # Get clingo path and version.
+    metadata['tool_dependencies']['clingo'] = which('clingo')
+    response = subprocess.Popen(['clingo', '--version'], stdout=subprocess.PIPE, start_new_session=True, universal_newlines='')
+    for line in response.stdout:
+        str_line = str(line)
+        if 'clingo version' in str_line:
+            clingo_version = str_line.split('clingo version ')[1]
+    metadata['tool_dependencies']['clingo_version'] = clingo_version
+
+    # If recon, get mpwt, padmet and Pathway Tools versions.
+    if dict_args['cmd'] == 'recon' or dict_args['cmd'] == 'workflow':
+        from mpwt import __version__ as mpwt_version
+        metadata['tool_dependencies']['python_package']['mpwt'] = mpwt_version
+        if sys.version_info >= (3, 9):
+            import importlib.metadata
+            padmet_version = importlib.metadata.version("padmet")
+        else:
+            import pkg_resources
+            padmet_version = pkg_resources.get_distribution('padmet').version
+
+        metadata['tool_dependencies']['python_package']['padmet'] = padmet_version
+        from mpwt.utils import get_ptools_version
+        metadata['tool_dependencies']['Pathway-Tools'] = get_ptools_version()
+
+    metadata['duration'] = duration
+
+    with open(metadata_json_file, 'w') as dumpfile:
+        json.dump(metadata, dumpfile, indent=4)
 
 
 if __name__ == "__main__":

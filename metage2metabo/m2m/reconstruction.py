@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2023 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade
+# Copyright (C) 2019-2024 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -29,6 +29,8 @@ from multiprocessing import Pool
 
 from padmet.classes.padmetSpec import PadmetSpec
 from padmet.utils import sbmlPlugin
+
+from menetools.sbml import get_model, get_listOfSpecies
 
 from shutil import copyfile
 
@@ -180,6 +182,10 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean, use_pwt_xml):
     nb_genomes_dir = len([folder for folder in os.listdir(genomes_dir) if os.path.isdir(os.path.join(genomes_dir, folder))])
     if use_pwt_xml:
         nb_pgdb_dir = len([folder for folder in os.listdir(pgdb_dir) if os.path.isfile(os.path.join(pgdb_dir, folder))])
+        logger.warning("Adding prefix M_ to XML form Pathway Tools.")
+        for xml_file in os.listdir(pgdb_dir):
+            xml_path = os.path.join(pgdb_dir, xml_file)
+            update_pathway_tools_xml(xml_path, xml_path)
     else:
         nb_pgdb_dir = len([folder for folder in os.listdir(pgdb_dir) if os.path.isdir(os.path.join(pgdb_dir, folder))])
 
@@ -263,10 +269,10 @@ def create_sbml_stat(species_name, sbml_file):
             for el in els:
                 reaction_id = sbmlPlugin.convert_from_coded_id(el.get('id'))[0]
                 reactions.append(reaction_id)
-                for subel in el.getchildren():
+                for subel in el.iter():
                     if 'notes' in subel.tag:
-                        for subsubel in subel.getchildren():
-                            for subsubsubel in subsubel.getchildren():
+                        for subsubel in subel.iter():
+                            for subsubsubel in subsubel.iter():
                                 if 'GENE_ASSOCIATION' in subsubsubel.text:
                                     for gene in sbmlPlugin.parseGeneAssoc(subsubsubel.text):
                                         if gene not in genes:
@@ -275,7 +281,7 @@ def create_sbml_stat(species_name, sbml_file):
                                         gene_associated_rxns.append(reaction_id)
                     # Use geneProductAssociation for xml from MetaFlux.
                     elif 'geneProductAssociation' in subel.tag:
-                        for subsubel in subel.getchildren():
+                        for subsubel in subel.iter():
                             if 'geneProductRef' in subsubel.tag:
                                 gene = subsubel.get('{http://www.sbml.org/sbml/level3/version1/fbc/version2}geneProduct')
                                 if gene:
@@ -285,7 +291,7 @@ def create_sbml_stat(species_name, sbml_file):
                                     if reaction_id not in fbc_gene_associated_rxns:
                                         fbc_gene_associated_rxns.append(reaction_id)
                             else:
-                                for subsubsubel in subsubel.getchildren():
+                                for subsubsubel in subsubel.iter():
                                     gene = subsubsubel.get('{http://www.sbml.org/sbml/level3/version1/fbc/version2}geneProduct')
                                     if gene:
                                         gene = gene.replace('G_', '')
@@ -325,6 +331,27 @@ def mean_sd_data(datas):
         sd_data = None
 
     return mean_data, sd_data
+
+
+def update_pathway_tools_xml(input_sbml, output_sbml):
+    """ Update XML from Pathway Tools by adding a 'M_' prefix to avoid issue, when using metaboltie IDs.
+
+    Args:
+        input_sbml (str): path to xml input file
+        output_sbml (str): path to xml output file
+    """
+    tree = etree.parse(input_sbml)
+    sbml = tree.getroot()
+    model = get_model(sbml)
+    speciesids = [species.attrib.get("id") for species in get_listOfSpecies(model)]
+    speciesids.sort(key=len, reverse=True)
+    with open(input_sbml, 'r') as open_sbml:
+        open_sbml_str = open_sbml.read()
+        for species in speciesids:
+            open_sbml_str = open_sbml_str.replace(species, 'M_'+species)
+
+    with open(output_sbml, 'w') as open_sbml_out:
+        open_sbml_out.write(open_sbml_str)
 
 
 def analyze_recon(sbml_folder, output_stat_file, padmet_folder=None, padmet_bool=None, nb_cpu=1):
