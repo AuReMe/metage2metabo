@@ -36,6 +36,7 @@ WARNING: change for individual and community scopes:
 * Update license year and affiliation.
 * Move support for CI to Python 3.8 and 3.9.
 * Remvoe import in `__init__.py` to avoid loading m2m_analysis dependencies when using only m2m.
+* Avoid using os.unlink() function on Windows as it can lead to Permission Error.
 
 # Metage2Metabo v1.5.4 (2023-05-25)
 
