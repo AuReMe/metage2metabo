@@ -14,6 +14,7 @@ WARNING: change for individual and community scopes:
 * Add a function to modify xml created by Pathway Tools (issue #60).
 * Troubleshooting page in readthedocs (issue #24 and #25).
 * Metadata json file created when using command line (both for `m2m` and `m2m_analysis`).
+* Essential and alterative symbiont in `producibility_targets.json` (issue #19).
 * Test for host for m2m metacom.
 
 ## Fix
@@ -25,9 +26,11 @@ WARNING: change for individual and community scopes:
 
 ## Modify
 
+* Better deal with seeds that are absent from networks or not produced in iscope and also the seeds that are produced through interactions in cscope (issue #53).
 * Exit m2m_analysis when there are unproducible targets (issue #23).
 * Check forbidden characters during targets file creation.
-* Do not allow abbreviation for argparse.
+* Do not allow abbreviation in command arguments by argparse (issue #54).
+* Sanitize use of tarfile extractall (issue #55).
 * Remove unused dependency.
 * First step in replacing `pkg_resources` (which will become deprecated in the future) with `importlib.metadata` or import of \_\_version\_\_.
 * Move from `setup.py`/`setup.cfg` to `pyproject.toml`.
@@ -35,7 +38,7 @@ WARNING: change for individual and community scopes:
 * Update docs and readme.
 * Update license year and affiliation.
 * Move support for CI to Python 3.8 and 3.9.
-* Remvoe import in `__init__.py` to avoid loading m2m_analysis dependencies when using only m2m.
+* Remove import in `__init__.py` to avoid loading m2m_analysis dependencies when using only m2m.
 * Avoid using os.unlink() function on Windows as it can lead to Permission Error.
 
 # Metage2Metabo v1.5.4 (2023-05-25)
