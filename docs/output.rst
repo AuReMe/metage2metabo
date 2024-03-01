@@ -7,6 +7,7 @@ m2m Outputs
     .. code ::
 
         output_directory/
+        ├── m2m_metadata.json
         ├── m2m_command.log
         ├── pgdb
         │   ├── species_1
@@ -47,10 +48,13 @@ m2m Outputs
         │   └── rev_iscope.json
         │   └── rev_iscope.tsv
         ├── community_analysis
+        │   ├── addedvalue.json
         │   ├── comm_scopes.json
-        │   ├── addedvalue.json
-        │   ├── targets.sbml
+        │   ├── contributions_of_microbes.json
         │   ├── mincom.json
+        │   ├── rev_cscope.json
+        │   ├── rev_cscope.tsv
+        │   └── targets.sbml
         ├── producibility_targets.json
 
 By using the ``--pwt-xml`` option, m2m will use the xml files from Pathway Tools and there will be no .dat files.
@@ -58,6 +62,7 @@ By using the ``--pwt-xml`` option, m2m will use the xml files from Pathway Tools
     .. code ::
 
         output_directory/
+        ├── m2m_metadata.json
         ├── m2m_command.log
         ├── pgdb
         │   ├── species_1.xml
@@ -72,11 +77,25 @@ By using the ``--pwt-xml`` option, m2m will use the xml files from Pathway Tools
         │   └── rev_iscope.json
         │   └── rev_iscope.tsv
         ├── community_analysis
+        │   ├── addedvalue.json
         │   ├── comm_scopes.json
-        │   ├── addedvalue.json
-        │   ├── targets.sbml
+        │   ├── contributions_of_microbes.json
         │   ├── mincom.json
+        │   ├── rev_cscope.json
+        │   ├── rev_cscope.tsv
+        │   └── targets.sbml
         ├── producibility_targets.json
+
+m2m_metadata.json
+-----------------
+
+A json file summarising metadata of Metage2Metabo:
+
+* ``m2m_args``: input arguments given to Metage2Metabo such as the command used, the path to genomes or networks, etc.
+
+* ``tool_dependencies``: Python version, versions of Metage2Metabo and its dependencies and Clingo version. When using ``recon`` or ``workflow`` commands it will also contains Pathway Tools version.
+
+* ``duration``: duraiton of the un of Metage2Metabo in seconds.
 
 m2m_command.log
 ---------------
@@ -154,6 +173,12 @@ The results are stored in a json with 8 keys:
 
 * ``targets_producers``: for each target, the list of organisms able to produce this target. It is empty if you use ``m2m worfklow`` or ``m2m metacom`` without targets because cscope needs target to find the targets_producers.
 
+rev_cscope.json and rev_cscope.tsv
+==================================
+
+The reverse of the ``comm_scopes.json`` scope keys are stored in two files ``rev_cscope.json`` and ``rev_cscope.tsv``. It shows for each metabolites, which species in the community can produce it.
+The latter file is a matrix with compounds as column header and species in row. For each compounds, we have the producibility of the compounds by the species (0 not producible and 1 producible).
+
 addedvalue.json
 ===============
 
@@ -203,12 +228,25 @@ The results are stored in a json with 17 keys:
 
 * ``one_model_targetsproducers``: the organism that have the final reaction to produce the target in the optimal solution. It is a dictionary, with each target as key and the organism producing these targets as value.
 
+contributions_of_microbes.json
+==============================
+
+A json file detailing the role of community members in the production of metabolites: which organisms have the reactions that produce the metabolites.
+
+It contains one key per microbe in the community with several subkeys:
+
+* ``produced_alone``: metabolties that can be produced by the organism alone.
+
+* ``community_metabolic_gain``: metabolties that can be newly produced by the organism with the help of the community.
+
+* ``produced_in_community``: metabolties that can be produced by the organism when it is in the community (it is composed of ``community_metabolic_gain`` and ``produced_alone``).
+
 producibility_targets.json
 --------------------------
 
 After all these previous step, m2m (``m2m worfklow`` or ``m2m metacom``) will create this json which summarizes the producibility of each targets (either given by the user or from the addedvalue).
 
-This json contains 10 keys:
+This json contains 12 keys:
 
 * ``producible``: the producible compounds by the community.
 
@@ -223,6 +261,10 @@ This json contains 10 keys:
 * ``mincom_producible``: the compounds producible by the minimal community.
 
 * ``key_species``: organism from all the minimal communities.
+
+* ``essential_symbionts``: organisms in the intersection of all the minimal communities. They are occuring in all minimal solution.
+
+* ``alternative_symbionts``: organisms appearing in at least one minimal community but not in all.
 
 * ``mincom_inter_producers``: the organism that have the final reaction to produce the target in the intersection. It is a dictionary, with each target as key and the organism producing these targets as value.
 

@@ -4,7 +4,7 @@
 
 WARNING: change for individual and community scopes:
 * for individual scope: only seeds that are producible, ie associated with activated reactions are now shown in the results. Additional information on producible, non-producible and absent seeds are available in the json output. This requires MeneTools version >= `3.4.0`.
-* for community scope: use of `miscoto focus` for computation in order to retrieve the metabolite producers in community. This requires MeneTools version >= `3.2.0`.
+* for community scope: use of `miscoto focus` for computation in order to retrieve the metabolite producers in community. This requires MiSCoTo version >= `3.2.0`.
 
 ## Add
 

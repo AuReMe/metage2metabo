@@ -58,52 +58,62 @@ Optional arguments:
 * standard output
     .. code::
 
+        ###############################################
+        #                                             #
+        #      Enumeration of minimal communities     #
+        #                                             #
+        ###############################################
+
         ######### Enumeration of solution for: targets_toy #########
+        /shared/Softwares/git/miscoto/miscoto/encodings/community_soup.lp
         ######### Enumeration of minimal communities #########
-        5 minimal communities to produce the target metabolites
+        5 minimal communities (each containing 13 species) producing the target metabolites
         ######### Key species: Union of minimal communities #########
         # Bacteria occurring in at least one minimal community enabling the producibility of the target metabolites given as inputs
         Key species = 17
-        GCA_003437885
-        GCA_003437665
-        GCA_003437945
-        GCA_003437595
-        GCA_003437195
-        GCA_003437345
-        GCA_003437815
-        GCA_003438055
-        GCA_003437715
-        GCA_003437325
         GCA_003437905
-        GCA_003437375
-        GCA_003437175
-        GCA_003437785
-        GCA_003437055
         GCA_003437255
+        GCA_003437345
+        GCA_003437785
+        GCA_003437595
+        GCA_003437715
+        GCA_003437375
+        GCA_003437325
+        GCA_003437815
         GCA_003437295
+        GCA_003437175
+        GCA_003437885
+        GCA_003437945
+        GCA_003437665
+        GCA_003437195
+        GCA_003437055
+        GCA_003438055
         ######### Essential symbionts: Intersection of minimal communities #########
         # Bacteria occurring in ALL minimal community enabling the producibility of the target metabolites given as inputs
         Essential symbionts = 12
+        GCA_003437815
+        GCA_003437295
+        GCA_003437905
+        GCA_003437255
         GCA_003437885
         GCA_003437665
-        GCA_003437595
-        GCA_003437905
         GCA_003437195
-        GCA_003437375
+        GCA_003437595
         GCA_003437055
-        GCA_003437815
         GCA_003438055
         GCA_003437715
-        GCA_003437255
-        GCA_003437295
+        GCA_003437375
         ######### Alternative symbionts: Difference between Union and Intersection #########
         # Bacteria occurring in at least one minimal community but not all minimal community enabling the producibility of the target metabolites given as inputs
         Alternative symbionts = 5
-        GCA_003437945
         GCA_003437325
+        GCA_003437945
         GCA_003437175
         GCA_003437785
         GCA_003437345
+        --- Enumeration runtime 4.64 seconds ---
+
+        --- Total runtime 4.65 seconds ---
 
 * files output
     ::
@@ -112,6 +122,7 @@ Optional arguments:
         ├── json
         │   ├── targets_toy.json
         ├── m2m_analysis_enum.log
+        ├── m2m_analysis_metadata.json
 
 m2m_analysis graph
 ++++++++++++++++++
@@ -138,9 +149,19 @@ You can use the `taxon file from gut experience <https://github.com/AuReMe/metag
 * standard output
     .. code::
 
+        ###############################################
+        #                                             #
+        #         Solution graph creation             #
+        #                                             #
+        ###############################################
+
         ######### Graph of targets_toy #########
         Number of nodes: 17
         Number of edges: 126
+        --- Graph runtime 0.01 seconds ---
+
+        --- Total runtime 0.01 seconds ---
+
 
 * files output
     ::
@@ -152,6 +173,7 @@ You can use the `taxon file from gut experience <https://github.com/AuReMe/metag
         ├── key_species_stats.tsv
         ├── m2m_analysis_graph.log
         ├── miscoto_stats.txt
+        ├── m2m_analysis_metadata.json
 
 m2m_analysis powergraph
 +++++++++++++++++++++++
@@ -159,31 +181,66 @@ m2m_analysis powergraph
 
 It uses the following mandatory inputs (run ``m2m_analysis powergraph --help`` for optional arguments):
 
+-j JSON_DIR_OR_FILE                Folder containing JSON files of single JSON file containing miscoto enumeration results
 -g file                directory of GML files or a GML file
 -o directory           output directory for results
 
 Optional arguments:
 
 -q               quiet mode
---oog file             Oog jar file
+--oog file             Oog jar file (present in external_dependencies folder of the github repository)
 --taxon TAXON         Mpwt taxon file
 --level LEVEL         Taxonomy level, must be: phylum, class, order, family, genus or species. By default, it is phylum.
 
 .. code:: sh
 
-    m2m_analysis powergraph --oog Oog.jar -g output_directory/gml -o output_directory
+    m2m_analysis powergraph --oog Oog.jar -g output_directory/gml -j output_directory/json -o output_directory
 
 * standard output
     .. code::
 
+        ###############################################
+        #                                             #
+        #  Compression and visualisation of graph     #
+        #                                             #
+        ###############################################
+
         ######### Graph compression: targets_toy #########
         Number of powernodes: 3
         Number of poweredges: 2
-        Compression runtime 7.94 seconds ---
+        Compression runtime 1.52 seconds ---
 
+        ######### Test powergraph heuristics: targets_toy #########
+        Same combinations between theorical (5) and solution (5)
+        The powergraph seems to be an optimal representation of the solutions.
+
+        Same combinations between theorical (5) and the enumeration of solutions by m2m_analysis  (5)
+        The powergraph seems to be an optimal representation of the solutions.
+
+        Same number of solution between the computed combinations from powernodes (5) and the enumeration of solutions by m2m_analysis (5)
+        But this does not indicate that the powernodes are an optimal representation but that they contain the solution.
+
+        It seems that there are no heuristics in powergraph so it could be possible to create a boolean equation.
+        ######### Boolean equation of minimal communities #########
+        The boolean equation can only be created for simple case (without too many combinations).
+        Boolean equation seems good, as it has the same combinations (5) than the one from enumeration (5).
+        Boolean equation: 
+        (( GCA_003437905 ) & 
+        ( GCA_003437255 ) & 
+        ( GCA_003437785 | GCA_003437345 | GCA_003437175 | GCA_003437325 | GCA_003437945 ) & 
+        ( GCA_003437595 ) & 
+        ( GCA_003437715 ) & 
+        ( GCA_003437375 ) & 
+        ( GCA_003437815 ) & 
+        ( GCA_003437295 ) & 
+        ( GCA_003437885 ) & 
+        ( GCA_003437665 ) & 
+        ( GCA_003437195 ) & 
+        ( GCA_003437055 ) & 
+        ( GCA_003438055 ) )
         ######### PowerGraph visualization: targets_toy #########
-        ######### Creation of the powergraph website accessible at out_t/html/targets_toy #########
-        ######### Creation of the powergraph svg accessible at out_t/svg #########
+        Creation of the powergraph website accessible at output_directory/html/targets_toy
+        Creation of the powergraph svg accessible at output_directory/svg
         ********************************************************************************
         *  Oog - PowerGraph Library (Matthias Reimann, c 2006-2012)                    *
         *  PowerGraph Analysis through the command line interface of Oog               *
@@ -194,30 +251,31 @@ Optional arguments:
         *                                                                              *
         *  Contact: reimann@biotec.tu-dresden.de                                       *
         ********************************************************************************
-        <II> Current time: 2019/10/17 13:09:56
+        <II> Current time: 2024/03/01 11:56:46
         <II> Oog build: Oog_build_2012.04.17_14.16.48
-
-        <II> Working directory: . (/shared/metage2metabo/test/metabolic_data/)
+            
+        <II> Working directory: . (/shared/Softwares/git/metage2metabo/test/metabolic_data/)
         <II> Graph file directories: [.]
-        <II> Output directory: test_out/svg
-        <II> Loading graph (targets_toy.bbl) ... 27ms
+        <II> Output directory: output_directory/svg
+        <II> Loading graph (targets_toy.bbl) ... 21ms
         <II> Arrange Graph ... Exception in thread "PowerGraphArranger" java.lang.IndexOutOfBoundsException: Index 20 out of bounds for length 20
             at java.base/jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:64)
             at java.base/jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:70)
             at java.base/jdk.internal.util.Preconditions.checkIndex(Preconditions.java:248)
-            at java.base/java.util.Objects.checkIndex(Objects.java:372)
-            at java.base/java.util.ArrayList.get(ArrayList.java:458)
+            at java.base/java.util.Objects.checkIndex(Objects.java:374)
+            at java.base/java.util.ArrayList.get(ArrayList.java:459)
             at org.mattlab.eaglevista.graph.OogGraph.getID_(OogGraph.java:2703)
             at org.mattlab.eaglevista.graph.OogPGArranger.arrangeRec(OogPGArranger.java:361)
             at org.mattlab.eaglevista.graph.OogPGArranger.arrange(OogPGArranger.java:327)
             at org.mattlab.eaglevista.graph.OogPGArranger.run(OogPGArranger.java:271)
-            at java.base/java.lang.Thread.run(Thread.java:834)
-        4001ms (15ms)
-        <II> Create SVG ... 469ms
-        <II> Image written (test_out/svg/targets_toy.bbl.svg)
-        --- Powergraph runtime 22.25 seconds ---
+            at java.base/java.lang.Thread.run(Thread.java:829)
+        4001ms (14ms)
+        <II> Create SVG ... 275ms
+        <II> Image written (output_directory/svg/targets_toy.bbl.svg)
+        --- Powergraph runtime 6.06 seconds ---
 
-        --- Total runtime 22.44 seconds ---
+        --- Total runtime 6.08 seconds ---
+
 
 * files output
     ::
@@ -237,6 +295,7 @@ Optional arguments:
         ├── svg
         │   ├── targets_toy.bbl.svg
         ├── m2m_analysis_powergraph.log
+        ├── m2m_analysis_metadata.json
 
 
 This command creates the following svg (node colords: dark pink for essential symbionts and blue for alternative symbionts):
@@ -271,67 +330,136 @@ Optional arguments:
 * standard output
     .. code::
 
+        ###############################################
+        #                                             #
+        #      Enumeration of minimal communities     #
+        #                                             #
+        ###############################################
+
         ######### Enumeration of solution for: targets_toy #########
+        /shared/Softwares/git/miscoto/miscoto/encodings/community_soup.lp
         ######### Enumeration of minimal communities #########
-        5 minimal communities to produce the target metabolites
+        5 minimal communities (each containing 13 species) producing the target metabolites
         ######### Key species: Union of minimal communities #########
         # Bacteria occurring in at least one minimal community enabling the producibility of the target metabolites given as inputs
         Key species = 17
-        GCA_003437885
-        GCA_003437665
-        GCA_003437945
-        GCA_003437595
         GCA_003437195
-        GCA_003437345
-        GCA_003437815
-        GCA_003438055
-        GCA_003437715
-        GCA_003437325
-        GCA_003437905
-        GCA_003437375
-        GCA_003437175
-        GCA_003437785
+        GCA_003437885
         GCA_003437055
+        GCA_003437815
+        GCA_003437375
+        GCA_003437665
+        GCA_003437175
+        GCA_003437945
+        GCA_003437715
+        GCA_003438055
+        GCA_003437345
+        GCA_003437905
+        GCA_003437325
         GCA_003437255
+        GCA_003437595
+        GCA_003437785
         GCA_003437295
         ######### Essential symbionts: Intersection of minimal communities #########
         # Bacteria occurring in ALL minimal community enabling the producibility of the target metabolites given as inputs
         Essential symbionts = 12
-        GCA_003437885
-        GCA_003437665
-        GCA_003437595
-        GCA_003437905
         GCA_003437195
-        GCA_003437375
+        GCA_003437885
         GCA_003437055
         GCA_003437815
-        GCA_003438055
-        GCA_003437715
+        GCA_003437375
+        GCA_003437905
+        GCA_003437665
         GCA_003437255
+        GCA_003437595
+        GCA_003437715
         GCA_003437295
+        GCA_003438055
         ######### Alternative symbionts: Difference between Union and Intersection #########
         # Bacteria occurring in at least one minimal community but not all minimal community enabling the producibility of the target metabolites given as inputs
         Alternative symbionts = 5
-        GCA_003437945
-        GCA_003437325
         GCA_003437175
         GCA_003437785
         GCA_003437345
-        --- Enumeration runtime 9.18 seconds ---
+        GCA_003437325
+        GCA_003437945
+        --- Enumeration runtime 4.73 seconds ---
+
+
+        ###############################################
+        #                                             #
+        #         Solution graph creation             #
+        #                                             #
+        ###############################################
+
+        ######### Extract taxon information from taxon_id.tsv. #########
+        No taxon_id for GCA_003437378 in file taxon_id.tsv.
+        --- Taxonomy runtime 0.02 seconds ---
 
         ######### Graph of targets_toy #########
         Number of nodes: 17
         Number of edges: 126
         --- Graph runtime 0.03 seconds ---
 
+
+        ###############################################
+        #                                             #
+        #  Compression and visualisation of graph     #
+        #                                             #
+        ###############################################
+
         ######### Graph compression: targets_toy #########
         Number of powernodes: 3
         Number of poweredges: 2
-        Compression runtime 7.43 seconds ---
+        Compression runtime 1.55 seconds ---
 
+        ######### Test powergraph heuristics: targets_toy #########
+        Same combinations between theorical (5) and solution (5)
+        The powergraph seems to be an optimal representation of the solutions.
+
+        Same combinations between theorical (5) and the enumeration of solutions by m2m_analysis  (5)
+        The powergraph seems to be an optimal representation of the solutions.
+
+        Same number of solution between the computed combinations from powernodes (5) and the enumeration of solutions by m2m_analysis (5)
+        But this does not indicate that the powernodes are an optimal representation but that they contain the solution.
+
+        It seems that there are no heuristics in powergraph so it could be possible to create a boolean equation.
+        ######### Boolean equation of minimal communities #########
+        The boolean equation can only be created for simple case (without too many combinations).
+        Boolean equation seems good, as it has the same combinations (5) than the one from enumeration (5).
+        Boolean equation: 
+        (( GCA_003437195 ) & 
+        ( GCA_003437885 ) & 
+        ( GCA_003437055 ) & 
+        ( GCA_003437815 ) & 
+        ( GCA_003437375 ) & 
+        ( GCA_003437665 ) & 
+        ( GCA_003437175 | GCA_003437785 | GCA_003437345 | GCA_003437325 | GCA_003437945 ) & 
+        ( GCA_003437715 ) & 
+        ( GCA_003438055 ) & 
+        ( GCA_003437905 ) & 
+        ( GCA_003437255 ) & 
+        ( GCA_003437595 ) & 
+        ( GCA_003437295 ) )
+
+
+        Boolean equation with taxonomic name: 
+        (( Bacillota__2 ) & 
+        ( Bacteroidota__2 ) & 
+        ( Bacillota__1 ) & 
+        ( Bacteroidota__1 ) & 
+        ( Actinomycetota__4 ) & 
+        ( Bacillota__4 ) & 
+        ( Actinomycetota__1 | Actinomycetota__6 | Actinomycetota__3 | Actinomycetota__2 | Actinomycetota__7 ) & 
+        ( Actinomycetota__5 ) & 
+        ( Bacillota__6 ) & 
+        ( Bacillota__5 ) & 
+        ( Pseudomonadota__1 ) & 
+        ( Bacillota__3 ) & 
+        ( Pseudomonadota__2 ) )
         ######### PowerGraph visualization: targets_toy #########
-        ######### Creation of the powergraph website accessible at output_directory/html/targets_toy #########
-        ######### Creation of the powergraph svg accessible at output_directory/svg #########
+        Creation of the powergraph website accessible at output_directory/html/targets_toy
+        Creation of the powergraph svg accessible at output_directory/svg
         ********************************************************************************
         *  Oog - PowerGraph Library (Matthias Reimann, c 2006-2012)                    *
         *  PowerGraph Analysis through the command line interface of Oog               *
@@ -342,32 +470,33 @@ Optional arguments:
         *                                                                              *
         *  Contact: reimann@biotec.tu-dresden.de                                       *
         ********************************************************************************
-        <II> Current time: 2019/10/17 13:09:56
+        <II> Current time: 2024/03/01 11:58:24
         <II> Oog build: Oog_build_2012.04.17_14.16.48
-
-        <II> Working directory: . (/shared/metage2metabo/test/metabolic_data/)
+            
+        <II> Working directory: . (/shared/Softwares/git/metage2metabo/test/metabolic_data/)
         <II> Graph file directories: [.]
-        <II> Output directory: test_out/svg
-        <II> Loading graph (targets_toy.bbl) ... 33ms
+        <II> Output directory: output_directory/svg
+        <II> Loading graph (targets_toy.bbl) ... 18ms
         <II> Arrange Graph ... Exception in thread "PowerGraphArranger" java.lang.IndexOutOfBoundsException: Index 20 out of bounds for length 20
             at java.base/jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:64)
             at java.base/jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:70)
             at java.base/jdk.internal.util.Preconditions.checkIndex(Preconditions.java:248)
-            at java.base/java.util.Objects.checkIndex(Objects.java:372)
-            at java.base/java.util.ArrayList.get(ArrayList.java:458)
+            at java.base/java.util.Objects.checkIndex(Objects.java:374)
+            at java.base/java.util.ArrayList.get(ArrayList.java:459)
             at org.mattlab.eaglevista.graph.OogGraph.getID_(OogGraph.java:2703)
             at org.mattlab.eaglevista.graph.OogPGArranger.arrangeRec(OogPGArranger.java:361)
             at org.mattlab.eaglevista.graph.OogPGArranger.arrange(OogPGArranger.java:327)
             at org.mattlab.eaglevista.graph.OogPGArranger.run(OogPGArranger.java:271)
-            at java.base/java.lang.Thread.run(Thread.java:834)
-        4001ms (15ms)
-        <II> Create SVG ... 730ms
-        <II> Image written (test_out/svg/targets_toy.bbl.svg)
-        --- Powergraph runtime 13.05 seconds ---
+            at java.base/java.lang.Thread.run(Thread.java:829)
+        4000ms (13ms)
+        <II> Create SVG ... 222ms
+        <II> Image written (output_directory/svg/targets_toy.bbl.svg)
+        --- Powergraph runtime 6.01 seconds ---
 
-        --- m2m_analysis runtime 22.27 seconds ---
+        --- m2m_analysis runtime 10.77 seconds ---
 
-        --- Total runtime 22.32 seconds ---
+        --- Total runtime 10.79 seconds ---
+
 
 * files output
     ::
@@ -396,6 +525,11 @@ Optional arguments:
         │   |   ├── style.css
         │   ├── targets_toy_powergraph.html
         │   ├── targets_toy_powergraph_taxon.html
+        ├── minimal_equation
+        │   ├── targets_toy
+        │       ├── boolean_equation.json
+        │       ├── minimal_equations.tsv
+        │       ├── powernodes_composition.json
         ├── svg
         │   ├── targets_toy.bbl.svg
         │   ├── targets_toy_taxon.bbl.svg
@@ -405,6 +539,7 @@ Optional arguments:
         ├── miscoto_stats.txt
         ├── taxon_tree.txt
         ├── taxonomy_species.tsv
+        ├── m2m_analysis_metadata.json
 
 This command creates the previous svg and a new svg with the nodes colored according to their taxons:
 
@@ -443,12 +578,18 @@ m2m_analysis output files
     ├── svg
     │   ├── targets_toy.bbl.svg
     │   ├── targets_toy_taxon.bbl.svg (with the ``--taxon`` option)
+    ├── minimal_equation
+    │   ├── targets_toy
+    │       ├── boolean_equation.json
+    │       ├── minimal_equations.tsv
+    │       ├── powernodes_composition.json
     ├── key_species.json
     ├── key_species_stats.tsv
     ├── m2m_analysis_*.log
     ├── miscoto_stats.txt
     ├── taxon_tree.txt (with the ``--taxon`` option)
     ├── taxonomy_species.tsv (with the ``--taxon`` option)
+    ├── m2m_analysis_metadata.json
 
 Miscoto results
 +++++++++++++++
@@ -523,6 +664,19 @@ You can use this file to visualize the power graph with Cytoscape. To do this yo
 When you have installed Cytoscape, put the file ``CyOog.jar`` in ``path/to/cytoscape/install/dir/plugins/``.
 
 m2m_analysis can also create visualization of the power graph.
+
+Boolean equation
+++++++++++++++++
+
+If the power graph is simple enough, Metage2Metabo will try to create a boolean equation summarizing the power graph.
+
+The results will be stored in three files:
+
+* ``boolean_equation.json``: a json containing several keys: (1) ``boolean_equation`` the boolean equation, (2) ``bacterial_groups`` the identified groups associated with the boolean equation, (3) ``boolean_equation_taxon`` if the "--taxon" option was used the boolean equation with taxon name and (4) if the "--taxon" option was used the identified groups (with taxon name) associated with the boolean equation.
+
+* ``minimal_equations.tsv``: a tsv file containing multiple rows. Each row corresponds to a minimal solution according to the powernodes identified by powergrasp.
+
+* ``powernodes_composition.json``: a json file containing the powernode composition contained in ``minimal_equations.tsv``.
 
 Mini website
 ++++++++++++
