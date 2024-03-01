@@ -14,7 +14,7 @@ WARNING: change for individual and community scopes:
 * Add a function to modify xml created by Pathway Tools (issue #60).
 * Troubleshooting page in readthedocs (issue #24 and #25).
 * Metadata json file created when using command line (both for `m2m` and `m2m_analysis`).
-* Essential and alterative symbiont in `producibility_targets.json` (issue #19).
+* Essential and alternative symbiont in `producibility_targets.json` (issue #19).
 * Test for host for m2m metacom.
 
 ## Fix
