@@ -1,4 +1,4 @@
-[![PyPI version](https://img.shields.io/pypi/v/metage2metabo.svg)](https://pypi.org/project/Metage2Metabo/) [![GitHub license](https://img.shields.io/github/license/AuReMe/metage2metabo.svg)](https://github.com/AuReMe/metage2metabo/blob/master/LICENSE) [![Actions Status](https://github.com/AuReMe/metage2metabo/actions/workflows/pythonpackage.yml/badge.svg)](https://github.com/AuReMe/metage2metabo/actions/workflows/pythonpackage.yml) [![Documentation Status](https://readthedocs.org/projects/metage2metabo/badge/?version=latest)](https://metage2metabo.readthedocs.io/en/latest/?badge=latest) [![](https://img.shields.io/badge/doi-10.7554/eLife.61968-blueviolet.svg)](https://doi.org/10.7554/eLife.61968)
+[![PyPI version](https://img.shields.io/pypi/v/metage2metabo.svg)](https://pypi.org/project/Metage2Metabo/) [![GitHub license](https://img.shields.io/github/license/AuReMe/metage2metabo.svg)](https://github.com/AuReMe/metage2metabo/blob/main/LICENSE) [![Actions Status](https://github.com/AuReMe/metage2metabo/actions/workflows/pythonpackage.yml/badge.svg)](https://github.com/AuReMe/metage2metabo/actions/workflows/pythonpackage.yml) [![Documentation Status](https://readthedocs.org/projects/metage2metabo/badge/?version=latest)](https://metage2metabo.readthedocs.io/en/latest/?badge=latest) [![](https://img.shields.io/badge/doi-10.7554/eLife.61968-blueviolet.svg)](https://doi.org/10.7554/eLife.61968)
 
 # M2M - metage2metabo
 Metage2metabo is a Python3 (Python >= 3.8, tested with 3.8 and 3.9) tool to perform graph-based metabolic analysis starting from annotated genomes (**reference genomes or metagenome-assembled genomes**). It uses *Pathway Tools* in a automatic and parallel way to **reconstruct metabolic networks** for a large number of genomes. The obtained metabolic networks are then **analyzed individually and collectively** in order to get the **added value of metabolic cooperation in microbiota over individual metabolism** and to **identify and screen interesting organisms** among all.
@@ -54,7 +54,7 @@ The computation is made using logic solvers (Answer Set Programming). The presen
 
 ## License
 
-This project is licensed under the GNU Lesser General Public License - see the [LICENSE.md](https://github.com/AuReMe/metage2metabo/blob/master/LICENSE) file for details.
+This project is licensed under the GNU Lesser General Public License - see the [LICENSE.md](https://github.com/AuReMe/metage2metabo/blob/main/LICENSE) file for details.
 
 ## Documentation
 
@@ -62,7 +62,7 @@ A more detailled documentation is available at: [https://metage2metabo.readthedo
 
 ## Technologies
 
-Python 3 (Python 3.8 and 3.9 is tested). M2M uses a certain number of Python dependencies. An example of all these dependencies working for Ubuntu 18.04 is available in [requirements.txt](https://github.com/AuReMe/metage2metabo/blob/master/requirements.txt).
+Python 3 (Python 3.8 and 3.9 is tested). M2M uses a certain number of Python dependencies. An example of all these dependencies working for Ubuntu 18.04 is available in [requirements.txt](https://github.com/AuReMe/metage2metabo/blob/main/requirements.txt).
 They can be installed with:
 ````sh
 pip install -r requirements.txt --no-cache-dir
@@ -118,7 +118,7 @@ Also, m2m_analysis relies on other packages:
         ````sh
         source ~/.bashrc
 
-* [Oog Power Graph Command line tool](https://github.com/AuReMe/metage2metabo/tree/master/external_dependencies/Oog_CommandLineTool2012) to create a svg file from the compressed graph at the end of m2m_analysis. This tool is a jar file (``Oog.jar``) so Java is needed to use it.
+* [Oog Power Graph Command line tool](https://github.com/AuReMe/metage2metabo/tree/main/external_dependencies/Oog_CommandLineTool2012) to create a svg file from the compressed graph at the end of m2m_analysis. This tool is a jar file (``Oog.jar``) so Java is needed to use it.
 
 ## Installation
 
@@ -209,7 +209,7 @@ subcommands:
     powergraph          powergraph creation and visualization
     workflow            whole workflow
 
-Optional: Oog.jar file (https://github.com/AuReMe/metage2metabo/tree/master/external_dependencies) for powergraph svg creation.
+Optional: Oog.jar file (https://github.com/AuReMe/metage2metabo/tree/main/external_dependencies) for powergraph svg creation.
 ````
 
 ## Release Notes
@@ -272,10 +272,10 @@ Huerta-Cepas J, Serra F, Bork P. ETE 3: Reconstruction, Analysis, and Visualizat
 
 ## Article data
 
-Data used to create figures and tables are listed in the [article_data](https://github.com/AuReMe/metage2metabo/tree/master/article_data) folder, it contains:
+Data used to create figures and tables are listed in the [article_data](https://github.com/AuReMe/metage2metabo/tree/main/article_data) folder, it contains:
 
-- [gsmn_characteristics](https://github.com/AuReMe/metage2metabo/tree/master/article_data/gsmn_characteristics): scripts and tables to show the characteristics of draft metabolic networks created by M2M for gut, rumen and diabetes dataset.
-- [diabetes_study](https://github.com/AuReMe/metage2metabo/tree/master/article_data/diabetes_study): scripts and tables to create the figures of the diabetes analyses in the article.
+- [gsmn_characteristics](https://github.com/AuReMe/metage2metabo/tree/main/article_data/gsmn_characteristics): scripts and tables to show the characteristics of draft metabolic networks created by M2M for gut, rumen and diabetes dataset.
+- [diabetes_study](https://github.com/AuReMe/metage2metabo/tree/main/article_data/diabetes_study): scripts and tables to create the figures of the diabetes analyses in the article.
 
 ## Authors
 [Clémence Frioux](https://cfrioux.github.io/) and [Arnaud Belcour](https://arnaudbelcour.github.io/blog/), `Univ Bordeaux, Inria, INRAE, Bordeaux, France`, `Univ Grenoble Alpes, Inria, Grenoble, France` and `Univ Rennes, Inria, CNRS, IRISA, Rennes, France`.

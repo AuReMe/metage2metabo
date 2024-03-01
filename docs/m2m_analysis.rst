@@ -8,7 +8,7 @@ Requirements
 
 m2m_analysis needs:
 
-* `Oog Power Graph Command line tool <https://github.com/AuReMe/metage2metabo/tree/master/external_dependencies/Oog_CommandLineTool2012>`__: used to create a svg file of the power graph. It is a jar file (``Oog.jar`` compiled for Java 6), so you need at least Java 6.
+* `Oog Power Graph Command line tool <https://github.com/AuReMe/metage2metabo/tree/main/external_dependencies/Oog_CommandLineTool2012>`__: used to create a svg file of the power graph. It is a jar file (``Oog.jar`` compiled for Java 6), so you need at least Java 6.
 
 * These python packages:
 
@@ -31,7 +31,7 @@ The last step (``m2m_analysis powergraph``) compresses the graph into a power gr
 m2m Tutorial
 ------------
 
-Test data is avaible in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/test>`__.
+Test data is avaible in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/main/test>`__.
 It contains enough data to run the different subcommands.
 
 m2m_analysis enum
@@ -140,7 +140,7 @@ Optional arguments:
 --taxon file           mpwt taxon file
 --level LEVEL         Taxonomy level, must be: phylum, class, order, family, genus or species. By default, it is phylum.
 
-You can use the `taxon file from gut experience <https://github.com/AuReMe/metage2metabo/blob/master/article_data/gut_microbiota/taxon_id.tsv>`__.
+You can use the `taxon file from gut experience <https://github.com/AuReMe/metage2metabo/blob/main/article_data/gut_microbiota/taxon_id.tsv>`__.
 
 .. code:: sh
 
@@ -660,7 +660,7 @@ Compressed solution graph (power graph)
 
 The previous solution graph is then compressed into a power graph using PowerGrASP. The result file is bbl file (``bbl/*.bbl``).
 
-You can use this file to visualize the power graph with Cytoscape. To do this you need the `version 2.8.2 of Cytoscape <http://chianti.ucsd.edu/Cyto-2%5F8%5F2/>`__ and the `CyOog plugin <https://github.com/AuReMe/metage2metabo/tree/master/external_dependencies>`__.
+You can use this file to visualize the power graph with Cytoscape. To do this you need the `version 2.8.2 of Cytoscape <http://chianti.ucsd.edu/Cyto-2%5F8%5F2/>`__ and the `CyOog plugin <https://github.com/AuReMe/metage2metabo/tree/main/external_dependencies>`__.
 When you have installed Cytoscape, put the file ``CyOog.jar`` in ``path/to/cytoscape/install/dir/plugins/``.
 
 m2m_analysis can also create visualization of the power graph.
@@ -742,4 +742,4 @@ If you have used the ``--taxon``, two new files have been created:
 More information
 -----------------
 
-Take a look at the complete tutorial in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/tutorials/method_tutorial>`__
+Take a look at the complete tutorial in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/main/tutorials/method_tutorial>`__

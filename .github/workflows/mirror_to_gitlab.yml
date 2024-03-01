@@ -2,7 +2,7 @@ name: PushGitlab
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -21,4 +21,4 @@ jobs:
         git config user.name "${{ secrets.GITLAB_USERNAME }}"
         git config user.email "${{ secrets.GITLAB_EMAIL }}"
         git remote set-url origin https://oauth2:${token}@gitlab.inria.fr/pleiade/metage2metabo.git
-        git push origin master
+        git push origin main

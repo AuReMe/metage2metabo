@@ -55,7 +55,7 @@ MESSAGE = """
 Detection of key species among communities.
 """
 REQUIRES = """
-Optional: Oog.jar file (https://github.com/AuReMe/metage2metabo/tree/master/external_dependencies) for powergraph svg creation.
+Optional: Oog.jar file (https://github.com/AuReMe/metage2metabo/tree/main/external_dependencies) for powergraph svg creation.
 """
 
 logger = logging.getLogger()

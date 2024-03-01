@@ -7,7 +7,7 @@ The obtained metabolic networks are then *analyzed individually and collectively
 
 M2M can be used as a whole workflow (``m2m workflow``, ``m2m metacom``) or steps can be performed individually (``m2m recon``, ``m2m iscope``, ``m2m cscope``, ``m2m addedvalue``, ``m2m mincom``, ``m2m seeds``).
 
-This project is licensed under the GNU Lesser General Public License - see the `LICENSE.md <https://github.com/AuReMe/metage2metabo/blob/master/LICENSE>`__ file for details.
+This project is licensed under the GNU Lesser General Public License - see the `LICENSE.md <https://github.com/AuReMe/metage2metabo/blob/main/LICENSE>`__ file for details.
 
 General information about the modelling
 ========================================

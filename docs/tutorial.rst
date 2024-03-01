@@ -1,7 +1,7 @@
 ============
 m2m Tutorial
 ============
-Test data is avaible in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/test>`__.
+Test data is avaible in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/main/test>`__.
 It contains enough data to run the different subcommands.
 
 Outputs and logs
@@ -45,7 +45,7 @@ The input genomic data has to follow a strict structure:
         └── organism_n         
             └── organism_n.gbk
 
-This structure can be observed in the `workflow_genomes.tar.gz` file in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/metage2metabo/workflow_data>`__.
+This structure can be observed in the `workflow_genomes.tar.gz` file in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/main/metage2metabo/workflow_data>`__.
 
 By extracting this file, you will find the
 
@@ -786,7 +786,7 @@ Optional arguments:
 --pwt-xml        extract xml from Pathway Tools instead of using padmet to create sbml
 --target-com-scope           Instead of the addedvalue, use the community scope as targets for mincom
 
-You can run the workflow analysis with the two genbanks files available in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/metage2metabo>`__ (`workflow_data`). Two genomes are available in the compressed archive `workflow_genomes.tar.gz`. The archive has to be uncompressed before testing.
+You can run the workflow analysis with the two genbanks files available in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/main/metage2metabo>`__ (`workflow_data`). Two genomes are available in the compressed archive `workflow_genomes.tar.gz`. The archive has to be uncompressed before testing.
 
 .. code:: sh
 
@@ -1070,4 +1070,4 @@ More generally, for more information and analysis on the usage of hosts in addit
 More information
 -----------------
 
-Take a look at the complete tutorial in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/master/tutorials/method_tutorial>`__
+Take a look at the complete tutorial in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/main/tutorials/method_tutorial>`__
