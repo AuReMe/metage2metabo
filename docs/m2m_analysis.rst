@@ -670,6 +670,28 @@ Boolean equation
 
 If the power graph is simple enough, Metage2Metabo will try to create a boolean equation summarizing the power graph.
 
+Boolean equation is written as follow:
+
+::
+
+    (( GCA_003437195 ) & 
+    ( GCA_003437885 ) & 
+    ( GCA_003437055 ) & 
+    ( GCA_003437815 ) & 
+    ( GCA_003437375 ) & 
+    ( GCA_003437665 ) & 
+    ( GCA_003437175 | GCA_003437785 | GCA_003437345 | GCA_003437325 | GCA_003437945 ) & 
+    ( GCA_003437715 ) & 
+    ( GCA_003438055 ) & 
+    ( GCA_003437905 ) & 
+    ( GCA_003437255 ) & 
+    ( GCA_003437595 ) & 
+    ( GCA_003437295 ) )
+
+``&`` is for the AND operator indicating that the two groups around this operator are needed. ``( GCA_003437195 ) &  ( GCA_003437885 )`` reads as we need both GCA_003437195 AND GCA_003437885.
+
+``|`` is for the OR operator indicating indicating that the the two groups around this operator are redundant. ``( GCA_003437175 | GCA_003437785 | GCA_003437345 | GCA_003437325 | GCA_003437945 )`` reads as we need one organism among GCA_003437175, GCA_003437785, GCA_003437345, GCA_003437325, GCA_003437945.
+
 The results will be stored in three files:
 
 * ``boolean_equation.json``: a json containing several keys: (1) ``boolean_equation`` the boolean equation, (2) ``bacterial_groups`` the identified groups associated with the boolean equation, (3) ``boolean_equation_taxon`` if the "--taxon" option was used the boolean equation with taxon name and (4) if the "--taxon" option was used the identified groups (with taxon name) associated with the boolean equation.
