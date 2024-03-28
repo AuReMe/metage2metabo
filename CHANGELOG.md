@@ -1,5 +1,11 @@
 # Changelog
 
+# Metage2Metabo v1.6.1 (2024-03-28)
+
+## Fix
+
+* Fix an issue with host keys ("host_prodtargets", "host_scope", "comhost_scope" and "host_unprodtargets") not appearing in `comm_scopes.json` file. But these keys used the old behavior of Metage2Metabo (possible unproducible seeds are contained in them). Host handling by Metage2Metabo will be modified in a future release.
+
 # Metage2Metabo v1.6.0 (2024-03-01)
 
 WARNING: change for individual and community scopes:
