@@ -57,7 +57,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install .
-        python -c 'from ete import NCBITaxa; ncbi = NCBITaxa()'
+        python -c 'from ete3 import NCBITaxa; ncbi = NCBITaxa()'
     - name: Test with pytest
       run: |
         pip install pytest
