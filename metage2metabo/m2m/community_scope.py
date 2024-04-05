@@ -134,6 +134,11 @@ def comm_scope_run(instance, output_dir, host_mn=None):
         scopes_results = run_scopes(lp_instance_file=instance)
         com_scope_dict = {}
         com_scope_dict['com_scope'] = scopes_results['com_scope']
+        com_scope_dict['host_prodtargets'] = scopes_results['host_prodtargets']
+        com_scope_dict['host_scope'] = scopes_results['host_scope']
+        com_scope_dict['comhost_scope'] = scopes_results['comhost_scope']
+        com_scope_dict['host_unprodtargets'] = scopes_results['host_unprodtargets']
+
         contributions_of_microbes = None
         logger.info('The computation of the community scope with a host is of limited functionality. It will not highlight the contribution of each microbe to the community scope. Additionally, the producibility of seeds by the microbes will not be computed. Consider running the community scope without a host (i.e. all metabolic networks, including the host, in the same directory) to get the full functionality of the community scope. \n')
         with open(com_scopes_path, 'w') as dumpfile:

@@ -522,6 +522,16 @@ def test_m2m_metacom_tiny_toy_host():
     # ensure the newly producible targets are ok
     assert set(mincom['producible']) == PROD_TARGETS
 
+    comm_scopes_file = os.path.join(*[respath, 'community_analysis', 'comm_scopes.json'])
+    with open(comm_scopes_file, 'r') as json_cdata:
+        comm_scopes = json.load(json_cdata)
+
+    # Check host keys in comm_scopes json.
+    assert len(comm_scopes['com_scope']) == 13
+    assert set(comm_scopes['host_unprodtargets']) == set(['M_F_c', 'M_H_c', 'M_foo_c', 'M_C_c'])
+    # Host scope = old behavior, seed in scope.
+    assert set(comm_scopes['host_scope']) == set(['M_S1_c', 'M_S2_c'])
+
     # clean
     # Due to unstable behaviour of os.unlink on Windows, do not delete the file.
     # Refer to: https://github.com/python/cpython/issues/109608
