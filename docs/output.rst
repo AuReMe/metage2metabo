@@ -93,16 +93,16 @@ A json file summarising metadata of Metage2Metabo:
 
 * ``m2m_args``: input arguments given to Metage2Metabo such as the command used, the path to genomes or networks, etc.
 
-* ``tool_dependencies``: Python version, versions of Metage2Metabo and its dependencies and Clingo version. When using ``recon`` or ``workflow`` commands it will also contains Pathway Tools version.
+* ``tool_dependencies``: Python version, versions of Metage2Metabo and its dependencies and Clingo version. When using ``recon`` or ``workflow`` commands it will also contain Pathway Tools version.
 
-* ``duration``: duraiton of the un of Metage2Metabo in seconds.
+* ``duration``: duration of the Metage2Metabo run in seconds.
 
 m2m_command.log
 ---------------
 
 A log file named after the command used. For example, if you launch ``m2m metacom``, the file will be named ``m2m_metacom.log``.
 
-This file contains all the logs return by m2m.
+This file contains all the logs returned by m2m.
 
 pgdb folder
 -----------
@@ -132,7 +132,7 @@ recon_stats.tsv
 
 After the reconstruction, m2m will summary the information of the draft metabolic networks in this file.
 
-It will contain the number of genes, reactions, compounds and pathways in each metabolic networks.
+It will contain the number of genes, reactions, compounds and pathways in each metabolic network.
 
 indiv_scopes
 ------------
@@ -141,9 +141,9 @@ The indiv_scopes folder is created after the individual scopes step (in ``m2m wo
 
 The results are stored in a json file named ``indiv_scopes.json``. The keys in this file are each metabolic network and the values are the compounds that can be produced individually by the metabolic network.
 
-Also it can occur that seeds are produbile by individual organisms, in this case they will be listed in ``indiv_produced_seeds.json``. The keys in this file are each metabolic network and the values are the seeds that can be produced individually by the metabolic network.
+Also it can occur that seeds are producible by individual organisms, in this case they will be listed in ``indiv_produced_seeds.json``. The keys in this file are each metabolic network and the values are the seeds that can be produced individually by the metabolic network.
 
-The reverse of the previous iscope dictionary is stored in two files ``rev_iscope.json`` and ``rev_iscope.tsv``. The latter file is a matrix with compounds as column header and species in row. For each compounds, we have the producibility of the compounds by the species (0 not producible and 1 producible).
+The reverse of the previous iscope dictionary is stored in two files ``rev_iscope.json`` and ``rev_iscope.tsv``. The latter file is a matrix with compounds as column header and species in row. For each compound, we have the producibility by the species (0 not producible and 1 producible).
 
 community_analysis
 ------------------
@@ -176,15 +176,15 @@ The results are stored in a json with 8 keys:
 rev_cscope.json and rev_cscope.tsv
 ==================================
 
-The reverse of the ``comm_scopes.json`` scope keys are stored in two files ``rev_cscope.json`` and ``rev_cscope.tsv``. It shows for each metabolites, which species in the community can produce it.
-The latter file is a matrix with compounds as column header and species in row. For each compounds, we have the producibility of the compounds by the species (0 not producible and 1 producible).
+The reverse of the ``comm_scopes.json`` scope keys are stored in two files ``rev_cscope.json`` and ``rev_cscope.tsv``. For each metabolite, it shows which species in the community can produce it.
+The latter file is a matrix with compounds as column header and species in row. For each compound, we have the producibility by the species (0 not producible and 1 producible).
 
 addedvalue.json
 ===============
 
 After the individual scopes and the community scopes, the addedvalue (``m2m worfklow``, ``m2m metacom``, ``m2m addedvalue``), extracts the compounds that are producible by the community but not by individual organism.
 
-The result are stored in a json file with one key ``addedvalue`` which enumerates all the compounds producible by the community but not by the individual organism.
+The results are stored in a json file with one key ``addedvalue`` which enumerates all the compounds producible by the community but not by the individual organism.
 
 targets.sbml
 ============
@@ -210,7 +210,7 @@ The results are stored in a json with 17 keys:
 
 * ``one_model``: results of the optimal solution.
 
-* ``exchanged``, ``union_exchanged`` and ``inter_exchanged``: the exchanged compounds by the community, this step needs a lot of resources so it is not used in m2m. If you want to use it, use miscoto with the ``minexch`` option.
+* ``exchanged``, ``union_exchanged`` and ``inter_exchanged``: the exchanged compounds by the community. This step needs a lot of resources, so it is not used in m2m. If you want to use it, use miscoto with the ``minexch`` option.
 
 * ``key_species``: organisms from all the minimal communities.
 
@@ -218,15 +218,15 @@ The results are stored in a json with 17 keys:
 
 * ``alternative_symbionts``: organisms appearing in at least one minimal community but not in all.
 
-* ``score_optimum_inter``: the optimum score found for the intersection, it corresponds to the number of organism in the minimal community.
+* ``score_optimum_inter``: the optimum score found for the intersection. It corresponds to the number of organism in the minimal community.
 
-* ``score_optimum_union``: the optimum score found for the union, it corresponds to the number of organism in the minimal community.
+* ``score_optimum_union``: the optimum score found for the union. It corresponds to the number of organism in the minimal community.
 
-* ``inter_targetsproducers``: the organism that have the final reaction to produce the target in the intersection. It is a dictionary, with each target as key and the organism producing these targets as value.
+* ``inter_targetsproducers``: the organisms that have the final reaction to produce the target in the intersection. It is a dictionary with each target as the key and a list of organisms producing that target as the value.
 
-* ``union_targetsproducers``: the organism that have the final reaction to produce the target in the union. It is a dictionary, with each target as key and the organism producing these targets as value.
+* ``union_targetsproducers``: the organisms that have the final reaction to produce the target in the union. It is a dictionary with each target as the key and a list of organisms producing that target as the value.
 
-* ``one_model_targetsproducers``: the organism that have the final reaction to produce the target in the optimal solution. It is a dictionary, with each target as key and the organism producing these targets as value.
+* ``one_model_targetsproducers``: the organisms that have the final reaction to produce the target in the optimal solution. It is a dictionary with each target as the key and a list of organisms producing that target as the value.
 
 contributions_of_microbes.json
 ==============================
@@ -235,16 +235,16 @@ A json file detailing the role of community members in the production of metabol
 
 It contains one key per microbe in the community with several subkeys:
 
-* ``produced_alone``: metabolties that can be produced by the organism alone.
+* ``produced_alone``: metabolites that can be produced by the organism alone.
 
-* ``community_metabolic_gain``: metabolties that can be newly produced by the organism with the help of the community.
+* ``community_metabolic_gain``: metabolites that can be newly produced by the organism with the help of the community.
 
-* ``produced_in_community``: metabolties that can be produced by the organism when it is in the community (it is composed of ``community_metabolic_gain`` and ``produced_alone``).
+* ``produced_in_community``: metabolites that can be produced by the organism when it is in the community (it is composed of ``community_metabolic_gain`` and ``produced_alone``).
 
 producibility_targets.json
 --------------------------
 
-After all these previous step, m2m (``m2m worfklow`` or ``m2m metacom``) will create this json which summarizes the producibility of each targets (either given by the user or from the addedvalue).
+After all these previous steps, m2m (``m2m worfklow`` or ``m2m metacom``) will create this json which summarizes the producibility of each targets (either given by the user or from the addedvalue).
 
 This json contains 12 keys:
 
@@ -256,7 +256,7 @@ This json contains 12 keys:
 
 * ``individual_producers``: for each targets the individual organisms that can produce them.
 
-* ``com_only_producers``: the organism that have the final reaction to produce the target but needs other organisms to produces the previous compounds needed by this final reaction. It is a dictionary, with each target as key and the organism producing these targets as value.
+* ``com_only_producers``: the organisms that have the final reaction to produce the target but needs other organisms to produce the previous compounds needed by this final reaction. It is a dictionary with each target as the key and a list of organisms producing that target as the value.
 
 * ``mincom_producible``: the compounds producible by the minimal community.
 
@@ -266,8 +266,8 @@ This json contains 12 keys:
 
 * ``alternative_symbionts``: organisms appearing in at least one minimal community but not in all.
 
-* ``mincom_inter_producers``: the organism that have the final reaction to produce the target in the intersection. It is a dictionary, with each target as key and the organism producing these targets as value.
+* ``mincom_inter_producers``: the organism that have the final reaction to produce the target in the intersection. It is a dictionary with each target as the key and a list of organisms producing that target as the value.
 
-* ``mincom_union_producers``: the organism that have the final reaction to produce the target in the union. It is a dictionary, with each target as key and the organism producing these targets as value.
+* ``mincom_union_producers``: the organism that have the final reaction to produce the target in the union. It is a dictionary with each target as the key and a list of organisms producing that target as the value.
 
-* ``mincom_optsol_producers``: the organism that have the final reaction to produce the target in the optimal solution. It is a dictionary, with each target as key and the organism producing these targets as value.
+* ``mincom_optsol_producers``: the organism that have the final reaction to produce the target in the optimal solution. It is a dictionary with each target as the key and a list of organisms producing that target as the value.
