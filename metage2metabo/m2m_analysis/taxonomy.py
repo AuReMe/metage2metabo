@@ -16,7 +16,7 @@ import csv
 import time
 import sys
 import logging
-from ete3 import NCBITaxa
+from ete4 import NCBITaxa
 
 logger = logging.getLogger(__name__)
 
@@ -109,7 +109,7 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_
     tree = ncbi.get_topology(taxon_ids)
 
     with open(tree_output_file, "w") as tree_file:
-        tree_file.write(tree.get_ascii(attributes=["sci_name", "rank"]))
+        tree_file.write(tree.to_str(props=["sci_name", "rank"]))
 
     logger.info(
         "--- Taxonomy runtime %.2f seconds ---\n" % (time.time() - starttime))

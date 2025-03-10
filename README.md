@@ -63,8 +63,13 @@ A more detailled documentation is available at: [https://metage2metabo.readthedo
 ## Technologies
 
 Python 3 (Python 3.8 and 3.9 are tested). M2M uses a certain number of Python dependencies. An example of all these dependencies working for Ubuntu 18.04 is available in [requirements.txt](https://github.com/AuReMe/metage2metabo/blob/main/requirements.txt).
+
+**Temporary warning**: Due to changes in SQLite, ete3 is not working with newer version of SQLite (equal or superior to ``3.49.1``).
+As ete3 is not maintained, we have replaced ``ete3`` with ``ete4``. But ete4 is not yet available on Pypi. This adds a new step for the installation of emapper2gbk.
+
 They can be installed with:
 ````sh
+pip install git+https://github.com/etetoolkit/ete.git@a96d66643b7dd53c1d60968b610c5cd6c9497a9c
 pip install -r requirements.txt --no-cache-dir
 ````
 In particular, m2m relies on:
@@ -75,7 +80,7 @@ In particular, m2m relies on:
 
 Also, m2m_analysis relies on other packages:
 * [networkx](https://github.com/networkx/networkx) to create graph from miscoto results
-* [ete3](https://github.com/etetoolkit/ete) to add taxonomy information on the graph if you used mpwt taxon file
+* [ete4](https://github.com/etetoolkit/ete) to add taxonomy information on the graph if you used mpwt taxon file
 * [powergrasp](https://github.com/Aluriak/PowerGrASP) to compress networkx graph
 
 ## Requirements
@@ -265,7 +270,7 @@ Bourneuf L, Nicolas J. FCA in a Logical Programming Setting for Visualization-Or
 
 Royer L, Reimann M, Andreopoulos B, Schroeder M, Unraveling Protein Networks with Power Graph Analysis. PLOS Computational Biology 2008;4:e1000108. [https://doi.org/10.1371/journal.pcbi.1000108](https://doi.org/10.1371/journal.pcbi.1000108).
 
-- ``ete3`` for taxonomic information used in power graphs:
+- ``ete4`` for taxonomic information used in power graphs:
 
 Huerta-Cepas J, Serra F, Bork P. ETE 3: Reconstruction, Analysis, and Visualization of Phylogenomic Data. Molecular Biology and Evolution 2016;33:1635–1638. [https://doi.org/10.1093/molbev/msw046](https://doi.org/10.1093/molbev/msw046).
 

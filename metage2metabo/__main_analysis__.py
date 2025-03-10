@@ -34,9 +34,9 @@ except ImportError:
     raise ImportError('Requires powergrasp (https://github.com/Aluriak/PowerGrASP).')
 
 try:
-    import ete3
+    import ete4
 except ImportError:
-    raise ImportError('Requires ete3 (https://github.com/etetoolkit/ete).')
+    raise ImportError('Requires ete4 (https://github.com/etetoolkit/ete).')
 
 from metage2metabo import utils
 from metage2metabo import __version__ as VERSION
@@ -390,10 +390,10 @@ def create_metadata(dict_args, duration, metadata_json_file):
         from networkx import __version__ as networkx_version
         metadata['tool_dependencies']['python_package']['networkx'] = networkx_version
 
-    # If taxonomy, get ete3 version.
+    # If taxonomy, get ete4 version.
     if dict_args['cmd'] == 'taxonomy' or dict_args['cmd'] == 'workflow':
-        from ete3 import __version__ as ete3_version
-        metadata['tool_dependencies']['python_package']['ete3'] = ete3_version
+        from ete4 import __version__ as ete_version
+        metadata['tool_dependencies']['python_package']['ete4'] = ete_version
 
     metadata['duration'] = duration
 
