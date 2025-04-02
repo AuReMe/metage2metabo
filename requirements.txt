@@ -1,6 +1,7 @@
 bubbletools>=0.6.10
 clyngor>=0.3.31
 clyngor-with-clingo>=5.3.post1
+ete4>=4.1.1
 MeneTools>=3.4.0
 Miscoto>=3.2.0
 mpwt>=0.8.6
