@@ -64,9 +64,6 @@ A more detailled documentation is available at: [https://metage2metabo.readthedo
 
 Python 3 (Python 3.8 and 3.9 are tested). M2M uses a certain number of Python dependencies. An example of all these dependencies working for Ubuntu 18.04 is available in [requirements.txt](https://github.com/AuReMe/metage2metabo/blob/main/requirements.txt).
 
-**Temporary warning**: Due to changes in SQLite, ete3 is not working with newer version of SQLite (equal or superior to ``3.49.1``).
-As ete3 is not maintained, we have replaced ``ete3`` with ``ete4``. But ete4 is not yet available on Pypi. This adds a new step for the installation of emapper2gbk.
-
 They can be installed with:
 ````sh
 pip install git+https://github.com/etetoolkit/ete.git@a96d66643b7dd53c1d60968b610c5cd6c9497a9c
