@@ -66,7 +66,6 @@ Python 3 (Python 3.8 and 3.9 are tested). M2M uses a certain number of Python de
 
 They can be installed with:
 ````sh
-pip install git+https://github.com/etetoolkit/ete.git@a96d66643b7dd53c1d60968b610c5cd6c9497a9c
 pip install -r requirements.txt --no-cache-dir
 ````
 In particular, m2m relies on:
