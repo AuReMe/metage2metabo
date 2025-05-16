@@ -59,6 +59,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install .
         python -c 'from ete4 import NCBITaxa; ncbi = NCBITaxa()'
+    - name: Configure python encoding
+      if: matrix.platform == 'windows-latest'
+      run: |
+        set PYTHONIOENCODING=utf-8
+        set PYTHONLEGACYWINDOWSSTDIO=utf-8
     - name: Test with pytest
       run: |
         pip install pytest
