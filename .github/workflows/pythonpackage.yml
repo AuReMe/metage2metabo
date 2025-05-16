@@ -31,7 +31,7 @@ jobs:
   build:
     strategy:
       matrix:
-        platform: [ubuntu-latest, macos-13] # Temporary removing windows-latest.
+        platform: [ubuntu-latest, macos-13, windows-latest]
         python-version: ["3.9", "3.10"]
     runs-on: ${{ matrix.platform }}
 
@@ -45,7 +45,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install graphviz
-        pip install git+https://github.com/etetoolkit/ete.git@a96d66643b7dd53c1d60968b610c5cd6c9497a9c
+        pip install git+https://github.com/ArnaudBelcour/ete.git@ete4
         pip install -r requirements.txt
     #- name: Lint with flake8
       #run: |
