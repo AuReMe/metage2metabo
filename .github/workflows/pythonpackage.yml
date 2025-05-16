@@ -31,7 +31,7 @@ jobs:
   build:
     strategy:
       matrix:
-        platform: [ubuntu-latest, macos-13, windows-latest]
+        platform: [ubuntu-latest, macos-13] # Temporary removing windows-latest.
         python-version: ["3.9", "3.10"]
     runs-on: ${{ matrix.platform }}
 
