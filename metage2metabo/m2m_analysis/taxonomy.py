@@ -100,7 +100,7 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_
             logger.critical('ERROR: No headers "taxon_id" and/or "species" in taxon file {0}.'.format(mpwt_taxon_file))
             sys.exit()
 
-    with open(taxon_output_file, "w") as taxonomy_file:
+    with open(taxon_output_file, "w", encoding="utf8") as taxonomy_file:
         csvwriter = csv.writer(taxonomy_file, delimiter="\t")
         csvwriter.writerow(["organism_id", "taxid", "taxon_number", "phylum", "class", "order", "family", "genus", "species"])
         for taxonomy_file_data in taxonomy_file_datas:
