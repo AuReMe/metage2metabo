@@ -59,12 +59,22 @@ jobs:
         python -m pip install --upgrade pip
         pip install .
         python -c 'from ete4 import NCBITaxa; ncbi = NCBITaxa()'
-    - name: Configure python encoding
+    - name: Test with Windows
       if: matrix.platform == 'windows-latest'
       run: |
         set PYTHONIOENCODING=utf-8
         set PYTHONLEGACYWINDOWSSTDIO=utf-8
+        pip install pytest
+        cd test
+        pytest test_m2m_addedvalue.py
+        pytest test_m2m_analysis.py
+        pytest test_m2m_cscope.py
+        pytest test_m2m_iscope.py
+        pytest test_m2m_metacom.py
+        pytest test_m2m_mincom.py
+        pytest test_tiny_toy_metacom.py
     - name: Test with pytest
+      if: matrix.platform != 'windows-latest'
       run: |
         pip install pytest
         cd test
