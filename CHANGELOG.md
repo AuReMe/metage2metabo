@@ -1,10 +1,14 @@
 # Changelog
 
-# Metage2Metabo v1.6.2 (2025-04-16)
+# Metage2Metabo v1.6.2 (2025-05-16)
 
 ## Fix
 
 * Fix an issue with ete3 and move to ete4.
+
+## Modify
+
+* Update license year.
 
 # Metage2Metabo v1.6.1 (2024-04-05)
 
