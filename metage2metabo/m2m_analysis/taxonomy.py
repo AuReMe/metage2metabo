@@ -108,7 +108,7 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_
 
     tree = ncbi.get_topology(taxon_ids)
 
-    with open(tree_output_file, "w") as tree_file:
+    with open(tree_output_file, "w", encoding="utf8") as tree_file:
         tree_file.write(tree.to_str(props=["sci_name", "rank"]))
 
     logger.info(
