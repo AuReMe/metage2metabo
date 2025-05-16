@@ -9,6 +9,7 @@
 ## Modify
 
 * Update license year.
+* Move support for CI to Python 3.9 and 3.10.
 
 # Metage2Metabo v1.6.1 (2024-04-05)
 
