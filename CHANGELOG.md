@@ -1,6 +1,6 @@
 # Changelog
 
-# Metage2Metabo v1.6.2 (2026-04-16)
+# Metage2Metabo v1.6.2 (2026-01-16)
 
 ## Add
 
