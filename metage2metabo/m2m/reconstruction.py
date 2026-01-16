@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2024 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
+# Copyright (C) 2019-2026 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -38,7 +38,8 @@ logger = logging.getLogger(__name__)
 logging.getLogger("mpwt").setLevel(logging.INFO)
 
 
-def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clean, use_pwt_xml):
+def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clean, use_pwt_xml,
+          standalone=None):
     """Run metabolic network reconstruction with Pathway Tools and get SBMLs.
     
     Args:
@@ -50,6 +51,7 @@ def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clea
         nb_cpu (int): number of CPU for multiprocessing
         clean (bool): re-run metabolic reconstructions that are already available if found
         use_pwt_xml (bool): use Pathway Tools XML instead of creating them with padmet
+        standalone (bool): use standalone mode of Pathway Tools
 
     Returns:
         tuple: PGDB directory (str), SBML directory (str)
@@ -67,7 +69,7 @@ def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clea
 
     # Create PGDBs
     pgdb_dir = genomes_to_pgdb(inp_dir, out_dir, nb_cpu,
-                                   clean, use_pwt_xml)
+                                   clean, use_pwt_xml, standalone)
 
     if use_pwt_xml:
         sbml_dir = os.path.join(out_dir, 'sbml')
@@ -94,7 +96,7 @@ def recon(inp_dir, out_dir, noorphan_bool, padmet_bool, sbml_level, nb_cpu, clea
     return pgdb_dir, sbml_dir, padmet_folder
 
 
-def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean, use_pwt_xml):
+def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean, use_pwt_xml, standalone=None):
     """Run Pathway Tools on each genome of the repository
     
     Args:
@@ -103,6 +105,7 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean, use_pwt_xml):
         cpu (int): number of CPUs to use
         clean (bool): delete PGDBs in ptools-local coresponding to the input data
         use_pwt_xml (bool): use Pathway Tools XML instead of creating them with padmet
+        standalone (bool): use standalone mode of Pathway Tools
 
     Returns:
         pgdb_dir (str): pgdb repository
@@ -167,7 +170,6 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean, use_pwt_xml):
                         patho_inference=True,
                         patho_hole_filler=False,
                         patho_operon_predictor=False,
-                        no_download_articles=False,
                         flat_creation=True,
                         dat_extraction=move_dat,
                         xml_extraction=move_xml,
@@ -177,7 +179,8 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean, use_pwt_xml):
                         number_cpu=cpu,
                         taxon_file=taxon_file,
                         patho_log=log_dir,
-                        verbose=False)
+                        verbose=False,
+                        standalone=standalone)
 
     nb_genomes_dir = len([folder for folder in os.listdir(genomes_dir) if os.path.isdir(os.path.join(genomes_dir, folder))])
     if use_pwt_xml:

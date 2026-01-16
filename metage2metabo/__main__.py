@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2024 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
+# Copyright (C) 2019-2026 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -16,7 +16,6 @@ import argparse
 import logging
 import json
 import os
-import pkg_resources
 import re
 import subprocess
 import sys
@@ -203,6 +202,13 @@ def main():
         required=False,
         action="store_true",
         default=None)
+    parent_parser_standalone = argparse.ArgumentParser(add_help=False)
+    parent_parser_standalone.add_argument(
+        "--standalone",
+        help="Instruct Pathway-Tools (>= 27.0) to operate in standalone mode, limiting internet queries.",
+        required=False,
+        action="store_true",
+        default=None)
 
     # subparsers
     subparsers = parser.add_subparsers(
@@ -215,7 +221,7 @@ def main():
         parents=[
             parent_parser_g, parent_parser_o, parent_parser_c, parent_parser_q,
             parent_parser_l, parent_parser_no, parent_parser_p, parent_parser_cl,
-            parent_parser_xml
+            parent_parser_xml, parent_parser_standalone
         ],
         description=
         "Run metabolic network reconstruction for each annotated genome of the input directory, using Pathway Tools",
@@ -280,7 +286,7 @@ def main():
             parent_parser_g, parent_parser_s, parent_parser_m, parent_parser_o,
             parent_parser_c, parent_parser_q, parent_parser_no, parent_parser_p,
             parent_parser_t_optional, parent_parser_cl, parent_parser_xml,
-            parent_parser_t_com_scope
+            parent_parser_t_com_scope, parent_parser_standalone
         ],
         description=
         "Run the whole workflow: metabolic network reconstruction, individual and community scope analysis and community selection",
@@ -359,7 +365,7 @@ def main():
     if args.cmd == "workflow":
         main_workflow(args.genomes, args.out, args.cpu, args.clean, args.seeds,
                       args.noorphan, args.padmet, new_arg_modelhost, args.targets, args.pwt_xml,
-                      args.target_com_scope)
+                      args.target_com_scope, args.standalone)
     elif args.cmd in ["iscope", "cscope", "addedvalue", "mincom", "metacom"]:
         if not os.path.isdir(args.networksdir):
             logger.critical(args.networksdir + " is not a correct directory path")
@@ -386,7 +392,7 @@ def main():
             main_metacom(network_dir, args.out, args.seeds, new_arg_modelhost, args.targets, args.cpu, args.target_com_scope)
     elif args.cmd == "recon":
         main_recon(args.genomes, args.out, args.noorphan, args.padmet, args.level, args.cpu,
-                   args.clean, args.pwt_xml)
+                   args.clean, args.pwt_xml, args.standalone)
     elif args.cmd == "seeds":
         if not utils.is_valid_file(args.metabolites):
             logger.critical(args.metabolites + " is not a correct filepath")
@@ -539,10 +545,11 @@ def main_test(outdir, cpu):
     host_mn=None
     targets_file=None
     use_pwt_xml=False
+    standalone=None
     main_workflow(inp_dir, out_dir, nb_cpu,
                 clean, seeds, noorphan_bool,
                 padmet_bool, host_mn, targets_file,
-                use_pwt_xml)
+                use_pwt_xml, standalone)
 
 
 def create_metadata(dict_args, duration, metadata_json_file):

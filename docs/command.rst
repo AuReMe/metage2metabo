@@ -52,7 +52,7 @@ m2m recon
 
     .. code::
 
-        usage: m2m recon [-h] -g GENOMES -o OUPUT_DIR [-c CPU] [-q] [-l {2,3}] [--noorphan] [-p] [--clean] [--pwt-xml]
+        usage: m2m recon [-h] -g GENOMES -o OUPUT_DIR [-c CPU] [-q] [-l {2,3}] [--noorphan] [-p] [--clean] [--pwt-xml] [--standalone]
 
         Run metabolic network reconstruction for each annotated genome of the input directory, using Pathway Tools
 
@@ -70,6 +70,7 @@ m2m recon
         -p, --padmet          create padmet files
         --clean               clean PGDBs if already present
         --pwt-xml             use this option to use Pathway Tools xml (incompatible with -p)
+        --standalone          Instruct Pathway-Tools (>= 27.0) to operate in standalone mode, limiting internet queries.
 
 
 m2m iscope
@@ -165,7 +166,7 @@ m2m workflow
 
     .. code::
 
-        usage: m2m workflow [-h] -g GENOMES -s SEEDS [-m MODELHOST] -o OUPUT_DIR [-c CPU] [-q] [--noorphan] [-p] [-t TARGETS] [--clean] [--pwt-xml] [--target-com-scope]
+        usage: m2m workflow [-h] -g GENOMES -s SEEDS [-m MODELHOST] -o OUPUT_DIR [-c CPU] [-q] [--noorphan] [-p] [-t TARGETS] [--clean] [--pwt-xml] [--target-com-scope] [--standalone]
 
         Run the whole workflow: metabolic network reconstruction, individual and community scope analysis and community selection
 
@@ -188,6 +189,7 @@ m2m workflow
         --clean               clean PGDBs if already present
         --pwt-xml             use this option to use Pathway Tools xml (incompatible with -p)
         --target-com-scope    Instead of the addedvalue, use the community scope as targets for mincom.
+        --standalone          Instruct Pathway-Tools (>= 27.0) to operate in standalone mode, limiting internet queries.
 
 
 m2m metacom

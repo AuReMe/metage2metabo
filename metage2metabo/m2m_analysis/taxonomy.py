@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2024 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
+# Copyright (C) 2019-2026 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -16,7 +16,7 @@ import csv
 import time
 import sys
 import logging
-from ete3 import NCBITaxa
+from ete4 import NCBITaxa
 
 logger = logging.getLogger(__name__)
 
@@ -100,7 +100,7 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_
             logger.critical('ERROR: No headers "taxon_id" and/or "species" in taxon file {0}.'.format(mpwt_taxon_file))
             sys.exit()
 
-    with open(taxon_output_file, "w") as taxonomy_file:
+    with open(taxon_output_file, "w", encoding="utf8") as taxonomy_file:
         csvwriter = csv.writer(taxonomy_file, delimiter="\t")
         csvwriter.writerow(["organism_id", "taxid", "taxon_number", "phylum", "class", "order", "family", "genus", "species"])
         for taxonomy_file_data in taxonomy_file_datas:
@@ -108,8 +108,8 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_
 
     tree = ncbi.get_topology(taxon_ids)
 
-    with open(tree_output_file, "w") as tree_file:
-        tree_file.write(tree.get_ascii(attributes=["sci_name", "rank"]))
+    with open(tree_output_file, "w", encoding="utf8") as tree_file:
+        tree_file.write(tree.to_str(props=["sci_name", "rank"]))
 
     logger.info(
         "--- Taxonomy runtime %.2f seconds ---\n" % (time.time() - starttime))

@@ -29,6 +29,7 @@ Optional arguments:
 -l int           specify the level for the sbml to be created
 -q               quiet mode
 --pwt-xml        extract xml from Pathway Tools instead of using padmet to create sbml
+--standalone          Instruct Pathway-Tools (>= 27.0) to operate in standalone mode, limiting internet queries.
 
 The input genomic data has to follow a strict structure:
 
@@ -785,6 +786,7 @@ Optional arguments:
 -m file                host metabolic network SBML file
 --pwt-xml        extract xml from Pathway Tools instead of using padmet to create sbml
 --target-com-scope           Instead of the addedvalue, use the community scope as targets for mincom
+--standalone          Instruct Pathway-Tools (>= 27.0) to operate in standalone mode, limiting internet queries.
 
 You can run the workflow analysis with the two genbanks files available in the `Github repository <https://github.com/AuReMe/metage2metabo/tree/main/metage2metabo>`__ (`workflow_data`). Two genomes are available in the compressed archive `workflow_genomes.tar.gz`. The archive has to be uncompressed before testing.
 

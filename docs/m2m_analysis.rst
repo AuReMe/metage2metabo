@@ -13,7 +13,7 @@ m2m_analysis needs:
 * These python packages:
 
     * `networkx <https://github.com/networkx/networkx>`__: to create graph from miscoto results
-    * `ete3 <https://github.com/etetoolkit/ete>`__: to add taxonomy information on the graph if you used mpwt taxon file
+    * `ete4 <https://github.com/etetoolkit/ete>`__: to add taxonomy information on the graph if you used mpwt taxon file
     * `powergrasp <https://github.com/Aluriak/PowerGrASP>`__: to compress networkx graph (which required `graphviz <https://github.com/graphp/graphviz>`__)
 
 Presentation

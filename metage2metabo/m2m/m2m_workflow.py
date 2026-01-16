@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2019-2024 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
+# Copyright (C) 2019-2026 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -33,7 +33,8 @@ from metage2metabo.m2m.minimal_community import mincom
 logger = logging.getLogger(__name__)
 
 
-def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_bool, host_mn, targets_file, use_pwt_xml, target_com_scope=None):
+def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_bool, host_mn, targets_file, use_pwt_xml, target_com_scope=None,
+                 standalone=None):
     """Run the whole m2m workflow.
     
     Args:
@@ -48,9 +49,10 @@ def run_workflow(inp_dir, out_dir, nb_cpu, clean, seeds, noorphan_bool, padmet_b
         targets_file (str): targets file
         use_pwt_xml (bool): use Pathway Tools XML instead of creating them with padmet
         target_com_scope (bool): if True, will use all metabolties in com_scope as targets for minimal community predictions.
+        standalone (bool): use standalone mode of Pathway Tools
     """
     # METABOLIC NETWORK RECONSTRUCTION
-    sbml_dir = recon(inp_dir, out_dir, noorphan_bool, padmet_bool, 2, nb_cpu, clean, use_pwt_xml)[1]
+    sbml_dir = recon(inp_dir, out_dir, noorphan_bool, padmet_bool, 2, nb_cpu, clean, use_pwt_xml, standalone)[1]
 
     # METABOLISM COMMUNITY ANALYSIS
     metacom_analysis(sbml_dir, out_dir, seeds, host_mn, targets_file, nb_cpu, target_com_scope)

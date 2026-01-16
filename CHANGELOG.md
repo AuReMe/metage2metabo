@@ -1,5 +1,22 @@
 # Changelog
 
+# Metage2Metabo v1.6.2 (2026-01-16)
+
+## Add
+
+* `standalone` option to mpwt (limiting the number of internet queries done by Pathway Tools), warning this requires mpwt version `>=0.8.8`.
+
+## Fix
+
+* Fix an issue with ete3 and move to ete4.
+* Fix an issue with new version of mpwt missing argument `no_download_articles` since version `0.8.8` (issue #69).
+* Fix a warning in test with an invalid escape character.
+
+## Modify
+
+* Update license year.
+* Move support for CI to Python 3.11 and update GitHub action versions to fix issue with MacOS runners.
+
 # Metage2Metabo v1.6.1 (2024-04-05)
 
 ## Fix
