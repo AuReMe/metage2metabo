@@ -4,6 +4,6 @@ clyngor-with-clingo>=5.3.post1
 ete4>=4.1.1
 MeneTools>=3.4.0
 Miscoto>=3.2.0
-mpwt>=0.8.6
+mpwt>=0.8.8
 padmet>=5.0.1
 powergrasp>=0.8.18

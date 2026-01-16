@@ -2,6 +2,10 @@
 
 # Metage2Metabo v1.6.2 (2026-04-16)
 
+## Add
+
+* `standalone` option to mpwt (limiting the number of internet queries done by Pathway Tools), warning this requires mpwt version `>=0.8.8`.
+
 ## Fix
 
 * Fix an issue with ete3 and move to ete4.
