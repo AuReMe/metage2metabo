@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2025 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
+# Copyright (C) 2019-2026 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -167,7 +167,6 @@ def genomes_to_pgdb(genomes_dir, output_dir, cpu, clean, use_pwt_xml):
                         patho_inference=True,
                         patho_hole_filler=False,
                         patho_operon_predictor=False,
-                        no_download_articles=False,
                         flat_creation=True,
                         dat_extraction=move_dat,
                         xml_extraction=move_xml,

@@ -28,7 +28,7 @@ def test_create_species_sbml():
 
 
 def test_create_species_sbml_invalid_id():
-    metabolites = set(['M_A+_c', 'M_B_\c', 'M_C!=_c', 'M_D_c'])
+    metabolites = set(['M_A+_c', 'M_B_\\c', 'M_C!=_c', 'M_D_c'])
     metabolite_file = os.path.join('test_metabolite.sbml')
 
     with pytest.raises(SystemExit) as pytest_exit:

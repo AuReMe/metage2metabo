@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2025 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
+# Copyright (C) 2019-2026 Clémence Frioux & Arnaud Belcour - Inria Dyliss - Pleiade - Microcosme
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -16,7 +16,6 @@ import argparse
 import logging
 import json
 import os
-import pkg_resources
 import re
 import subprocess
 import sys

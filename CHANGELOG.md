@@ -1,15 +1,17 @@
 # Changelog
 
-# Metage2Metabo v1.6.2 (2025-05-16)
+# Metage2Metabo v1.6.2 (2026-04-16)
 
 ## Fix
 
 * Fix an issue with ete3 and move to ete4.
+* Fix an issue with new version of mpwt missing argument `no_download_articles` since version `0.8.8` (issue #69).
+* Fix a warning in test with an invalid escape character.
 
 ## Modify
 
 * Update license year.
-* Move support for CI to Python 3.9 and 3.10.
+* Move support for CI to Python 3.11 and update GitHub action versions to fix issue with MacOS runners.
 
 # Metage2Metabo v1.6.1 (2024-04-05)
 
