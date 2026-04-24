@@ -116,6 +116,12 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_
 
 
 def extract_data_from_manual(manual_taxon, taxon_output_file):
+    """From a file linking genome ID to selected taxon name, extract taxon name and generate a tabulated file
+
+    Args:
+        manual_taxon (str): tsv/csv file linking genome ID to taxon name
+        taxon_output_file (str): path to taxon name output file
+    """
     taxonomy_file_datas = []
     taxon_count = {}
     if manual_taxon.endswith('.tsv'):

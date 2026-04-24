@@ -37,6 +37,7 @@ def run_analysis_workflow(sbml_folder, target_folder_file, seed_file, output_dir
         oog_jar (str): path to OOG jar file
         host_file (str): metabolic network file for host
         taxonomy_level (str): taxonomy level, must be: phylum, class, order, family, genus or species.
+        manual_taxon (str): tsv/csv file linking genome ID to taxon name.
     """
     starttime = time.time()
 
@@ -44,7 +45,7 @@ def run_analysis_workflow(sbml_folder, target_folder_file, seed_file, output_dir
 
     gml_output = graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file, taxonomy_level, manual_taxon)
 
-    powergraph_analysis(json_file_folder, gml_output, output_dir, oog_jar, taxon_file, taxonomy_level, manual_taxon)
+    powergraph_analysis(json_file_folder, gml_output, output_dir, oog_jar, taxon_file, taxonomy_level, manual_taxon=manual_taxon)
 
     logger.info(
         '--- m2m_analysis runtime %.2f seconds ---\n' % (time.time() - starttime))

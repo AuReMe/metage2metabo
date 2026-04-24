@@ -103,7 +103,6 @@ def test_m2m_analysis_call():
         respath, '-t', targets_path, '-s', seeds_path,
         '-q'])
 
-
     # KEY SPECIES ANALYSIS
     with open(json_file, 'r') as json_data:
         d_m2m_analysis = json.load(json_data)
@@ -267,5 +266,115 @@ def test_m2m_analysis_workflow_manual_taxon():
         assert sorted(output_data[species_type]) == sorted(expected_results[species_type])
 
 
+def test_m2m_analysis_enum_graph_powergraph_taxon_phylum():
+    """
+    Test m2m analysis when called in terminal.
+    """
+    # RUN THE COMMAND
+    inppath = 'metabolic_data'
+    respath = 'm2m_analysis_output'
+    draft_path = os.path.join(respath, 'toy_bact')
+    draft_tgz_path = os.path.join(inppath, 'toy_bact.tar.gz')
+    seeds_path = os.path.join(inppath, 'seeds_toy.sbml')
+    targets_path = os.path.join(inppath, 'targets_toy.sbml')
+    taxon_file_path = os.path.join(inppath, 'taxon_id.tsv')
+
+    html_file_path = os.path.join(*[respath, 'html', 'targets_toy_powergraph.html'])
+
+    if not os.path.exists(respath):
+        os.makedirs(respath)
+    utils.safe_tar_extract_all(draft_tgz_path, respath)
+
+    subprocess.call([
+        'm2m_analysis', 'enum', '-n', draft_path, '-o',
+        respath, '-t', targets_path, '-s', seeds_path, '-q'])
+    json_path = os.path.join(respath, 'json')
+    subprocess.call([
+        'm2m_analysis', 'graph', '-j', json_path, '-o',
+        respath, '-t', targets_path, '--taxon',
+        '--level', 'phylum',
+        taxon_file_path, '-q'])
+    gml_path = os.path.join(respath, 'gml')
+    subprocess.call([
+        'm2m_analysis', 'powergraph', '-g', gml_path, '-j', json_path,
+        '-o', respath, '--taxon', taxon_file_path,
+        '--level', 'phylum', '-q'])
+
+    expected_results = {'essential': ['Actinomycetota__4', 'Actinomycetota__5', 'Bacillota__1',
+                                      'Bacillota__2', 'Bacillota__3', 'Bacillota__4',
+                                      'Bacillota__5', 'Bacillota__6', 'Bacteroidota__1',
+                                      'Bacteroidota__2', 'Pseudomonadota__1', 'Pseudomonadota__2'],
+                    'alternative': ['Actinomycetota__1', 'Actinomycetota__2', 'Actinomycetota__3',
+                                    'Actinomycetota__6', 'Actinomycetota__7']}
+    output_data = {}
+    with open(html_file_path, 'r') as output_file:
+        for line in output_file:
+            if "data: { 'id'" in line:
+                species_id = line.split("'id':")[1].split(',')[0].split("'")[1]
+                if 'PWRN-' not in species_id:
+                    species_type = line.split("'type':")[1].split(',')[0].split("'")[1]
+                    if species_type not in output_data:
+                        output_data[species_type] = [species_id]
+                    else:
+                        output_data[species_type].append(species_id)
+
+    for species_type in output_data:
+        assert sorted(output_data[species_type]) == sorted(expected_results[species_type])
+
+
+def test_m2m_analysis_enum_graph_powergraph_manual_taxon():
+    """
+    Test m2m analysis when called in terminal.
+    """
+    # RUN THE COMMAND
+    inppath = 'metabolic_data'
+    respath = 'm2m_analysis_output'
+    draft_path = os.path.join(respath, 'toy_bact')
+    draft_tgz_path = os.path.join(inppath, 'toy_bact.tar.gz')
+    seeds_path = os.path.join(inppath, 'seeds_toy.sbml')
+    targets_path = os.path.join(inppath, 'targets_toy.sbml')
+    taxon_manual_file_path = os.path.join(inppath, 'manual_taxon_name.tsv')
+
+    html_file_path = os.path.join(*[respath, 'html', 'targets_toy_powergraph.html'])
+
+    if not os.path.exists(respath):
+        os.makedirs(respath)
+    utils.safe_tar_extract_all(draft_tgz_path, respath)
+
+    subprocess.call([
+        'm2m_analysis', 'enum', '-n', draft_path, '-o',
+        respath, '-t', targets_path, '-s', seeds_path, '-q'])
+    json_path = os.path.join(respath, 'json')
+    subprocess.call([
+        'm2m_analysis', 'graph', '-j', json_path, '-o',
+        respath, '-t', targets_path, '--manual-taxon',
+        taxon_manual_file_path, '-q'])
+    gml_path = os.path.join(respath, 'gml')
+    subprocess.call([
+        'm2m_analysis', 'powergraph', '-g', gml_path, '-j', json_path,
+        '-o', respath, '--manual-taxon', taxon_manual_file_path, '-q'])
+
+    expected_results = {'essential': ['Actinomycetota__4', 'Actinomycetota__5', 'Bacillota__1',
+                                      'Bacillota__2', 'Bacillota__3', 'Bacillota__4',
+                                      'Bacillota__5', 'Bacillota__6', 'Bacteroidota__1',
+                                      'Bacteroidota__2', 'Pseudomonadota__1', 'Pseudomonadota__2'],
+                    'alternative': ['Actinomycetota__1', 'Actinomycetota__2', 'Actinomycetota__3',
+                                    'Actinomycetota__6', 'Actinomycetota__7']}
+    output_data = {}
+    with open(html_file_path, 'r') as output_file:
+        for line in output_file:
+            if "data: { 'id'" in line:
+                species_id = line.split("'id':")[1].split(',')[0].split("'")[1]
+                if 'PWRN-' not in species_id:
+                    species_type = line.split("'type':")[1].split(',')[0].split("'")[1]
+                    if species_type not in output_data:
+                        output_data[species_type] = [species_id]
+                    else:
+                        output_data[species_type].append(species_id)
+
+    for species_type in output_data:
+        assert sorted(output_data[species_type]) == sorted(expected_results[species_type])
+
+
 if __name__ == "__main__":
-    test_m2m_analysis_workflow_manual_taxon()
+    test_m2m_analysis_enum_graph_powergraph_manual_taxon()

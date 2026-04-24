@@ -205,7 +205,7 @@ def main():
         help="powergraph creation and visualization",
         parents=[
             parent_parser_j, parent_parser_g, parent_parser_jar, parent_parser_q, parent_parser_taxon,
-            parent_parser_level, parent_parser_o
+            parent_parser_level, parent_parser_o, parent_parser_manual_taxon
         ],
         description=
         "Compress the GMl graph of solution and create a powergraph (bbl), a website format of the powergraph and a svg of the graph (if you use the --oog option)",
@@ -310,7 +310,7 @@ def main():
     elif args.cmd == "graph":
         main_graph(args.json, args.targets, args.out, args.taxon, args.level, args.manual_taxon)
     elif args.cmd == "powergraph":
-        main_powergraph(args.json, args.gml, args.out, args.oog, args.taxon, args.level, args.manual_taxon)
+        main_powergraph(args.json, args.gml, args.out, args.oog, args.taxon, args.level, True, args.manual_taxon)
 
     duration = time.time() - start_time
     dict_args= vars(args)
