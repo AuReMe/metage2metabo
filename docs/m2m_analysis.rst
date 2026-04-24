@@ -27,6 +27,10 @@ In a second step (``m2m_analysis graph``), the optimal solutions from the enumer
 
 The last step (``m2m_analysis powergraph``) compresses the graph into a power graph (in bbl format). Then it creates a svg picture of this power graph.
 
+During m2m_analysis workflow, you can change genome ID to taxon ID in order to have a taxonomic view of the results.
+There is two possibilities to achieve this, either with `--taxon` option that will use ete4 and NCBI Taxonomy to translate taxon ID from a tsv file into taxon name. You can find an example of such file in `test folder <https://github.com/AuReMe/metage2metabo/tree/main/testmetabolic_data/taxon_id.tsv>`__.
+
+The second possibility is with the option `--manual-taxon`, which expects a tabulated or comma-separated file indicating for each genome ID the associated taxon name. You can find an example of such file in `test folder <https://github.com/AuReMe/metage2metabo/tree/main/testmetabolic_data/manual_taxon_name.tsv>`__.
 
 m2m Tutorial
 ------------
@@ -139,6 +143,7 @@ Optional arguments:
 -q               quiet mode
 --taxon file           mpwt taxon file
 --level LEVEL         Taxonomy level, must be: phylum, class, order, family, genus or species. By default, it is phylum.
+--manual-taxon         TSV or CSV file assigning for each genome a taxon name.
 
 You can use the `taxon file from gut experience <https://github.com/AuReMe/metage2metabo/blob/main/article_data/gut_microbiota/taxon_id.tsv>`__.
 
@@ -191,6 +196,7 @@ Optional arguments:
 --oog file             Oog jar file (present in external_dependencies folder of the github repository)
 --taxon TAXON         Mpwt taxon file
 --level LEVEL         Taxonomy level, must be: phylum, class, order, family, genus or species. By default, it is phylum.
+--manual-taxon         TSV or CSV file assigning for each genome a taxon name.
 
 .. code:: sh
 
@@ -322,6 +328,7 @@ Optional arguments:
 --taxon file           mpwt taxon file
 --oog file             Oog jar file
 --level LEVEL         Taxonomy level, must be: phylum, class, order, family, genus or species. By default, it is phylum.
+--manual-taxon         TSV or CSV file assigning for each genome a taxon name.
 
 .. code:: sh
 

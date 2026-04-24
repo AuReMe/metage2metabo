@@ -142,6 +142,12 @@ def main():
         help="Mpwt taxon file",
         required=False,
         default=None)
+    parent_parser_manual_taxon = argparse.ArgumentParser(add_help=False)
+    parent_parser_manual_taxon.add_argument(
+        "--manual-taxon",
+        help="Manual selected taxon file",
+        required=False,
+        default=None)
     parent_parser_j = argparse.ArgumentParser(add_help=False)
     parent_parser_j.add_argument(
         "-j",
@@ -190,7 +196,7 @@ def main():
         help="graph creation with enumeration solution",
         parents=[
             parent_parser_j, parent_parser_o, parent_parser_t, parent_parser_taxon, parent_parser_q,
-            parent_parser_level
+            parent_parser_level, parent_parser_manual_taxon
         ],
         description="Create the solution graph using the JSON from miscoto enumeration",
         allow_abbrev=False)
@@ -210,7 +216,7 @@ def main():
         help="whole workflow",
         parents=[
             parent_parser_s, parent_parser_n, parent_parser_t, parent_parser_m, parent_parser_o, parent_parser_jar,
-            parent_parser_taxon, parent_parser_q, parent_parser_level
+            parent_parser_taxon, parent_parser_q, parent_parser_level, parent_parser_manual_taxon
         ],
         description=
         "Run the whole workflow: miscoto enumeration, graph on solution and powergraph creation",
@@ -298,13 +304,13 @@ def main():
     # deal with given subcommand
     if args.cmd == "workflow":
         main_analysis_workflow(network_dir, args.targets, args.seeds, args.out, args.taxon,
-                                args.oog, new_arg_modelhost, args.level)
+                                args.oog, new_arg_modelhost, args.level, args.manual_taxon)
     elif args.cmd == "enum":
         main_enumeration(network_dir, args.targets, args.seeds, args.out, new_arg_modelhost)
     elif args.cmd == "graph":
-        main_graph(args.json, args.targets, args.out, args.taxon, args.level)
+        main_graph(args.json, args.targets, args.out, args.taxon, args.level, args.manual_taxon)
     elif args.cmd == "powergraph":
-        main_powergraph(args.json, args.gml, args.out, args.oog, args.taxon, args.level)
+        main_powergraph(args.json, args.gml, args.out, args.oog, args.taxon, args.level, args.manual_taxon)
 
     duration = time.time() - start_time
     dict_args= vars(args)

@@ -113,3 +113,30 @@ def extract_taxa(mpwt_taxon_file, taxon_output_file, tree_output_file, taxonomy_
 
     logger.info(
         "--- Taxonomy runtime %.2f seconds ---\n" % (time.time() - starttime))
+
+
+def extract_data_from_manual(manual_taxon, taxon_output_file):
+    taxonomy_file_datas = []
+    taxon_count = {}
+    if manual_taxon.endswith('.tsv'):
+        delimiter = '\t'
+    elif manual_taxon.endswith('.csv'):
+        delimiter = ','
+    with open(manual_taxon, "r", encoding="utf8") as open_manual_taxon:
+        csvreader = csv.reader(open_manual_taxon, delimiter=delimiter)
+        next(csvreader)
+        for line in csvreader:
+            organism_id = line[0]
+            taxon_number = line[1]
+            taxon = taxon_number.replace(' ', '_').replace('.', '')
+            if taxon not in taxon_count:
+                taxon_count[taxon] = 1
+            else:
+                taxon_count[taxon] += 1
+            taxonomy_file_datas.append([organism_id, taxon_number, taxon + '__' + str(taxon_count[taxon])])
+
+    with open(taxon_output_file, "w", encoding="utf8") as taxonomy_file:
+        csvwriter = csv.writer(taxonomy_file, delimiter="\t")
+        csvwriter.writerow(["organism_id", "taxid", "taxon_number"])
+        for taxonomy_file_data in taxonomy_file_datas:
+            csvwriter.writerow(taxonomy_file_data)

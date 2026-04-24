@@ -25,7 +25,7 @@ from metage2metabo.m2m_analysis.graph_compression import powergraph_analysis
 logger = logging.getLogger(__name__)
 
 
-def run_analysis_workflow(sbml_folder, target_folder_file, seed_file, output_dir, taxon_file, oog_jar, host_file=None, taxonomy_level="phylum"):
+def run_analysis_workflow(sbml_folder, target_folder_file, seed_file, output_dir, taxon_file, oog_jar, host_file=None, taxonomy_level="phylum", manual_taxon=None):
     """Run the whole m2m_analysis workflow
 
     Args:
@@ -42,9 +42,9 @@ def run_analysis_workflow(sbml_folder, target_folder_file, seed_file, output_dir
 
     json_file_folder = enumeration_analysis(sbml_folder, target_folder_file, seed_file, output_dir, host_file)
 
-    gml_output = graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file, taxonomy_level)
+    gml_output = graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file, taxonomy_level, manual_taxon)
 
-    powergraph_analysis(json_file_folder, gml_output, output_dir, oog_jar, taxon_file, taxonomy_level)
+    powergraph_analysis(json_file_folder, gml_output, output_dir, oog_jar, taxon_file, taxonomy_level, manual_taxon)
 
     logger.info(
         '--- m2m_analysis runtime %.2f seconds ---\n' % (time.time() - starttime))
