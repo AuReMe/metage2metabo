@@ -11,9 +11,11 @@ import shutil
 import subprocess
 import json
 import networkx as nx
+import pytest
 import sys
 
 from metage2metabo.m2m_analysis.enumeration import extract_groups_from_enumeration
+from metage2metabo.m2m_analysis.m2m_analysis_workflow import run_analysis_workflow
 from metage2metabo import utils
 
 KEY_SPECIES = ['GCA_003437665', 'GCA_003437785', 'GCA_003437345',
@@ -376,5 +378,30 @@ def test_m2m_analysis_enum_graph_powergraph_manual_taxon():
         assert sorted(output_data[species_type]) == sorted(expected_results[species_type])
 
 
+def test_m2m_analysis_enum_graph_powergraph_taxon_manual_taxon():
+    # Check that --taxon and --manual-taxon options can not be launched together.
+    inppath = 'metabolic_data'
+    respath = 'm2m_analysis_output'
+    draft_path = os.path.join(respath, 'toy_bact')
+    draft_tgz_path = os.path.join(inppath, 'toy_bact.tar.gz')
+    seeds_path = os.path.join(inppath, 'seeds_toy.sbml')
+    targets_path = os.path.join(inppath, 'targets_toy.sbml')
+    taxon_manual_file_path = os.path.join(inppath, 'manual_taxon_name.tsv')
+    taxon_id_file_path = os.path.join(inppath, 'taxon_id.tsv')
+
+    if not os.path.exists(respath):
+        os.makedirs(respath)
+    utils.safe_tar_extract_all(draft_tgz_path, respath)
+
+    with pytest.raises(SystemExit) as pytest_raise:
+        run_analysis_workflow(draft_path, targets_path, seeds_path, respath,
+            taxon_file=taxon_id_file_path, manual_taxon=taxon_manual_file_path)
+
+    assert pytest_raise.type == SystemExit
+    assert pytest_raise.value.code == 1
+
+    shutil.rmtree(respath)
+
+
 if __name__ == "__main__":
-    test_m2m_analysis_enum_graph_powergraph_manual_taxon()
+    test_m2m_analysis_enum_graph_powergraph_taxon_manual_taxon()

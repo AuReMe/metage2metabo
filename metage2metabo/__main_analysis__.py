@@ -310,7 +310,8 @@ def main():
     elif args.cmd == "graph":
         main_graph(args.json, args.targets, args.out, args.taxon, args.level, args.manual_taxon)
     elif args.cmd == "powergraph":
-        main_powergraph(args.json, args.gml, args.out, args.oog, args.taxon, args.level, True, args.manual_taxon)
+        test_powergraph = True
+        main_powergraph(args.json, args.gml, args.out, args.oog, args.taxon, args.level, test_powergraph, args.manual_taxon)
 
     duration = time.time() - start_time
     dict_args= vars(args)

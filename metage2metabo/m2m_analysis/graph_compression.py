@@ -142,6 +142,10 @@ def powergraph_analysis(enumeration_json_folder, gml_input_file_folder, output_f
     "#866097","#365D25","#252F99","#00CCFF","#674E60","#FC009C",
     "#92896B"]
 
+    if taxon_file and manual_taxon:
+        logger.critical('It is not possible to give at the same time options --taxon and --manual-taxon. Specify only one.')
+        sys.exit(1)
+
     if taxon_file and manual_taxon is None:
         taxonomy_output_file = os.path.join(output_folder, 'taxonomy_species.tsv')
         tree_output_file = os.path.join(output_folder, 'taxon_tree.txt')

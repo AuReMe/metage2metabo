@@ -54,6 +54,10 @@ def graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file=
 
     gml_output = os.path.join(output_dir, 'gml')
 
+    if taxon_file and manual_taxon:
+        logger.critical('It is not possible to give at the same time options --taxon and --manual-taxon. Specify only one.')
+        sys.exit(1)
+
     if taxon_file and manual_taxon is None:
         taxonomy_output_file = os.path.join(output_dir, 'taxonomy_species.tsv')
         tree_output_file = os.path.join(output_dir, 'taxon_tree.txt')
