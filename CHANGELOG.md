@@ -1,5 +1,11 @@
 # Changelog
 
+# Metage2Metabo v1.6.3 (2026-05-26)
+
+## Add
+
+* `--manual-taxon` option to `m2m_analysis` to give a manually assigned taxon name file instead of relying on ete4 and NCBI Taxonomy.
+
 # Metage2Metabo v1.6.2 (2026-01-16)
 
 ## Add

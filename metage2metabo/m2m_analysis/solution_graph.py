@@ -22,13 +22,13 @@ import time
 
 from itertools import combinations
 from metage2metabo import utils, sbml_management
-from metage2metabo.m2m_analysis.taxonomy import get_taxon, extract_taxa
+from metage2metabo.m2m_analysis.taxonomy import get_taxon, extract_taxa, extract_data_from_manual
 from operator import add
 
 logger = logging.getLogger(__name__)
 
 
-def graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file=None, taxonomy_level="phylum"):
+def graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file=None, taxonomy_level="phylum", manual_taxon=None):
     """Run the graph creation on miscoto output
 
     Args:
@@ -37,6 +37,7 @@ def graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file=
         output_dir (str): results directory
         taxon_file (str): mpwt taxon file for species in sbml folder
         taxonomy_level (str): taxonomy level, must be: phylum, class, order, family, genus or species.
+        manual_taxon (str): manual taxonomy file associating genome and manual indicated taxa.
 
     Returns:
         str: path to folder containing gml results
@@ -53,10 +54,17 @@ def graph_analysis(json_file_folder, target_folder_file, output_dir, taxon_file=
 
     gml_output = os.path.join(output_dir, 'gml')
 
-    if taxon_file:
+    if taxon_file and manual_taxon:
+        logger.critical('It is not possible to give at the same time options --taxon and --manual-taxon. Specify only one.')
+        sys.exit(1)
+
+    if taxon_file and manual_taxon is None:
         taxonomy_output_file = os.path.join(output_dir, 'taxonomy_species.tsv')
         tree_output_file = os.path.join(output_dir, 'taxon_tree.txt')
         extract_taxa(taxon_file, taxonomy_output_file, tree_output_file, taxonomy_level)
+    elif manual_taxon is not None and taxon_file is None:
+        taxonomy_output_file = os.path.join(output_dir, 'taxonomy_species.tsv')
+        extract_data_from_manual(manual_taxon, taxonomy_output_file)
     else:
         taxonomy_output_file = None
 
@@ -75,7 +83,7 @@ def create_gml(json_paths, target_paths, output_dir, taxon_file=None):
         json_paths (str): {target: path_to_corresponding_json}
         target_paths (str): {target: path_to_corresponding_sbml}
         output_dir (str): results directory
-        taxon_file (str): mpwt taxon file for species in sbml folder
+        taxon_file (str): taxon linking organism ID and taxon name in sbml folder
     """
     miscoto_stat_output = os.path.join(output_dir, 'miscoto_stats.txt')
     key_species_stats_output = os.path.join(output_dir,'key_species_stats.tsv')

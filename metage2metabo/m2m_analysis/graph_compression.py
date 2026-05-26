@@ -29,7 +29,7 @@ from functools import reduce
 
 from bubbletools import convert, BubbleTree
 from metage2metabo import utils
-from metage2metabo.m2m_analysis.taxonomy import extract_taxa, get_taxon
+from metage2metabo.m2m_analysis.taxonomy import extract_taxa, get_taxon, extract_data_from_manual
 from metage2metabo.m2m_analysis.enumeration import extract_groups_from_enumeration, convert_groups_to_equation
 
 # Deactivate clingo module to avoid issue like this one:
@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 
 
 def powergraph_analysis(enumeration_json_folder, gml_input_file_folder, output_folder, oog_jar=None,
-                        taxon_file=None, taxonomy_level="phylum", test_powergraph=True):
+                        taxon_file=None, taxonomy_level="phylum", test_powergraph=True, manual_taxon=None):
     """Run the graph compression and picture creation
 
     Args:
@@ -52,6 +52,7 @@ def powergraph_analysis(enumeration_json_folder, gml_input_file_folder, output_f
         taxon_file (str): mpwt taxon file for species
         taxonomy_level (str): taxonomy level, must be: phylum, class, order, family, genus or species
         test_powergraph (bool): boolean to decide if the powergraph combinations must be tested to check for use of heuristics
+        manual_taxon (str): tsv/csv file linking genome ID to taxon name.
     """
     starttime = time.time()
     logger.info('\n###############################################')
@@ -141,13 +142,24 @@ def powergraph_analysis(enumeration_json_folder, gml_input_file_folder, output_f
     "#866097","#365D25","#252F99","#00CCFF","#674E60","#FC009C",
     "#92896B"]
 
-    if taxon_file is not None:
+    if taxon_file and manual_taxon:
+        logger.critical('It is not possible to give at the same time options --taxon and --manual-taxon. Specify only one.')
+        sys.exit(1)
+
+    if taxon_file and manual_taxon is None:
         taxonomy_output_file = os.path.join(output_folder, 'taxonomy_species.tsv')
         tree_output_file = os.path.join(output_folder, 'taxon_tree.txt')
         if not os.path.exists(taxonomy_output_file):
             extract_taxa(taxon_file, taxonomy_output_file, tree_output_file, taxonomy_level)
 
         taxon_species, all_taxons = get_taxon(taxonomy_output_file)
+    elif taxon_file is None and manual_taxon is not None:
+        taxonomy_output_file = os.path.join(output_folder, 'taxonomy_species.tsv')
+        extract_data_from_manual(manual_taxon, taxonomy_output_file)
+        taxon_species, all_taxons = get_taxon(taxonomy_output_file)
+    else:
+        taxon_species = None
+        all_taxons = None
 
     for target_name in gml_paths:
         bbl_output = os.path.join(bbl_path, target_name + '.bbl')
@@ -167,8 +179,6 @@ def powergraph_analysis(enumeration_json_folder, gml_input_file_folder, output_f
         enumeration_json_file = enumeration_json_paths[target_name]
         if test_powergraph is True:
             output_minimal_equations_folder = os.path.join(minimal_equation_output, target_name)
-            if taxon_file is None:
-                taxon_species = None
             test_powergraph_heuristics(enumeration_json_file, bbl_output, output_minimal_equations_folder, taxon_species)
 
         logger.info('######### PowerGraph visualization: ' + target_name + ' #########')
@@ -177,7 +187,7 @@ def powergraph_analysis(enumeration_json_folder, gml_input_file_folder, output_f
         essentials = [organism for organism in graph.nodes if graph.nodes[organism]['note'] == 'ES']
         alternatives = [organism for organism in graph.nodes if graph.nodes[organism]['note'] == 'AS']
 
-        if taxon_file:
+        if taxon_file or manual_taxon:
             key_species = essentials + alternatives
             taxon_key_species = set([organism.split('__')[0] for organism in key_species])
             if len(set(all_taxons).intersection(taxon_key_species)) == 0:
@@ -198,7 +208,7 @@ def powergraph_analysis(enumeration_json_folder, gml_input_file_folder, output_f
                 taxon_colors[taxon] = used_colors[index]
 
         bbl_to_html(bbl_output, html_target)
-        if taxon_file:
+        if taxon_file or manual_taxon:
             if os.path.exists(html_target +'_taxon'):
                 shutil.rmtree(html_target +'_taxon')
             shutil.copytree(html_target, html_target +'_taxon')
