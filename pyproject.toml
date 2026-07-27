@@ -4,18 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "Metage2Metabo"
-dynamic = ["version"]
+dynamic = ["version", "dependencies"]
 authors = [{name = "AuReMe", email = "gem-aureme@inria.fr"}]
 readme = "README.md"
 description = "Automatic reconstruction of draft metabolic networks with Pathway Tools and graph-based metabolic analysis"
 license = {text = "LGPL-3.0-or-later"}
 requires-python = ">= 3.8"
-dependencies = [
-  'miscoto',
-  'menetools',
-  'mpwt',
-  'padmet'
-]
 
 [project.scripts]
 m2m = "metage2metabo.__main__:main"
