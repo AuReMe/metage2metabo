@@ -20,6 +20,6 @@ Inria Bordeaux Sud Ouest<br/>
 Contact : clemence DOT frioux AT inria DOT fr
 
 
-## INCLUDED SOFTWARE
+## ADDITIONAL SOFTWARE REQUIRED TO RUN Metage2Metabo
 
 The Pathway Tools software is provided under this [license](https://biocyc.org/download-bundle.shtml). The MetaCyc database is delivered under this [license](https://metacyc.org/download.shtml).
